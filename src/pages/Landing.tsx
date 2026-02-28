@@ -1,38 +1,59 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Skull, TrendingUp, Video, Hash, ArrowRight, BarChart3, Zap, Globe } from "lucide-react";
+import { Skull, TrendingUp, Video, Hash, ArrowRight, BarChart3, Zap, Globe, Sparkles, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
 
-const features = [
+interface FeatureItem {
+  icon: any;
+  title: string;
+  description: string;
+  link: string;
+  requiresAuth: boolean;
+}
+
+const features: FeatureItem[] = [
   {
     icon: TrendingUp,
     title: "Google Trends Tracking",
     description: "Monitor real-time funeral-related search trends with volume data and sparkline charts.",
+    link: "/dashboard",
+    requiresAuth: false,
   },
   {
     icon: BarChart3,
     title: "Reddit Sentiment",
     description: "Track Reddit discussions with sentiment analysis, upvotes, and engagement metrics.",
+    link: "/dashboard",
+    requiresAuth: false,
   },
   {
     icon: Video,
     title: "AI Video Ideas",
     description: "Generate short-form video content ideas powered by AI, based on trending topics.",
+    link: "/video-ideas",
+    requiresAuth: true,
   },
   {
     icon: Hash,
     title: "Hashtag Intelligence",
     description: "TikTok and Instagram hashtag tracking with growth rates and category analysis.",
+    link: "/hashtags",
+    requiresAuth: false,
   },
   {
     icon: Globe,
     title: "Keyword Watchlist",
     description: "Save keywords to your personal watchlist and get notified on volume spikes.",
+    link: "/dashboard",
+    requiresAuth: false,
   },
   {
     icon: Zap,
     title: "Script Generation",
     description: "One-click AI script generation for any video idea - ready to record or customize for your funeral home.",
+    link: "/video-ideas",
+    requiresAuth: true,
   },
 ];
 
@@ -44,6 +65,26 @@ const stats = [
 ];
 
 const Landing = () => {
+  const { user, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
+  const isAuthenticated = authLoading || !!user;
+
+  const handleFeatureClick = (feature: FeatureItem) => {
+    if (feature.requiresAuth && !isAuthenticated) {
+      navigate("/auth");
+    } else {
+      navigate(feature.link);
+    }
+  };
+
+  const handleGenerateIdeas = () => {
+    if (!isAuthenticated) {
+      navigate("/auth");
+    } else {
+      navigate("/video-ideas");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Nav */}
@@ -59,11 +100,13 @@ const Landing = () => {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <Link to="/auth">
-              <Button variant="ghost" size="sm" className="text-muted-foreground text-xs">
-                Sign In
-              </Button>
-            </Link>
+            {!authLoading && !user && (
+              <Link to="/auth">
+                <Button variant="ghost" size="sm" className="text-muted-foreground text-xs">
+                  Sign In
+                </Button>
+              </Link>
+            )}
             <Link to="/dashboard">
               <Button size="sm" className="text-xs font-semibold gap-1">
                 Open Dashboard <ArrowRight className="h-3.5 w-3.5" />
@@ -95,17 +138,29 @@ const Landing = () => {
             <p className="text-lg text-muted-foreground mb-8 max-w-xl mx-auto leading-relaxed">
               Real-time search trends. Social listening from Reddit. AI-powered video ideas. Customizable scroll-stopping scripts. Hashtag intelligence - all in one dashboard for the funeral profession.
             </p>
-            <div className="flex items-center justify-center gap-3">
+            <div className="flex items-center justify-center gap-3 flex-wrap">
               <Link to="/dashboard">
                 <Button size="lg" className="font-semibold gap-2 px-6 bg-tertiary text-tertiary-foreground hover:bg-tertiary/90">
                   Explore Dashboard <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
-              <Link to="/auth">
-                <Button variant="outline" size="lg" className="font-semibold px-6 border-border text-muted-foreground hover:text-foreground">
-                  Create Account
-                </Button>
-              </Link>
+              <Button
+                size="lg"
+                variant="outline"
+                onClick={handleGenerateIdeas}
+                className="font-semibold gap-2 px-6 border-secondary/50 text-secondary hover:bg-secondary/10"
+              >
+                <Sparkles className="h-4 w-4" />
+                Generate Video Ideas
+                {!isAuthenticated && <Lock className="h-3 w-3 ml-1 text-muted-foreground" />}
+              </Button>
+              {!authLoading && !user && (
+                <Link to="/auth">
+                  <Button variant="ghost" size="lg" className="font-semibold px-6 text-muted-foreground hover:text-foreground">
+                    Create Account
+                  </Button>
+                </Link>
+              )}
             </div>
           </motion.div>
 
@@ -151,13 +206,24 @@ const Landing = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.08, duration: 0.5 }}
-                className="section-panel hover:border-tertiary/30 transition-colors group"
+                onClick={() => handleFeatureClick(feature)}
+                className="section-panel hover:border-tertiary/30 transition-colors group cursor-pointer"
               >
-                <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                  <feature.icon className="h-4.5 w-4.5 text-primary" />
+                <div className="flex items-start justify-between mb-4">
+                  <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <feature.icon className="h-4.5 w-4.5 text-primary" />
+                  </div>
+                  {feature.requiresAuth && !isAuthenticated && (
+                    <span className="text-[10px] text-muted-foreground flex items-center gap-1 px-2 py-0.5 rounded-full border border-border/50 bg-muted/30">
+                      <Lock className="h-2.5 w-2.5" /> Sign in
+                    </span>
+                  )}
                 </div>
-                <h3 className="font-display font-semibold text-foreground mb-2">{feature.title}</h3>
+                <h3 className="font-display font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">{feature.title}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
+                <div className="mt-3 flex items-center gap-1 text-xs text-muted-foreground group-hover:text-primary transition-colors">
+                  Explore <ArrowRight className="h-3 w-3" />
+                </div>
               </motion.div>
             ))}
           </div>
@@ -179,11 +245,22 @@ const Landing = () => {
             <p className="text-muted-foreground mb-6 max-w-md mx-auto">
               Start exploring trends, generating content ideas, and tracking hashtags - completely free.
             </p>
-            <Link to="/dashboard">
-              <Button size="lg" className="font-semibold gap-2 px-8 bg-tertiary text-tertiary-foreground hover:bg-tertiary/90">
-                Get Started <ArrowRight className="h-4 w-4" />
+            <div className="flex items-center justify-center gap-3 flex-wrap">
+              <Link to="/dashboard">
+                <Button size="lg" className="font-semibold gap-2 px-8 bg-tertiary text-tertiary-foreground hover:bg-tertiary/90">
+                  Get Started <ArrowRight className="h-4 w-4" />
+                </Button>
+              </Link>
+              <Button
+                size="lg"
+                variant="outline"
+                onClick={handleGenerateIdeas}
+                className="font-semibold gap-2 px-6 border-secondary/50 text-secondary hover:bg-secondary/10"
+              >
+                <Sparkles className="h-4 w-4" />
+                Generate Video Ideas
               </Button>
-            </Link>
+            </div>
           </motion.div>
         </div>
       </section>
