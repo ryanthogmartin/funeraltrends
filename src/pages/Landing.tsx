@@ -199,33 +199,74 @@ const Landing = () => {
           </motion.div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {features.map((feature, i) => (
-              <motion.div
-                key={feature.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.08, duration: 0.5 }}
-                onClick={() => handleFeatureClick(feature)}
-                className="section-panel hover:border-tertiary/30 transition-colors group cursor-pointer"
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
-                    <feature.icon className="h-4.5 w-4.5 text-primary" />
-                  </div>
-                  {feature.requiresAuth && !isAuthenticated && (
-                    <span className="text-[10px] text-muted-foreground flex items-center gap-1 px-2 py-0.5 rounded-full border border-border/50 bg-muted/30">
-                      <Lock className="h-2.5 w-2.5" /> Sign in
-                    </span>
+            {features.map((feature, i) => {
+              const isLocked = feature.requiresAuth && !isAuthenticated;
+              return (
+                <motion.div
+                  key={feature.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.08, duration: 0.5 }}
+                  onClick={() => handleFeatureClick(feature)}
+                  className={`section-panel transition-all duration-300 group cursor-pointer relative overflow-hidden ${
+                    isLocked
+                      ? "hover:border-secondary/50 hover:shadow-[0_0_20px_-5px_hsl(var(--secondary)/0.2)]"
+                      : "hover:border-tertiary/30"
+                  }`}
+                >
+                  {/* Locked overlay gradient on hover */}
+                  {isLocked && (
+                    <div className="absolute inset-0 bg-gradient-to-t from-secondary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
                   )}
-                </div>
-                <h3 className="font-display font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">{feature.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
-                <div className="mt-3 flex items-center gap-1 text-xs text-muted-foreground group-hover:text-primary transition-colors">
-                  Explore <ArrowRight className="h-3 w-3" />
-                </div>
-              </motion.div>
-            ))}
+
+                  <div className="flex items-start justify-between mb-4 relative">
+                    <div className={`w-9 h-9 rounded-lg flex items-center justify-center transition-colors duration-300 ${
+                      isLocked
+                        ? "bg-secondary/10 group-hover:bg-secondary/20"
+                        : "bg-primary/10"
+                    }`}>
+                      <feature.icon className={`h-4.5 w-4.5 transition-colors duration-300 ${
+                        isLocked ? "text-secondary" : "text-primary"
+                      }`} />
+                    </div>
+                    {isLocked && (
+                      <motion.span
+                        className="flex items-center gap-1 px-2.5 py-1 rounded-full border border-secondary/30 bg-secondary/10 text-secondary text-[10px] font-medium"
+                        whileHover={{ scale: 1.05 }}
+                      >
+                        <Lock className="h-2.5 w-2.5" />
+                        Sign in to unlock
+                      </motion.span>
+                    )}
+                  </div>
+                  <h3 className={`font-display font-semibold mb-2 transition-colors duration-300 ${
+                    isLocked
+                      ? "text-foreground group-hover:text-secondary"
+                      : "text-foreground group-hover:text-primary"
+                  }`}>{feature.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
+                  <div className={`mt-3 flex items-center gap-1 text-xs transition-all duration-300 ${
+                    isLocked
+                      ? "text-muted-foreground group-hover:text-secondary"
+                      : "text-muted-foreground group-hover:text-primary"
+                  }`}>
+                    {isLocked ? (
+                      <>
+                        <Lock className="h-3 w-3" />
+                        <span className="group-hover:hidden">Requires account</span>
+                        <span className="hidden group-hover:inline">Sign in to get started</span>
+                        <ArrowRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </>
+                    ) : (
+                      <>
+                        Explore <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
+                      </>
+                    )}
+                  </div>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </section>
