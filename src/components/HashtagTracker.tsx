@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Hash, TrendingUp, TrendingDown, Loader2, Copy, Check, Flame, Leaf, Zap } from "lucide-react";
+import { Hash, TrendingUp, TrendingDown, Loader2, Copy, Check, Flame, Leaf, Zap, ExternalLink } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
@@ -69,7 +69,7 @@ const HashtagTracker = ({ trends }: HashtagTrackerProps) => {
         <h2 className="text-lg font-serif font-semibold text-foreground">
           TikTok Hashtag Tracker
         </h2>
-        <span className="text-xs text-muted-foreground ml-auto">Funeral-related hashtags</span>
+        <Badge variant="outline" className="ml-auto text-[10px] bg-muted/50 text-muted-foreground border-border">AI-Suggested</Badge>
       </div>
 
       {isLoading && (
@@ -102,6 +102,15 @@ const HashtagTracker = ({ trends }: HashtagTrackerProps) => {
                   <div className="flex items-center gap-1.5 mb-1">
                     <span className="text-sm font-semibold text-foreground truncate">{tag.hashtag}</span>
                     <CopyHashtag text={tag.hashtag} />
+                    <a
+                      href={`https://www.tiktok.com/tag/${tag.hashtag.replace('#', '')}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-1 rounded hover:bg-accent transition-colors text-muted-foreground hover:text-foreground"
+                      title="Verify on TikTok"
+                    >
+                      <ExternalLink className="h-3 w-3" />
+                    </a>
                   </div>
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     <span>{tag.views} views</span>
