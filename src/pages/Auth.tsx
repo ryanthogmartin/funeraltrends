@@ -72,15 +72,20 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4">
+    <div className="flex-1 flex items-center justify-center px-4 py-12">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-sm"
       >
-        <div className="flex items-center gap-3 mb-8 justify-center">
-          <Skull className="h-6 w-6 text-primary" />
-          <h1 className="text-2xl font-serif font-bold text-gradient-gold">Funeral Trends</h1>
+        <div className="flex items-center gap-2 mb-8 justify-center">
+          <Skull className="h-5 w-5 text-primary" />
+          <div>
+            <span className="font-display font-bold text-foreground text-lg tracking-tight">
+              Funeral<span className="text-primary">Trends</span>
+            </span>
+            <p className="text-[9px] text-muted-foreground leading-none -mt-0.5">powered by DISRUPT Media</p>
+          </div>
         </div>
 
         <div className="glass-card p-6">
