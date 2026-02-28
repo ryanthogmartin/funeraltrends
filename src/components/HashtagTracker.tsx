@@ -69,7 +69,7 @@ const HashtagTracker = ({ trends }: HashtagTrackerProps) => {
         <h2 className="text-lg font-display font-semibold text-foreground">
           TikTok Hashtag Tracker
         </h2>
-        <Badge variant="outline" className="ml-auto text-[10px] bg-muted/50 text-muted-foreground border-border">AI-Suggested</Badge>
+        <Badge variant="outline" className="ml-auto text-[10px] bg-tertiary/10 text-tertiary border-tertiary/30">AI-Suggested</Badge>
       </div>
 
       {isLoading && (
@@ -96,7 +96,7 @@ const HashtagTracker = ({ trends }: HashtagTrackerProps) => {
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: i * 0.05, duration: 0.3 }}
-                className="flex items-center gap-3 bg-accent/40 rounded-lg p-3 border border-border/50 hover:border-primary/30 transition-colors"
+                className="flex items-center gap-3 bg-accent/40 rounded-lg p-3 border border-border/50 hover:border-tertiary/30 transition-colors"
               >
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1.5 mb-1">

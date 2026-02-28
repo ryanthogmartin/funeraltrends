@@ -24,7 +24,7 @@ const RedditCard = ({ post, index }: RedditCardProps) => {
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: index * 0.06, duration: 0.4 }}
-        className="glass-card p-4 hover:border-primary/30 transition-all group cursor-pointer"
+        className="glass-card p-4 hover:border-tertiary/30 transition-all group cursor-pointer"
       >
         <div className="flex items-start gap-3">
           <div className="flex flex-col items-center gap-0.5 pt-0.5">
@@ -32,7 +32,7 @@ const RedditCard = ({ post, index }: RedditCardProps) => {
             <span className="text-xs font-mono text-foreground">{post.score >= 1000 ? `${(post.score / 1000).toFixed(1)}k` : post.score}</span>
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-foreground leading-snug group-hover:text-primary transition-colors">
+            <p className="text-sm font-medium text-foreground leading-snug group-hover:text-tertiary transition-colors">
               {post.title}
             </p>
             <div className="flex items-center gap-3 mt-2">

@@ -60,7 +60,7 @@ const TrendRow = ({ trend, index, rank, onAddToWatchlist, isAddingToWatchlist, a
           href={`https://trends.google.com/trends/explore?q=${encodeURIComponent(trend.keyword)}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-sm font-medium text-foreground truncate group-hover:text-primary transition-colors hover:underline block"
+          className="text-sm font-medium text-foreground truncate group-hover:text-tertiary transition-colors hover:underline block"
         >
           {trend.keyword}
         </a>

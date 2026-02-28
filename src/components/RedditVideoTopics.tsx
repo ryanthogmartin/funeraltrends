@@ -92,7 +92,7 @@ const RedditVideoTopics = ({ posts, isAuthenticated, onRequireAuth }: RedditVide
           <h2 className="text-lg font-display font-semibold text-foreground">
             Reddit-Inspired Video Ideas
           </h2>
-          <Sparkles className="h-4 w-4 text-accent-foreground" />
+          <Sparkles className="h-4 w-4 text-tertiary" />
           <span className="text-xs text-muted-foreground ml-auto">Based on Top 5 Reddit Post Discussions</span>
         </div>
 
@@ -127,7 +127,7 @@ const RedditVideoTopics = ({ posts, isAuthenticated, onRequireAuth }: RedditVide
                     variant="ghost"
                     size="sm"
                     onClick={() => handleGenerate25(group.post_title)}
-                    className="gap-1 text-[10px] h-6 text-muted-foreground hover:text-primary shrink-0 ml-2"
+                    className="gap-1 text-[10px] h-6 text-muted-foreground hover:text-tertiary shrink-0 ml-2"
                   >
                     <Sparkles className="h-3 w-3" />
                     25 More
