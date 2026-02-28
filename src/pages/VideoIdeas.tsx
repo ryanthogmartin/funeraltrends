@@ -9,7 +9,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 
 const VideoIdeas = () => {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const navigate = useNavigate();
 
   const { data: trends = mockTrends } = useQuery({
@@ -32,24 +32,24 @@ const VideoIdeas = () => {
       </div>
 
       <QuestionSeriesGenerator
-        isAuthenticated={!!user}
+        isAuthenticated={loading || !!user}
         onRequireAuth={() => navigate("/auth")}
       />
 
       <CustomKeywordTopics
-        isAuthenticated={!!user}
+        isAuthenticated={loading || !!user}
         onRequireAuth={() => navigate("/auth")}
       />
 
       <VideoTopics
         trends={trends}
-        isAuthenticated={!!user}
+        isAuthenticated={loading || !!user}
         onRequireAuth={() => navigate("/auth")}
       />
 
       <RedditVideoTopics
         posts={redditPosts}
-        isAuthenticated={!!user}
+        isAuthenticated={loading || !!user}
         onRequireAuth={() => navigate("/auth")}
       />
     </div>
