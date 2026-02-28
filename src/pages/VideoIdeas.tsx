@@ -1,5 +1,6 @@
 import VideoTopics from "@/components/VideoTopics";
 import RedditVideoTopics from "@/components/RedditVideoTopics";
+import CustomKeywordTopics from "@/components/CustomKeywordTopics";
 import { mockTrends, mockRedditPosts } from "@/lib/mockData";
 import { fetchTrends, fetchRedditPosts } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
@@ -28,6 +29,11 @@ const VideoIdeas = () => {
         <h1 className="text-2xl font-display font-bold text-foreground">Video Content Ideas</h1>
         <p className="text-sm text-muted-foreground mt-1">AI-generated short-form video ideas based on trending topics and Reddit discussions.</p>
       </div>
+
+      <CustomKeywordTopics
+        isAuthenticated={!!user}
+        onRequireAuth={() => navigate("/auth")}
+      />
 
       <VideoTopics
         trends={trends}
