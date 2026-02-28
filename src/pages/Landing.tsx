@@ -93,7 +93,7 @@ const Landing = () => {
               <span className="text-gradient-primary">before they peak</span>
             </h1>
             <p className="text-lg text-muted-foreground mb-8 max-w-xl mx-auto leading-relaxed">
-              Real-time search trends, Reddit discussions, AI-generated video ideas, and hashtag intelligence — all in one executive dashboard for the funeral profession.
+              Real-time search trends. Social listening from Reddit. AI-powered video ideas. Customizable scroll-stopping scripts. Hashtag intelligence - all in one dashboard for the funeral profession.
             </p>
             <div className="flex items-center justify-center gap-3">
               <Link to="/dashboard">
@@ -139,7 +139,7 @@ const Landing = () => {
               Everything you need to stay ahead
             </h2>
             <p className="text-muted-foreground max-w-lg mx-auto">
-              A comprehensive toolkit for funeral profession content creators and marketers.
+              A comprehensive toolkit for funeral profession content creators.
             </p>
           </motion.div>
 
@@ -177,7 +177,7 @@ const Landing = () => {
               Ready to track what matters?
             </h2>
             <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-              Start exploring trends, generating content ideas, and tracking hashtags — completely free.
+              Start exploring trends, generating content ideas, and tracking hashtags - completely free.
             </p>
             <Link to="/dashboard">
               <Button size="lg" className="font-semibold gap-2 px-8 bg-tertiary text-tertiary-foreground hover:bg-tertiary/90">
