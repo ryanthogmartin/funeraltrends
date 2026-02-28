@@ -1,4 +1,4 @@
-import { Search, TrendingUp, MessageSquare, Heart, RefreshCw, Loader2 } from "lucide-react";
+import { Search, TrendingUp, MessageSquare, Heart, RefreshCw, Loader2, LogIn, LogOut } from "lucide-react";
 import DashboardHeader from "@/components/DashboardHeader";
 import StatCard from "@/components/StatCard";
 import TrendChart from "@/components/TrendChart";
@@ -7,6 +7,7 @@ import RedditCard from "@/components/RedditCard";
 import VideoTopics from "@/components/VideoTopics";
 import RedditVideoTopics from "@/components/RedditVideoTopics";
 import HashtagTracker from "@/components/HashtagTracker";
+import KeywordWatchlist from "@/components/KeywordWatchlist";
 import { mockTrends, mockRedditPosts, mockStats } from "@/lib/mockData";
 import { fetchTrends, fetchRedditPosts, fetchDashboardStats, triggerDataRefresh } from "@/lib/api";
 import { exportTrendsCsv } from "@/lib/exportCsv";
@@ -14,11 +15,16 @@ import { motion } from "framer-motion";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 const Index = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const { user, loading: authLoading, signOut } = useAuth();
+  const navigate = useNavigate();
 
   const { data: trends = mockTrends } = useQuery({
     queryKey: ['funeral-trends'],
@@ -86,6 +92,21 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex items-center justify-end gap-2 mb-4">
+          {authLoading ? null : user ? (
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground">{user.email}</span>
+              <Button variant="ghost" size="sm" onClick={signOut} className="gap-1 text-xs h-7">
+                <LogOut className="h-3 w-3" /> Sign Out
+              </Button>
+            </div>
+          ) : (
+            <Button variant="outline" size="sm" onClick={() => navigate("/auth")} className="gap-1 text-xs h-7">
+              <LogIn className="h-3 w-3" /> Sign In
+            </Button>
+          )}
+        </div>
+
         <DashboardHeader
           lastUpdated={isRefreshing ? "refreshing..." : "recently"}
           onRefresh={handleRefresh}
@@ -153,6 +174,24 @@ const Index = () => {
 
         {/* TikTok Hashtag Tracker */}
         <HashtagTracker trends={trends} />
+
+        {/* Keyword Watchlist — requires auth */}
+        {user && <KeywordWatchlist userId={user.id} trends={trends} />}
+
+        {!user && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="glass-card p-6 mt-6 text-center"
+          >
+            <p className="text-sm text-muted-foreground mb-3">
+              Sign in to save keywords to your watchlist and get spike alerts
+            </p>
+            <Button variant="outline" size="sm" onClick={() => navigate("/auth")} className="gap-1.5">
+              <LogIn className="h-3.5 w-3.5" /> Sign In to Enable Watchlist
+            </Button>
+          </motion.div>
+        )}
 
         {/* Footer */}
         <div className="mt-8 text-center">
