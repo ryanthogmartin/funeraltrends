@@ -28,7 +28,7 @@ export const InviteEmail = ({
 }: InviteEmailProps) => (
   <Html lang="en" dir="ltr">
     <Head />
-    <Preview>You've been invited to join FuneralTrends</Preview>
+    <Preview>You've been invited to FuneralTrends</Preview>
     <Body style={main}>
       <Container style={container}>
         <Section style={header}>
@@ -40,7 +40,7 @@ export const InviteEmail = ({
           <Text style={text}>
             You've been invited to join{' '}
             <Link href={siteUrl} style={link}><strong>FuneralTrends</strong></Link>.
-            Click the button below to accept and create your account.
+            Click below to accept and create your account.
           </Text>
           <Button style={button} href={confirmationUrl}>
             Accept Invitation

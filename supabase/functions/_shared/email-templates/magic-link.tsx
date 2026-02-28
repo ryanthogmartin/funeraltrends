@@ -25,7 +25,7 @@ export const MagicLinkEmail = ({
 }: MagicLinkEmailProps) => (
   <Html lang="en" dir="ltr">
     <Head />
-    <Preview>Your login link for FuneralTrends</Preview>
+    <Preview>Your FuneralTrends login link</Preview>
     <Body style={main}>
       <Container style={container}>
         <Section style={header}>
@@ -35,7 +35,7 @@ export const MagicLinkEmail = ({
         <Section style={card}>
           <Heading style={h1}>Your login link</Heading>
           <Text style={text}>
-            Click the button below to log in to FuneralTrends. This link will expire shortly.
+            Click the button below to log in. This link will expire shortly.
           </Text>
           <Button style={button} href={confirmationUrl}>
             Log In

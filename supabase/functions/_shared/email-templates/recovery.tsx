@@ -25,7 +25,7 @@ export const RecoveryEmail = ({
 }: RecoveryEmailProps) => (
   <Html lang="en" dir="ltr">
     <Head />
-    <Preview>Reset your password for FuneralTrends</Preview>
+    <Preview>Reset your FuneralTrends password</Preview>
     <Body style={main}>
       <Container style={container}>
         <Section style={header}>
@@ -35,7 +35,7 @@ export const RecoveryEmail = ({
         <Section style={card}>
           <Heading style={h1}>Reset your password</Heading>
           <Text style={text}>
-            We received a request to reset your password for FuneralTrends. Click the button below to choose a new password.
+            We received a request to reset your password. Click the button below to choose a new one.
           </Text>
           <Button style={button} href={confirmationUrl}>
             Reset Password
