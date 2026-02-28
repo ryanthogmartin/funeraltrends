@@ -46,7 +46,7 @@ Deno.serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: `You write 45-second video scripts for funeral directors to use on TikTok, Instagram Reels, and YouTube Shorts. The script should be teleprompter-ready — natural spoken language, not written prose.
+            content: `You write 45-second video scripts for funeral directors to use on TikTok, Instagram Reels, and YouTube Shorts. The script is written FROM the funeral director's perspective — they are the one speaking on camera as the expert. The script should be teleprompter-ready — natural spoken language, not written prose.
 
 Tone: ${toneGuide}
 

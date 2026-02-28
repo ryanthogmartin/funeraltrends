@@ -37,11 +37,11 @@ Deno.serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: 'You generate short-form video content ideas (TikTok/Reels/Shorts) for funeral industry topics. Return ONLY valid JSON, no markdown.'
+            content: 'You generate short-form video content ideas (TikTok/Reels/Shorts) for funeral directors to post on their social media. Every idea must be written FROM the funeral director\'s perspective — they are the creator, the expert, the one speaking on camera. Topics should position the funeral director as an authority, educator, or relatable professional. Never write ideas from the consumer or grieving family perspective. Return ONLY valid JSON, no markdown.'
           },
           {
             role: 'user',
-            content: `Generate exactly 25 unique short-form video content ideas for the funeral industry keyword "${keyword}". Each idea should be a catchy, engaging title under 80 characters suitable for TikTok/Reels/Shorts. Cover different angles: educational, myth-busting, emotional, behind-the-scenes, tips, trends, Q&A, storytelling.
+            content: `Generate exactly 25 unique short-form video content ideas for a funeral director to film about the keyword "${keyword}". Each idea should be a catchy, engaging title under 80 characters suitable for TikTok/Reels/Shorts. Write from the funeral director's voice and perspective. Cover different angles: behind-the-scenes, myth-busting, educational tips, day-in-the-life, "things I wish families knew", industry insider knowledge, Q&A, storytelling.
 
 Return JSON in this exact format:
 ${JSON.stringify({ keyword: "example", ideas: ["idea1", "idea2"] })}`

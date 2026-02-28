@@ -42,11 +42,11 @@ Deno.serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: 'You generate short-form video content ideas (TikTok/Reels/Shorts) inspired by Reddit discussions about the funeral industry. Return ONLY valid JSON, no markdown.'
+            content: 'You generate short-form video content ideas (TikTok/Reels/Shorts) inspired by Reddit discussions, written FOR funeral directors to film and post. Every idea must be from the funeral director\'s perspective — they are the creator, the expert, the one on camera. Topics should position them as an authority, educator, or relatable professional responding to what people are discussing online. Never write ideas from the consumer perspective. Return ONLY valid JSON, no markdown.'
           },
           {
             role: 'user',
-            content: `Based on these 5 trending Reddit discussions about funerals, suggest exactly 3 short-form video content ideas for each. Each idea should be a catchy, engaging title under 80 characters suitable for TikTok/Reels/Shorts.
+            content: `Based on these 5 trending Reddit discussions about funerals, suggest exactly 3 short-form video content ideas for each that a funeral director would film and post. Each idea should be a catchy, engaging title under 80 characters suitable for TikTok/Reels/Shorts. Write from the funeral director's voice — think "A funeral director responds to...", "Here's what I'd tell this person...", etc.
 
 Reddit posts:
 ${postDescriptions}
