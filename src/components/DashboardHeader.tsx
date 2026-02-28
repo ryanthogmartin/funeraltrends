@@ -35,16 +35,16 @@ const DashboardHeader = ({ lastUpdated, onRefresh, onExportCsv }: DashboardHeade
           variant="outline"
           size="sm"
           onClick={onExportCsv}
-          className="gap-1.5 text-xs">
+          className="gap-1.5 text-xs hidden sm:inline-flex">
             <Download className="h-3 w-3" />
-            <span className="hidden sm:inline">Export</span> CSV
+            Export CSV
           </Button>
         }
         <Button
           variant="outline"
           size="sm"
           onClick={onRefresh}
-          className="gap-1.5 text-xs">
+          className="gap-1.5 text-xs hidden sm:inline-flex">
           <RefreshCw className="h-3 w-3" />
           Refresh
         </Button>
