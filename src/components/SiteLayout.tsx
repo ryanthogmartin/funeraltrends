@@ -2,6 +2,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Skull, BarChart3, Video, Hash, LogIn, LogOut, Bookmark, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const navItems = [
   { to: "/dashboard", label: "Dashboard", icon: BarChart3 },
@@ -51,6 +52,7 @@ const SiteLayout = ({ children }: { children: React.ReactNode }) => {
           </nav>
 
           <div className="flex items-center gap-2">
+            <ThemeToggle />
             {loading ? null : user ? (
               <div className="flex items-center gap-2">
                 <span className="text-xs text-muted-foreground hidden sm:inline">{user.email}</span>
