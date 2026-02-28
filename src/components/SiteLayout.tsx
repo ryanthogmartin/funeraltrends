@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Skull, BarChart3, Video, Hash, LogIn, LogOut } from "lucide-react";
+import { Skull, BarChart3, Video, Hash, LogIn, LogOut, Bookmark } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -7,6 +7,7 @@ const navItems = [
   { to: "/dashboard", label: "Dashboard", icon: BarChart3 },
   { to: "/video-ideas", label: "Video Ideas", icon: Video },
   { to: "/hashtags", label: "Hashtags", icon: Hash },
+  { to: "/saved", label: "Saved", icon: Bookmark },
 ];
 
 const SiteLayout = ({ children }: { children: React.ReactNode }) => {
