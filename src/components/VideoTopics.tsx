@@ -91,7 +91,7 @@ const VideoTopics = ({ trends, onRequireAuth, isAuthenticated }: VideoTopicsProp
       >
         <div className="flex items-center gap-2 mb-4">
           <Video className="h-5 w-5 text-primary" />
-          <h2 className="text-lg font-serif font-semibold text-foreground">
+          <h2 className="text-lg font-display font-semibold text-foreground">
             Short-Form Video Ideas
           </h2>
           <Sparkles className="h-4 w-4 text-accent-foreground" />
@@ -188,7 +188,7 @@ const VideoTopics = ({ trends, onRequireAuth, isAuthenticated }: VideoTopicsProp
       <Dialog open={!!extraKeyword} onOpenChange={(open) => !open && setExtraKeyword(null)}>
         <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="font-serif text-lg flex items-center gap-2">
+            <DialogTitle className="font-display text-lg flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-primary" />
               25 Video Ideas: {extraKeyword}
             </DialogTitle>

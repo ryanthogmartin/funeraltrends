@@ -127,7 +127,7 @@ const KeywordWatchlist = ({ userId, trends }: KeywordWatchlistProps) => {
       >
         <div className="flex items-center gap-2 mb-4">
           <Eye className="h-5 w-5 text-primary" />
-          <h2 className="text-lg font-serif font-semibold text-foreground">
+          <h2 className="text-lg font-display font-semibold text-foreground">
             Keyword Watchlist
           </h2>
           {spikedCount > 0 && (
@@ -219,7 +219,7 @@ const KeywordWatchlist = ({ userId, trends }: KeywordWatchlistProps) => {
       <Dialog open={!!topicsKeyword} onOpenChange={(open) => !open && setTopicsKeyword(null)}>
         <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="font-serif text-lg flex items-center gap-2">
+            <DialogTitle className="font-display text-lg flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-primary" />
               25 Video Ideas: {topicsKeyword}
             </DialogTitle>

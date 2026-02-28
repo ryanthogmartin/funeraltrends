@@ -19,7 +19,7 @@ const DashboardHeader = ({ lastUpdated, onRefresh, onExportCsv }: DashboardHeade
       <div>
         <div className="flex items-center gap-3 mb-2">
           <Skull className="h-6 w-6 text-primary" />
-          <h1 className="text-3xl font-serif font-bold text-gradient-gold">
+          <h1 className="text-3xl font-display font-bold text-gradient-primary">
             Funeral Trends
           </h1>
         </div>

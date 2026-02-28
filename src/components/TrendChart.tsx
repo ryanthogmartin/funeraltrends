@@ -12,11 +12,11 @@ import {
 import type { TrendItem } from "@/lib/mockData";
 
 const COLORS = [
-  "hsl(42, 60%, 55%)",
+  "hsl(49, 100%, 48%)",
+  "hsl(190, 100%, 50%)",
+  "hsl(330, 100%, 60%)",
   "hsl(142, 50%, 45%)",
-  "hsl(200, 60%, 55%)",
-  "hsl(280, 50%, 60%)",
-  "hsl(20, 70%, 55%)",
+  "hsl(0, 0%, 74%)",
 ];
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -53,7 +53,7 @@ const TrendChart = ({ trends }: TrendChartProps) => {
       className="glass-card p-5 mb-6"
     >
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-serif font-semibold text-foreground">
+        <h2 className="text-lg font-display font-semibold text-foreground">
           Search Volume Trends
         </h2>
         <span className="text-xs text-muted-foreground">Top 5 keywords · 12-month view</span>
@@ -72,30 +72,30 @@ const TrendChart = ({ trends }: TrendChartProps) => {
             </defs>
             <CartesianGrid
               strokeDasharray="3 3"
-              stroke="hsl(220, 10%, 20%)"
+              stroke="hsl(0, 0%, 20%)"
               vertical={false}
             />
             <XAxis
               dataKey="month"
-              tick={{ fill: "hsl(220, 8%, 55%)", fontSize: 11 }}
-              axisLine={{ stroke: "hsl(220, 10%, 20%)" }}
+              tick={{ fill: "hsl(0, 0%, 74%)", fontSize: 11 }}
+              axisLine={{ stroke: "hsl(0, 0%, 20%)" }}
               tickLine={false}
             />
             <YAxis
-              tick={{ fill: "hsl(220, 8%, 55%)", fontSize: 11 }}
+              tick={{ fill: "hsl(0, 0%, 74%)", fontSize: 11 }}
               axisLine={false}
               tickLine={false}
             />
             <Tooltip
               contentStyle={{
-                backgroundColor: "hsl(220, 12%, 12%)",
-                border: "1px solid hsl(220, 10%, 20%)",
+                backgroundColor: "hsl(0, 0%, 12%)",
+                border: "1px solid hsl(0, 0%, 20%)",
                 borderRadius: "8px",
                 fontSize: 12,
-                color: "hsl(40, 10%, 90%)",
+                color: "hsl(0, 0%, 100%)",
               }}
-              itemStyle={{ color: "hsl(40, 10%, 90%)" }}
-              labelStyle={{ color: "hsl(40, 10%, 90%)", fontWeight: 600, marginBottom: 4 }}
+              itemStyle={{ color: "hsl(0, 0%, 100%)" }}
+              labelStyle={{ color: "hsl(0, 0%, 100%)", fontWeight: 600, marginBottom: 4 }}
             />
             {top5.map((trend, i) => (
               <Area

@@ -66,7 +66,7 @@ const InstagramHashtagTracker = ({ trends }: InstagramHashtagTrackerProps) => {
     >
       <div className="flex items-center gap-2 mb-4">
         <Hash className="h-5 w-5 text-primary" />
-        <h2 className="text-lg font-serif font-semibold text-foreground">
+        <h2 className="text-lg font-display font-semibold text-foreground">
           Instagram Hashtag Tracker
         </h2>
         <Badge variant="outline" className="ml-auto text-[10px] bg-muted/50 text-muted-foreground border-border">AI-Suggested</Badge>
