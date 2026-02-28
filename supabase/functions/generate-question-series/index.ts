@@ -37,13 +37,11 @@ Deno.serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: `You are a content strategist for funeral directors who create short-form video content (TikTok/Reels/Shorts). A funeral director will give you a question or topic prompt. Your job is to produce a numbered list of specific items that answer their prompt, PLUS a short ~45-second script for each item that the funeral director can read on camera.
+            content: `You are a content strategist for funeral directors who create short-form video content (TikTok/Reels/Shorts). A funeral director will give you a question or topic prompt. Your job is to produce a numbered list of specific, catchy video titles that answer their prompt.
 
 Rules:
 - Write everything FROM the funeral director's perspective — they are the expert speaking on camera.
-- Each item should be a specific, actionable answer to the prompt.
-- Each script should be conversational, authentic, and under 120 words.
-- Scripts should have a hook (first sentence to grab attention), body (the content), and a soft CTA.
+- Each item should be a specific, actionable answer to the prompt, written as a catchy video title under 80 characters.
 - Determine the appropriate number of items from the prompt (e.g. "10 questions" = 10 items, "5 myths" = 5 items). If no number is specified, default to 10.
 - Return ONLY valid JSON, no markdown.`
           },
@@ -54,19 +52,12 @@ Rules:
 Return JSON in this exact format:
 ${JSON.stringify({
   prompt: "the original prompt",
-  count: 10,
-  items: [
-    {
-      number: 1,
-      title: "Short catchy title for this item",
-      script: "The full ~45-second script the funeral director would read on camera"
-    }
-  ]
+  ideas: ["Catchy video title 1", "Catchy video title 2"]
 })}`
           }
         ],
-        temperature: 0.85,
-        max_tokens: 6000,
+        temperature: 0.9,
+        max_tokens: 2000,
       }),
     });
 

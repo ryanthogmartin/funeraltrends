@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { HelpCircle, Sparkles, Loader2, Copy, Check, Lock, Bookmark, ChevronDown, ChevronUp, Download } from "lucide-react";
+import { HelpCircle, Sparkles, Loader2, Copy, Check, Lock, FileText, Download, RefreshCw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
+import ScriptModal from "./ScriptModal";
 import SaveIdeaButton from "./SaveIdeaButton";
 import { useSaveIdea } from "@/hooks/useSaveIdea";
 import { exportVideoIdeasPdf } from "@/lib/exportPdf";
@@ -14,16 +15,9 @@ interface QuestionSeriesGeneratorProps {
   onRequireAuth: () => void;
 }
 
-interface SeriesItem {
-  number: number;
-  title: string;
-  script: string;
-}
-
 interface SeriesResult {
   prompt: string;
-  count: number;
-  items: SeriesItem[];
+  ideas: string[];
 }
 
 const CopyButton = ({ text }: { text: string }) => {
@@ -40,59 +34,25 @@ const CopyButton = ({ text }: { text: string }) => {
   );
 };
 
-const ScriptAccordion = ({ item }: { item: SeriesItem }) => {
-  const [open, setOpen] = useState(false);
-
-  return (
-    <div className="border border-border/50 rounded-lg overflow-hidden">
-      <button
-        onClick={() => setOpen(!open)}
-        className="w-full flex items-start gap-2 p-3 text-left hover:bg-accent/30 transition-colors"
-      >
-        <span className="text-[10px] font-mono text-primary mt-0.5 shrink-0 w-5 text-right font-bold">
-          {item.number}.
-        </span>
-        <span className="text-sm text-foreground flex-1 font-medium leading-snug">
-          {item.title}
-        </span>
-        {open ? (
-          <ChevronUp className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
-        ) : (
-          <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
-        )}
-      </button>
-      {open && (
-        <motion.div
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: "auto" }}
-          className="px-3 pb-3 border-t border-border/30"
-        >
-          <div className="mt-3 p-3 bg-accent/20 rounded-lg">
-            <p className="text-[10px] font-semibold text-primary uppercase tracking-wide mb-1.5">📹 Script</p>
-            <p className="text-xs text-foreground whitespace-pre-line leading-relaxed">{item.script}</p>
-          </div>
-        </motion.div>
-      )}
-    </div>
-  );
-};
-
 const QuestionSeriesGenerator = ({ isAuthenticated, onRequireAuth }: QuestionSeriesGeneratorProps) => {
   const [question, setQuestion] = useState("");
+  const [lastQuestion, setLastQuestion] = useState("");
   const [result, setResult] = useState<SeriesResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isRegenerating, setIsRegenerating] = useState(false);
+  const [scriptIdea, setScriptIdea] = useState<string | null>(null);
   const { toast } = useToast();
   const { saveIdea, saving, isSaved } = useSaveIdea();
 
-  const handleGenerate = async () => {
+  const handleGenerate = async (regenerate = false) => {
     if (!isAuthenticated) {
       onRequireAuth();
       return;
     }
 
-    const trimmed = question.trim();
+    const trimmed = regenerate ? lastQuestion : question.trim();
     if (!trimmed) {
-      toast({ title: "Enter a question", description: "Type a question or prompt to generate a video series.", variant: "destructive" });
+      toast({ title: "Enter a question", description: "Type a question or prompt to generate video ideas.", variant: "destructive" });
       return;
     }
     if (trimmed.length > 200) {
@@ -100,7 +60,12 @@ const QuestionSeriesGenerator = ({ isAuthenticated, onRequireAuth }: QuestionSer
       return;
     }
 
-    setIsLoading(true);
+    if (regenerate) {
+      setIsRegenerating(true);
+    } else {
+      setIsLoading(true);
+      setLastQuestion(trimmed);
+    }
     setResult(null);
 
     try {
@@ -109,7 +74,7 @@ const QuestionSeriesGenerator = ({ isAuthenticated, onRequireAuth }: QuestionSer
       });
 
       if (error) throw new Error(error.message);
-      if (!data?.success) throw new Error(data?.error || "Failed to generate series");
+      if (!data?.success) throw new Error(data?.error || "Failed to generate ideas");
       setResult(data.data);
     } catch (err: any) {
       toast({
@@ -119,6 +84,7 @@ const QuestionSeriesGenerator = ({ isAuthenticated, onRequireAuth }: QuestionSer
       });
     } finally {
       setIsLoading(false);
+      setIsRegenerating(false);
     }
   };
 
@@ -129,139 +95,150 @@ const QuestionSeriesGenerator = ({ isAuthenticated, onRequireAuth }: QuestionSer
     "8 ways to personalize a funeral service on any budget",
   ];
 
+  const loading = isLoading || isRegenerating;
+
   return (
-    <motion.section
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.1, duration: 0.5 }}
-      className="glass-card p-5 mt-6"
-    >
-      <div className="flex items-center gap-2 mb-4">
-        <HelpCircle className="h-5 w-5 text-secondary" />
-        <h2 className="text-lg font-display font-semibold text-foreground">
-          Question → Video Series
-        </h2>
-        <Sparkles className="h-4 w-4 text-tertiary" />
-        <span className="ml-auto text-xs text-muted-foreground flex items-center gap-1">
-          <Lock className="h-3 w-3" /> Requires login
-        </span>
-      </div>
-
-      <p className="text-sm text-muted-foreground mb-3">
-        Type a question or topic prompt and get a full video series with scripts for each item. Perfect for list-style content.
-      </p>
-
-      {/* Example prompts */}
-      <div className="flex flex-wrap gap-1.5 mb-4">
-        {examplePrompts.map((prompt, i) => (
-          <button
-            key={i}
-            onClick={() => setQuestion(prompt)}
-            className="text-[10px] px-2 py-1 rounded-full border border-border/50 text-muted-foreground hover:text-foreground hover:border-secondary/50 hover:bg-secondary/5 transition-colors"
-          >
-            {prompt.length > 50 ? prompt.slice(0, 50) + "…" : prompt}
-          </button>
-        ))}
-      </div>
-
-      <div className="flex gap-2">
-        <Input
-          placeholder="e.g. 10 questions every family should ask their funeral home..."
-          value={question}
-          onChange={(e) => setQuestion(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleGenerate()}
-          className="flex-1"
-          maxLength={200}
-          disabled={isLoading}
-        />
-        <Button
-          onClick={handleGenerate}
-          disabled={isLoading}
-          className="gap-1.5 bg-secondary text-secondary-foreground hover:bg-secondary/90 shrink-0"
-        >
-          {isLoading ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <Sparkles className="h-4 w-4" />
-          )}
-          Generate
-        </Button>
-      </div>
-
-      {isLoading && (
-        <div className="flex items-center justify-center py-10 gap-2 text-muted-foreground">
-          <Loader2 className="h-4 w-4 animate-spin" />
-          <span className="text-sm">Creating your video series with scripts...</span>
+    <>
+      <motion.section
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1, duration: 0.5 }}
+        className="glass-card p-5 mt-6"
+      >
+        <div className="flex items-center gap-2 mb-4">
+          <HelpCircle className="h-5 w-5 text-secondary" />
+          <h2 className="text-lg font-display font-semibold text-foreground">
+            Question → Video Series
+          </h2>
+          <Sparkles className="h-4 w-4 text-tertiary" />
+          <span className="ml-auto text-xs text-muted-foreground flex items-center gap-1">
+            <Lock className="h-3 w-3" /> Requires login
+          </span>
         </div>
-      )}
 
-      {result && !isLoading && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mt-5"
-        >
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-semibold text-secondary">
-              {result.prompt}
-            </h3>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() =>
-                  exportVideoIdeasPdf(
-                    result.prompt,
-                    result.items.map((it) => `${it.number}. ${it.title}\n\nScript:\n${it.script}`)
-                  )
-                }
-                className="gap-1.5 text-xs h-7"
-              >
-                <Download className="h-3 w-3" />
-                Download PDF
-              </Button>
-              <span className="text-xs text-muted-foreground">{result.items.length} videos</span>
+        <p className="text-sm text-muted-foreground mb-3">
+          Type a question or topic prompt and get a list of video ideas. Click the script button on any idea to generate a full script with your chosen tone.
+        </p>
+
+        {/* Example prompts */}
+        <div className="flex flex-wrap gap-1.5 mb-4">
+          {examplePrompts.map((prompt, i) => (
+            <button
+              key={i}
+              onClick={() => setQuestion(prompt)}
+              className="text-[10px] px-2 py-1 rounded-full border border-border/50 text-muted-foreground hover:text-foreground hover:border-secondary/50 hover:bg-secondary/5 transition-colors"
+            >
+              {prompt.length > 50 ? prompt.slice(0, 50) + "…" : prompt}
+            </button>
+          ))}
+        </div>
+
+        <div className="flex gap-2">
+          <Input
+            placeholder="e.g. 10 questions every family should ask their funeral home..."
+            value={question}
+            onChange={(e) => setQuestion(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleGenerate()}
+            className="flex-1"
+            maxLength={200}
+            disabled={loading}
+          />
+          <Button
+            onClick={() => handleGenerate()}
+            disabled={loading}
+            className="gap-1.5 bg-secondary text-secondary-foreground hover:bg-secondary/90 shrink-0"
+          >
+            {isLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Sparkles className="h-4 w-4" />
+            )}
+            Generate
+          </Button>
+        </div>
+
+        {loading && (
+          <div className="flex items-center justify-center py-10 gap-2 text-muted-foreground">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            <span className="text-sm">
+              {isRegenerating ? "Generating new suggestions..." : "Creating your video ideas..."}
+            </span>
+          </div>
+        )}
+
+        {result && !loading && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mt-4"
+          >
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-semibold text-secondary truncate flex-1 mr-2">
+                {result.prompt}
+              </h3>
+              <div className="flex items-center gap-2 shrink-0">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleGenerate(true)}
+                  className="gap-1 text-[10px] h-6 text-muted-foreground hover:text-secondary"
+                >
+                  <RefreshCw className="h-3 w-3" />
+                  New Suggestions
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => exportVideoIdeasPdf(result.prompt, result.ideas)}
+                  className="gap-1.5 text-xs h-7"
+                >
+                  <Download className="h-3 w-3" />
+                  Download PDF
+                </Button>
+                <span className="text-xs text-muted-foreground">{result.ideas.length} ideas</span>
+              </div>
             </div>
-          </div>
 
-          <div className="space-y-2">
-            {result.items.map((item, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 5 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.04 }}
-                className="group"
-              >
-                <div className="flex items-start gap-1">
-                  <div className="flex-1">
-                    <ScriptAccordion item={item} />
-                  </div>
-                  <div className="flex flex-col gap-0.5 mt-2.5">
-                    <SaveIdeaButton
-                      onSave={() =>
-                        saveIdea({
-                          type: "script",
-                          ideaText: item.title,
-                          scriptHook: item.title,
-                          scriptBody: item.script,
-                          scriptCta: "",
-                          scriptTone: "Question Series",
-                          source: `Series: ${result.prompt.slice(0, 50)}`,
-                        })
-                      }
-                      saved={isSaved(item.title, "script", "Question Series")}
-                      saving={saving}
-                    />
-                    <CopyButton text={`${item.title}\n\n${item.script}`} />
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
-      )}
-    </motion.section>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {result.ideas.map((idea, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.03 }}
+                  className="flex items-start gap-2 p-2 rounded-lg bg-accent/30 border border-border/50 group"
+                >
+                  <span className="text-[10px] font-mono text-muted-foreground mt-0.5 shrink-0 w-5 text-right">
+                    {i + 1}.
+                  </span>
+                  <span className="text-xs text-foreground flex-1 leading-snug">{idea}</span>
+                  <SaveIdeaButton
+                    onSave={() => saveIdea({ type: "idea", ideaText: idea, source: `Series: ${result.prompt.slice(0, 50)}` })}
+                    saved={isSaved(idea)}
+                    saving={saving}
+                    className="opacity-0 group-hover:opacity-100"
+                  />
+                  <button
+                    onClick={() => setScriptIdea(idea)}
+                    className="shrink-0 p-0.5 rounded hover:bg-accent transition-colors text-muted-foreground hover:text-secondary opacity-0 group-hover:opacity-100"
+                    title="Write Script"
+                  >
+                    <FileText className="h-3 w-3" />
+                  </button>
+                  <CopyButton text={idea} />
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </motion.section>
+
+      <ScriptModal
+        open={!!scriptIdea}
+        onOpenChange={(open) => !open && setScriptIdea(null)}
+        idea={scriptIdea || ""}
+      />
+    </>
   );
 };
 
