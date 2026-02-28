@@ -39,14 +39,14 @@ Make view counts realistic for funeral niche on TikTok.
 
 Return ONLY a valid JSON array, no markdown.`;
 
-    const response = await fetch('https://ai.lovable.dev/api/chat', {
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${LOVABLE_API_KEY}`,
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
+        model: 'google/gemini-3-flash-preview',
         messages: [{ role: 'user', content: prompt }],
       }),
     });
@@ -59,7 +59,8 @@ Return ONLY a valid JSON array, no markdown.`;
     const text = aiData.choices?.[0]?.message?.content || '';
 
     // Parse JSON from response
-    const jsonMatch = text.match(/\[[\s\S]*\]/);
+    const cleaned = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    const jsonMatch = cleaned.match(/\[[\s\S]*\]/);
     if (!jsonMatch) {
       throw new Error('Failed to parse hashtag data from AI');
     }
