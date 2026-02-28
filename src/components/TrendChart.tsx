@@ -115,19 +115,22 @@ const TrendChart = ({ trends }: TrendChartProps) => {
 
       <div className="flex flex-wrap gap-4 mt-3 px-1">
         {top5.map((trend, i) => (
-          <button
-            key={trend.keyword}
-            onClick={() => toggle(trend.keyword)}
-            className={`flex items-center gap-1.5 transition-opacity ${hidden.has(trend.keyword) ? "opacity-40" : "opacity-100"}`}
-          >
-            <span
-              className="inline-block w-2.5 h-2.5 rounded-full"
+          <div key={trend.keyword} className={`flex items-center gap-1.5 transition-opacity ${hidden.has(trend.keyword) ? "opacity-40" : "opacity-100"}`}>
+            <button
+              onClick={() => toggle(trend.keyword)}
+              className="inline-block w-2.5 h-2.5 rounded-full flex-shrink-0"
               style={{ backgroundColor: COLORS[i] }}
+              aria-label={`Toggle ${trend.keyword}`}
             />
-            <span className={`text-xs truncate max-w-[140px] ${hidden.has(trend.keyword) ? "line-through text-muted-foreground" : "text-muted-foreground"}`}>
+            <a
+              href={`https://trends.google.com/trends/explore?q=${encodeURIComponent(trend.keyword)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`text-xs truncate max-w-[140px] hover:underline ${hidden.has(trend.keyword) ? "line-through text-muted-foreground" : "text-muted-foreground"}`}
+            >
               {trend.keyword}
-            </span>
-          </button>
+            </a>
+          </div>
         ))}
       </div>
     </motion.div>
