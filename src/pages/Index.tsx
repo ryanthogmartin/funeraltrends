@@ -6,6 +6,7 @@ import TrendRow from "@/components/TrendRow";
 import RedditCard from "@/components/RedditCard";
 import VideoTopics from "@/components/VideoTopics";
 import RedditVideoTopics from "@/components/RedditVideoTopics";
+import HashtagTracker from "@/components/HashtagTracker";
 import { mockTrends, mockRedditPosts, mockStats } from "@/lib/mockData";
 import { fetchTrends, fetchRedditPosts, fetchDashboardStats, triggerDataRefresh } from "@/lib/api";
 import { exportTrendsCsv } from "@/lib/exportCsv";
@@ -149,6 +150,9 @@ const Index = () => {
 
         {/* Video Content Ideas - Reddit */}
         <RedditVideoTopics posts={redditPosts} />
+
+        {/* TikTok Hashtag Tracker */}
+        <HashtagTracker trends={trends} />
 
         {/* Footer */}
         <div className="mt-8 text-center">
