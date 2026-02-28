@@ -5,6 +5,7 @@ import TrendChart from "@/components/TrendChart";
 import GoogleTrendsSection from "@/components/GoogleTrendsSection";
 import RedditCard from "@/components/RedditCard";
 import KeywordWatchlist from "@/components/KeywordWatchlist";
+import FacebookInsights from "@/components/FacebookInsights";
 import { mockTrends, mockRedditPosts, mockStats } from "@/lib/mockData";
 import { fetchTrends, fetchRedditPosts, fetchDashboardStats, triggerDataRefresh } from "@/lib/api";
 import { exportTrendsCsv } from "@/lib/exportCsv";
@@ -129,6 +130,12 @@ const Dashboard = () => {
           </div>
         </motion.section>
       </div>
+
+      <FacebookInsights
+        trends={trends}
+        isAuthenticated={!!user}
+        onRequireAuth={() => navigate("/auth")}
+      />
 
       {user && <KeywordWatchlist userId={user.id} trends={trends} />}
 
