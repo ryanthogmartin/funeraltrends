@@ -154,7 +154,7 @@ const SavedIdeas = () => {
                 <button
                   onClick={() => handleDelete(item.id)}
                   disabled={deletingId === item.id}
-                  className="shrink-0 p-1 rounded hover:bg-destructive/10 transition-colors text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100"
+                  className="shrink-0 p-1 rounded hover:bg-destructive/10 transition-colors text-muted-foreground hover:text-destructive sm:opacity-0 sm:group-hover:opacity-100"
                   title="Delete"
                 >
                   {deletingId === item.id ? (

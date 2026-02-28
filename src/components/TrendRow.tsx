@@ -50,9 +50,9 @@ const TrendRow = ({ trend, index, rank, onAddToWatchlist, isAddingToWatchlist, a
       initial={{ opacity: 0, x: -10 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.05, duration: 0.4 }}
-      className="flex items-center gap-4 py-3 px-4 rounded-md hover:bg-secondary/50 transition-colors group"
+      className="flex items-center gap-2 sm:gap-4 py-3 px-2 sm:px-4 rounded-md hover:bg-secondary/50 transition-colors group"
     >
-      <span className="text-muted-foreground text-xs font-mono w-5 text-right">
+      <span className="text-muted-foreground text-xs font-mono w-5 text-right shrink-0">
         {rank}
       </span>
       <div className="flex-1 min-w-0">
@@ -68,8 +68,10 @@ const TrendRow = ({ trend, index, rank, onAddToWatchlist, isAddingToWatchlist, a
           {trend.volume.toLocaleString()} searches
         </p>
       </div>
-      <MiniSparkline data={trend.sparkline} />
-      <div className="flex items-center gap-1 min-w-[60px] justify-end">
+      <div className="hidden sm:block">
+        <MiniSparkline data={trend.sparkline} />
+      </div>
+      <div className="flex items-center gap-1 min-w-[50px] sm:min-w-[60px] justify-end">
         {isUp && <TrendingUp className="h-3.5 w-3.5 text-trend-up" />}
         {isDown && <TrendingDown className="h-3.5 w-3.5 text-trend-down" />}
         {!isUp && !isDown && <Minus className="h-3.5 w-3.5 text-trend-neutral" />}
@@ -95,7 +97,8 @@ const TrendRow = ({ trend, index, rank, onAddToWatchlist, isAddingToWatchlist, a
           ) : (
             <Plus className="h-3 w-3" />
           )}
-          Watchlist
+          <span className="hidden sm:inline">Watchlist</span>
+          <span className="sm:hidden">+</span>
         </Button>
       )}
     </motion.div>

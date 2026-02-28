@@ -175,7 +175,7 @@ const KeywordWatchlist = ({ userId, trends }: KeywordWatchlistProps) => {
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 10 }}
-                className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${
+                className={`flex items-center gap-2 sm:gap-3 p-3 rounded-lg border transition-colors ${
                   item.spiked
                     ? "bg-destructive/5 border-destructive/30"
                     : "bg-accent/30 border-border/50"
@@ -183,8 +183,8 @@ const KeywordWatchlist = ({ userId, trends }: KeywordWatchlistProps) => {
               >
                 {item.spiked && <Flame className="h-4 w-4 text-destructive shrink-0 animate-pulse" />}
                 <div className="flex-1 min-w-0">
-                  <span className="text-sm font-medium text-foreground">{item.keyword}</span>
-                  <div className="flex gap-2 text-xs text-muted-foreground mt-0.5">
+                  <span className="text-sm font-medium text-foreground truncate block">{item.keyword}</span>
+                  <div className="flex flex-wrap gap-2 text-xs text-muted-foreground mt-0.5">
                     {item.last_volume > 0 && <span>{item.last_volume.toLocaleString()} vol</span>}
                     {item.last_change_percent !== 0 && (
                       <span className={item.last_change_percent > 0 ? "text-[hsl(var(--trend-up))]" : "text-[hsl(var(--trend-down))]"}>
@@ -198,14 +198,15 @@ const KeywordWatchlist = ({ userId, trends }: KeywordWatchlistProps) => {
                   variant="ghost"
                   size="sm"
                   onClick={() => setTopicsKeyword(item.keyword)}
-                  className="gap-1 text-xs h-7 text-primary"
+                  className="gap-1 text-xs h-7 text-primary shrink-0"
                 >
                   <Sparkles className="h-3 w-3" />
-                  25 Ideas
+                  <span className="hidden sm:inline">25 Ideas</span>
+                  <span className="sm:hidden">Ideas</span>
                 </Button>
                 <button
                   onClick={() => removeKeyword.mutate(item.id)}
-                  className="p-1.5 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+                  className="p-1.5 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors shrink-0"
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                 </button>

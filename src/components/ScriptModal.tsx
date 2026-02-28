@@ -163,9 +163,9 @@ const ScriptModal = ({ open, onOpenChange, idea }: ScriptModalProps) => {
               )}
             </div>
 
-            <div className="flex items-center justify-between pt-2">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pt-2">
               <span className="text-xs text-muted-foreground">~{script.wordCount} words · ~45 seconds</span>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <Button
                   size="sm"
                   variant={editing ? "default" : "outline"}
@@ -173,7 +173,7 @@ const ScriptModal = ({ open, onOpenChange, idea }: ScriptModalProps) => {
                   className="gap-1.5 text-xs"
                 >
                   <Pencil className="h-3 w-3" />
-                  {editing ? "Done Editing" : "Customize"}
+                  {editing ? "Done" : "Edit"}
                 </Button>
                 <Button
                   size="sm"
@@ -203,7 +203,7 @@ const ScriptModal = ({ open, onOpenChange, idea }: ScriptModalProps) => {
                 </Button>
                 <Button size="sm" variant="outline" onClick={handleCopy} className="gap-1.5 text-xs">
                   {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
-                  {copied ? "Copied!" : "Copy Script"}
+                  {copied ? "Copied!" : "Copy"}
                 </Button>
               </div>
             </div>
