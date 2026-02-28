@@ -2,7 +2,7 @@ import { Search, TrendingUp, MessageSquare, Heart, RefreshCw, Loader2, LogIn, Lo
 import DashboardHeader from "@/components/DashboardHeader";
 import StatCard from "@/components/StatCard";
 import TrendChart from "@/components/TrendChart";
-import TrendRow from "@/components/TrendRow";
+import GoogleTrendsSection from "@/components/GoogleTrendsSection";
 import RedditCard from "@/components/RedditCard";
 import VideoTopics from "@/components/VideoTopics";
 import RedditVideoTopics from "@/components/RedditVideoTopics";
@@ -163,32 +163,12 @@ const Index = () => {
         {/* Main Content */}
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
           {/* Google Trends */}
-          <motion.section
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3, duration: 0.5 }}
-            className="lg:col-span-3 glass-card p-5"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-serif font-semibold text-foreground">
-                Google Trends — Funeral Searches
-              </h2>
-              <span className="text-xs text-muted-foreground">Past 24h</span>
-            </div>
-            <div className="space-y-0.5">
-              {trends.map((trend, i) => (
-                <TrendRow
-                  key={trend.keyword}
-                  trend={trend}
-                  index={i}
-                  rank={i + 1}
-                  onAddToWatchlist={handleAddToWatchlist}
-                  isAddingToWatchlist={addToWatchlist.isPending}
-                  addingKeyword={addingKeyword || undefined}
-                />
-              ))}
-            </div>
-          </motion.section>
+          <GoogleTrendsSection
+            trends={trends}
+            handleAddToWatchlist={handleAddToWatchlist}
+            isAddingToWatchlist={addToWatchlist.isPending}
+            addingKeyword={addingKeyword || undefined}
+          />
 
           {/* Reddit */}
           <motion.section
