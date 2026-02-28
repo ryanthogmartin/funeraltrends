@@ -14,8 +14,8 @@ const DashboardHeader = ({ lastUpdated, onRefresh, onExportCsv }: DashboardHeade
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
-      className="flex items-end justify-between mb-8"
-    >
+      className="flex items-end justify-between mb-8">
+
       <div>
         <div className="flex items-center gap-3 mb-2">
           <Skull className="h-6 w-6 text-primary" />
@@ -23,8 +23,8 @@ const DashboardHeader = ({ lastUpdated, onRefresh, onExportCsv }: DashboardHeade
             Funeral Trends
           </h1>
         </div>
-        <p className="text-muted-foreground text-sm">
-          Real-time funeral profession search trends & discussions — last 24 hours
+        <p className="text-muted-foreground text-sm">Real-time funeral profession search trends & discussions - last 24 hours
+
         </p>
       </div>
       <div className="flex items-center gap-3">
@@ -32,29 +32,29 @@ const DashboardHeader = ({ lastUpdated, onRefresh, onExportCsv }: DashboardHeade
           Updated {lastUpdated}
         </span>
         <div className="h-2 w-2 rounded-full bg-trend-up animate-pulse-subtle" />
-        {onExportCsv && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onExportCsv}
-            className="gap-1.5 text-xs"
-          >
+        {onExportCsv &&
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onExportCsv}
+          className="gap-1.5 text-xs">
+
             <Download className="h-3 w-3" />
             Export CSV
           </Button>
-        )}
+        }
         <Button
           variant="outline"
           size="sm"
           onClick={onRefresh}
-          className="gap-1.5 text-xs"
-        >
+          className="gap-1.5 text-xs">
+
           <RefreshCw className="h-3 w-3" />
           Refresh
         </Button>
       </div>
-    </motion.header>
-  );
+    </motion.header>);
+
 };
 
 export default DashboardHeader;
