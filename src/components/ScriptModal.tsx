@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Loader2, Copy, Check, FileText, Download, Bookmark } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Loader2, Copy, Check, FileText, Download, Bookmark, Pencil } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { exportScriptPdf } from "@/lib/exportPdf";
@@ -32,6 +33,10 @@ const ScriptModal = ({ open, onOpenChange, idea }: ScriptModalProps) => {
   const [script, setScript] = useState<ScriptData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [editHook, setEditHook] = useState("");
+  const [editBody, setEditBody] = useState("");
+  const [editCta, setEditCta] = useState("");
   const { toast } = useToast();
   const { saveIdea, saving: savingIdea, isSaved } = useSaveIdea();
 
@@ -48,6 +53,10 @@ const ScriptModal = ({ open, onOpenChange, idea }: ScriptModalProps) => {
       if (error) throw new Error(error.message);
       if (!data?.success) throw new Error(data?.error || 'Failed to generate script');
       setScript(data.data);
+      setEditHook(data.data.hook);
+      setEditBody(data.data.body);
+      setEditCta(data.data.cta);
+      setEditing(false);
     } catch (err: any) {
       toast({
         title: "Script generation failed",
@@ -59,7 +68,10 @@ const ScriptModal = ({ open, onOpenChange, idea }: ScriptModalProps) => {
     }
   };
 
-  const fullScript = script ? `${script.hook}\n\n${script.body}\n\n${script.cta}` : "";
+  const currentHook = editing ? editHook : (script?.hook || "");
+  const currentBody = editing ? editBody : (script?.body || "");
+  const currentCta = editing ? editCta : (script?.cta || "");
+  const fullScript = script ? `${currentHook}\n\n${currentBody}\n\n${currentCta}` : "";
 
   const handleCopy = () => {
     navigator.clipboard.writeText(fullScript);
@@ -71,6 +83,7 @@ const ScriptModal = ({ open, onOpenChange, idea }: ScriptModalProps) => {
     if (!open) {
       setSelectedTone(null);
       setScript(null);
+      setEditing(false);
     }
     onOpenChange(open);
   };
@@ -125,17 +138,29 @@ const ScriptModal = ({ open, onOpenChange, idea }: ScriptModalProps) => {
           <div className="space-y-3">
             <div className="p-3 bg-primary/5 rounded-lg border border-primary/20">
               <p className="text-xs font-semibold text-primary mb-1 uppercase tracking-wide">🎬 Hook (3 sec)</p>
-              <p className="text-sm text-foreground font-medium">{script.hook}</p>
+              {editing ? (
+                <Textarea value={editHook} onChange={(e) => setEditHook(e.target.value)} className="text-sm min-h-[40px]" />
+              ) : (
+                <p className="text-sm text-foreground font-medium">{currentHook}</p>
+              )}
             </div>
 
             <div className="p-3 bg-accent/30 rounded-lg border border-border/50">
               <p className="text-xs font-semibold text-primary mb-1 uppercase tracking-wide">📝 Script</p>
-              <p className="text-sm text-foreground whitespace-pre-line leading-relaxed">{script.body}</p>
+              {editing ? (
+                <Textarea value={editBody} onChange={(e) => setEditBody(e.target.value)} className="text-sm min-h-[120px]" />
+              ) : (
+                <p className="text-sm text-foreground whitespace-pre-line leading-relaxed">{currentBody}</p>
+              )}
             </div>
 
             <div className="p-3 bg-primary/5 rounded-lg border border-primary/20">
               <p className="text-xs font-semibold text-primary mb-1 uppercase tracking-wide">📣 Call to Action</p>
-              <p className="text-sm text-foreground font-medium">{script.cta}</p>
+              {editing ? (
+                <Textarea value={editCta} onChange={(e) => setEditCta(e.target.value)} className="text-sm min-h-[40px]" />
+              ) : (
+                <p className="text-sm text-foreground font-medium">{currentCta}</p>
+              )}
             </div>
 
             <div className="flex items-center justify-between pt-2">
@@ -143,13 +168,22 @@ const ScriptModal = ({ open, onOpenChange, idea }: ScriptModalProps) => {
               <div className="flex items-center gap-2">
                 <Button
                   size="sm"
+                  variant={editing ? "default" : "outline"}
+                  onClick={() => setEditing(!editing)}
+                  className="gap-1.5 text-xs"
+                >
+                  <Pencil className="h-3 w-3" />
+                  {editing ? "Done Editing" : "Customize"}
+                </Button>
+                <Button
+                  size="sm"
                   variant="outline"
                   onClick={() => saveIdea({
                     type: "script",
                     ideaText: idea,
-                    scriptHook: script.hook,
-                    scriptBody: script.body,
-                    scriptCta: script.cta,
+                    scriptHook: currentHook,
+                    scriptBody: currentBody,
+                    scriptCta: currentCta,
                     scriptTone: tones.find(t => t.id === selectedTone)?.label || selectedTone || "",
                   })}
                   disabled={savingIdea || isSaved(idea, "script", selectedTone || "")}
@@ -161,7 +195,7 @@ const ScriptModal = ({ open, onOpenChange, idea }: ScriptModalProps) => {
                 <Button
                   size="sm"
                   variant="outline"
-                  onClick={() => exportScriptPdf(idea, script, tones.find(t => t.id === selectedTone)?.label || selectedTone || "")}
+                  onClick={() => exportScriptPdf(idea, { hook: currentHook, body: currentBody, cta: currentCta, wordCount: script.wordCount }, tones.find(t => t.id === selectedTone)?.label || selectedTone || "")}
                   className="gap-1.5 text-xs"
                 >
                   <Download className="h-3 w-3" />
