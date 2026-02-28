@@ -174,11 +174,11 @@ const QuestionSeriesGenerator = ({ isAuthenticated, onRequireAuth }: QuestionSer
             animate={{ opacity: 1, y: 0 }}
             className="mt-4"
           >
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-semibold text-secondary truncate flex-1 mr-2">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+              <h3 className="text-sm font-semibold text-secondary truncate flex-1">
                 {result.prompt}
               </h3>
-              <div className="flex items-center gap-2 shrink-0">
+              <div className="flex items-center gap-2 shrink-0 flex-wrap">
                 <Button
                   variant="ghost"
                   size="sm"
@@ -186,7 +186,7 @@ const QuestionSeriesGenerator = ({ isAuthenticated, onRequireAuth }: QuestionSer
                   className="gap-1 text-[10px] h-6 text-muted-foreground hover:text-secondary"
                 >
                   <RefreshCw className="h-3 w-3" />
-                  New Suggestions
+                  Regenerate
                 </Button>
                 <Button
                   variant="outline"
@@ -195,7 +195,7 @@ const QuestionSeriesGenerator = ({ isAuthenticated, onRequireAuth }: QuestionSer
                   className="gap-1.5 text-xs h-7"
                 >
                   <Download className="h-3 w-3" />
-                  Download PDF
+                  PDF
                 </Button>
                 <span className="text-xs text-muted-foreground">{result.ideas.length} ideas</span>
               </div>

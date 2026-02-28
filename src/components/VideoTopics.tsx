@@ -90,13 +90,15 @@ const VideoTopics = ({ trends, onRequireAuth, isAuthenticated }: VideoTopicsProp
         transition={{ delay: 0.5, duration: 0.5 }}
         className="glass-card p-5 mt-6"
       >
-        <div className="flex items-center gap-2 mb-4">
-          <Video className="h-5 w-5 text-primary" />
-          <h2 className="text-lg font-display font-semibold text-foreground">
-            Short-Form Video Ideas
-          </h2>
-          <Sparkles className="h-4 w-4 text-tertiary" />
-          <span className="ml-auto text-xs text-muted-foreground">Based on Top 10 Funeral Search Topics</span>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-4">
+          <div className="flex items-center gap-2">
+            <Video className="h-5 w-5 text-primary" />
+            <h2 className="text-lg font-display font-semibold text-foreground">
+              Short-Form Video Ideas
+            </h2>
+            <Sparkles className="h-4 w-4 text-tertiary" />
+          </div>
+          <span className="sm:ml-auto text-xs text-muted-foreground">Based on Top 10 Funeral Search Topics</span>
         </div>
 
         {isLoading && (
