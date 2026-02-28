@@ -12,8 +12,9 @@ import { mockTrends, mockRedditPosts, mockStats } from "@/lib/mockData";
 import { fetchTrends, fetchRedditPosts, fetchDashboardStats, triggerDataRefresh } from "@/lib/api";
 import { exportTrendsCsv } from "@/lib/exportCsv";
 import { motion } from "framer-motion";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -23,6 +24,7 @@ const Index = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [addingKeyword, setAddingKeyword] = useState<string | null>(null);
   const { user, loading: authLoading, signOut } = useAuth();
   const navigate = useNavigate();
 
@@ -60,6 +62,41 @@ const Index = () => {
     }
     
     setIsRefreshing(false);
+  };
+
+  const addToWatchlist = useMutation({
+    mutationFn: async (keyword: string) => {
+      if (!user) {
+        navigate("/auth");
+        return;
+      }
+      setAddingKeyword(keyword);
+      const { error } = await supabase
+        .from("keyword_watchlist")
+        .insert({ user_id: user.id, keyword: keyword.trim() });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["keyword-watchlist"] });
+      toast({ title: "Added to watchlist!" });
+      setAddingKeyword(null);
+    },
+    onError: (err: any) => {
+      toast({
+        title: "Failed to add",
+        description: err.message?.includes("duplicate") ? "Already in your watchlist" : err.message,
+        variant: "destructive",
+      });
+      setAddingKeyword(null);
+    },
+  });
+
+  const handleAddToWatchlist = (keyword: string) => {
+    if (!user) {
+      navigate("/auth");
+      return;
+    }
+    addToWatchlist.mutate(keyword);
   };
 
   const stats = [
@@ -140,7 +177,15 @@ const Index = () => {
             </div>
             <div className="space-y-0.5">
               {trends.map((trend, i) => (
-                <TrendRow key={trend.keyword} trend={trend} index={i} rank={i + 1} />
+                <TrendRow
+                  key={trend.keyword}
+                  trend={trend}
+                  index={i}
+                  rank={i + 1}
+                  onAddToWatchlist={handleAddToWatchlist}
+                  isAddingToWatchlist={addToWatchlist.isPending}
+                  addingKeyword={addingKeyword || undefined}
+                />
               ))}
             </div>
           </motion.section>
@@ -167,7 +212,11 @@ const Index = () => {
         </div>
 
         {/* Video Content Ideas - Trends */}
-        <VideoTopics trends={trends} />
+        <VideoTopics
+          trends={trends}
+          isAuthenticated={!!user}
+          onRequireAuth={() => navigate("/auth")}
+        />
 
         {/* Video Content Ideas - Reddit */}
         <RedditVideoTopics posts={redditPosts} />
