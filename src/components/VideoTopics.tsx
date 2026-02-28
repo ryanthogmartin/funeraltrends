@@ -1,7 +1,8 @@
 import { motion } from "framer-motion";
-import { Video, Sparkles, Loader2 } from "lucide-react";
+import { Video, Sparkles, Loader2, Copy, Check } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useState } from "react";
 import type { TrendItem } from "@/lib/mockData";
 
 interface VideoTopicsProps {
@@ -21,6 +22,20 @@ const fetchVideoTopics = async (keywords: string[]): Promise<TopicGroup[]> => {
   if (error) throw new Error(error.message);
   if (!data?.success) throw new Error(data?.error || 'Failed to generate topics');
   return data.data;
+};
+
+const CopyButton = ({ text }: { text: string }) => {
+  const [copied, setCopied] = useState(false);
+  const handleCopy = () => {
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  };
+  return (
+    <button onClick={handleCopy} className="shrink-0 p-0.5 rounded hover:bg-accent transition-colors text-muted-foreground hover:text-foreground">
+      {copied ? <Check className="h-3 w-3 text-primary" /> : <Copy className="h-3 w-3" />}
+    </button>
+  );
 };
 
 const VideoTopics = ({ trends }: VideoTopicsProps) => {
@@ -46,7 +61,7 @@ const VideoTopics = ({ trends }: VideoTopicsProps) => {
           Short-Form Video Ideas
         </h2>
         <Sparkles className="h-4 w-4 text-accent-foreground" />
-        <span className="text-xs text-muted-foreground ml-auto">AI-generated from top 10 trends</span>
+        <span className="text-xs text-muted-foreground ml-auto">Based on Top 10 Funeral Search Topics</span>
       </div>
 
       {isLoading && (
@@ -77,9 +92,10 @@ const VideoTopics = ({ trends }: VideoTopicsProps) => {
               </h3>
               <ul className="space-y-1.5">
                 {group.ideas.map((idea, j) => (
-                  <li key={j} className="flex items-start gap-1.5">
+                  <li key={j} className="flex items-start gap-1.5 group">
                     <span className="text-accent-foreground text-xs mt-0.5 shrink-0">▶</span>
-                    <span className="text-xs text-foreground leading-snug">{idea}</span>
+                    <span className="text-xs text-foreground leading-snug flex-1">{idea}</span>
+                    <CopyButton text={idea} />
                   </li>
                 ))}
               </ul>
