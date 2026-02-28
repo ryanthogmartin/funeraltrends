@@ -111,9 +111,11 @@ const QuestionSeriesGenerator = ({ isAuthenticated, onRequireAuth }: QuestionSer
             Question → Video Series
           </h2>
           <Sparkles className="h-4 w-4 text-tertiary" />
-          <span className="ml-auto text-xs text-muted-foreground flex items-center gap-1">
-            <Lock className="h-3 w-3" /> Requires login
-          </span>
+          {!isAuthenticated && (
+            <span className="ml-auto text-xs text-muted-foreground flex items-center gap-1">
+              <Lock className="h-3 w-3" /> Requires login
+            </span>
+          )}
         </div>
 
         <p className="text-sm text-muted-foreground mb-3">
