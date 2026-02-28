@@ -147,7 +147,10 @@ const VideoTopics = ({ trends, onRequireAuth, isAuthenticated }: VideoTopicsProp
                         saving={saving}
                       />
                       <button
-                        onClick={() => setScriptIdea(idea)}
+                        onClick={() => {
+                          if (!isAuthenticated) { onRequireAuth?.(); return; }
+                          setScriptIdea(idea);
+                        }}
                         className="shrink-0 p-0.5 rounded hover:bg-accent transition-colors text-muted-foreground hover:text-primary"
                         title="Write Script"
                       >
@@ -207,13 +210,16 @@ const VideoTopics = ({ trends, onRequireAuth, isAuthenticated }: VideoTopicsProp
                     saving={saving}
                     className="opacity-0 group-hover:opacity-100"
                   />
-                  <button
-                    onClick={() => { setExtraKeyword(null); setScriptIdea(idea); }}
-                    className="shrink-0 p-0.5 rounded hover:bg-accent transition-colors text-muted-foreground hover:text-primary opacity-0 group-hover:opacity-100"
-                    title="Write Script"
-                  >
-                    <FileText className="h-3 w-3" />
-                  </button>
+                   <button
+                     onClick={() => {
+                       if (!isAuthenticated) { onRequireAuth?.(); return; }
+                       setExtraKeyword(null); setScriptIdea(idea);
+                     }}
+                     className="shrink-0 p-0.5 rounded hover:bg-accent transition-colors text-muted-foreground hover:text-primary opacity-0 group-hover:opacity-100"
+                     title="Write Script"
+                   >
+                     <FileText className="h-3 w-3" />
+                   </button>
                   <CopyButton text={idea} />
                 </motion.div>
               ))}
