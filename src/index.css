@@ -34,6 +34,9 @@
     --input: 0 0% 20%;
     --ring: 84 100% 50%;
 
+    --tertiary: 330 100% 50%;
+    --tertiary-foreground: 0 0% 100%;
+
     --radius: 0.75rem;
 
     --trend-up: 142 50% 45%;
@@ -107,5 +110,16 @@
 
   .glow-primary {
     box-shadow: 0 0 20px hsl(84 100% 50% / 0.15), 0 0 60px hsl(84 100% 50% / 0.05);
+  }
+
+  .text-gradient-tertiary {
+    background: linear-gradient(135deg, hsl(330 100% 50%), hsl(330 100% 70%));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .glow-tertiary {
+    box-shadow: 0 0 20px hsl(330 100% 50% / 0.15), 0 0 60px hsl(330 100% 50% / 0.05);
   }
 }
