@@ -5,3 +5,7 @@ project_id = "gaaxslezqzzujfrtkdpo"
     verify_jwt = false
   [functions.generate-question-series]
     verify_jwt = false
+  [functions.generate-facebook-ideas]
+    verify_jwt = false
+  [functions.search-facebook-trends]
+    verify_jwt = false
