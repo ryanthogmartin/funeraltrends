@@ -52,15 +52,14 @@ export async function fetchDashboardStats(): Promise<DashboardStats> {
     supabase.from('funeral_reddit_posts').select('score, sentiment'),
   ]);
 
-  if (!trendsRes.data?.length || !redditRes.data?.length) {
-    return mockStats;
-  }
+  const trends = trendsRes.data || [];
+  const reddit = redditRes.data || [];
 
-  const totalSearches = trendsRes.data.reduce((sum: number, t: any) => sum + t.volume, 0);
-  const trendingTopics = trendsRes.data.filter((t: any) => Number(t.change_percent) > 0).length;
-  const redditMentions = redditRes.data.reduce((sum: number, p: any) => sum + p.score, 0);
-  const positiveCount = redditRes.data.filter((p: any) => p.sentiment === 'positive').length;
-  const avgSentiment = positiveCount / redditRes.data.length;
+  const totalSearches = trends.reduce((sum: number, t: any) => sum + t.volume, 0);
+  const trendingTopics = trends.filter((t: any) => Number(t.change_percent) > 0).length;
+  const redditMentions = reddit.reduce((sum: number, p: any) => sum + p.score, 0);
+  const positiveCount = reddit.filter((p: any) => p.sentiment === 'positive').length;
+  const avgSentiment = reddit.length > 0 ? positiveCount / reddit.length : 0;
 
   return { totalSearches, trendingTopics, redditMentions, avgSentiment };
 }
