@@ -14,8 +14,8 @@ export default {
   	},
   	extend: {
   		fontFamily: {
-  			sans: [
-  				'Lato',
+			sans: [
+				'Poppins',
   				'ui-sans-serif',
   				'system-ui',
   				'-apple-system',
