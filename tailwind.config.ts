@@ -27,26 +27,12 @@ export default {
   				'Noto Sans',
   				'sans-serif'
   			],
-  			serif: [
-  				'EB Garamond',
-  				'ui-serif',
-  				'Georgia',
-  				'Cambria',
-  				'Times New Roman',
-  				'Times',
-  				'serif'
-  			],
-  			mono: [
-  				'Fira Code',
-  				'ui-monospace',
-  				'SFMono-Regular',
-  				'Menlo',
-  				'Monaco',
-  				'Consolas',
-  				'Liberation Mono',
-  				'Courier New',
-  				'monospace'
-  			]
+			serif: [
+				'Poppins',
+				'ui-sans-serif',
+				'system-ui',
+				'sans-serif'
+			],
   		},
   		colors: {
   			border: 'hsl(var(--border))',
