@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Skull, TrendingUp, Video, Hash, ArrowRight, BarChart3, Zap, Globe, Sparkles, Lock, Film } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
+import ThemeToggle from "@/components/ThemeToggle";
 
 interface FeatureItem {
   icon: any;
@@ -114,6 +115,7 @@ const Landing = () => {
             </div>
           </div>
           <div className="flex items-center gap-3">
+            <ThemeToggle />
             {!authLoading && !user && (
               <Link to="/auth">
                 <Button variant="ghost" size="sm" className="text-muted-foreground text-xs">
