@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Sparkles, Loader2, Copy, Check, TrendingUp, Search, FileText, MessageSquare, Users, Eye, ThumbsUp } from "lucide-react";
+import { Sparkles, Loader2, Copy, Check, TrendingUp, Search, FileText, MessageSquare, Users, Eye, ThumbsUp, Lock, ArrowRight } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
@@ -92,6 +92,59 @@ const FacebookInsights = ({ trends, isAuthenticated, onRequireAuth }: FacebookIn
     staleTime: 1000 * 60 * 30,
   });
 
+  if (!isAuthenticated) {
+    return (
+      <motion.section
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5, duration: 0.5 }}
+        className="glass-card p-5 mt-6 relative overflow-hidden cursor-pointer group hover:border-secondary/50 hover:shadow-[0_0_20px_-5px_hsl(var(--secondary)/0.2)] transition-all duration-300"
+        onClick={onRequireAuth}
+      >
+        <div className="absolute inset-0 bg-gradient-to-t from-secondary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10" />
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-4">
+          <div className="flex items-center gap-2">
+            <div className="w-5 h-5 rounded flex items-center justify-center bg-[#1877F2]/20">
+              <svg className="h-3.5 w-3.5 text-[#1877F2]" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+            </div>
+            <h2 className="text-lg font-display font-semibold text-foreground group-hover:text-secondary transition-colors duration-300">
+              Facebook Insights
+            </h2>
+            <Sparkles className="h-4 w-4 text-tertiary" />
+          </div>
+          <motion.span
+            className="flex items-center gap-1 px-2.5 py-1 rounded-full border border-secondary/30 bg-secondary/10 text-secondary text-[10px] font-medium ml-0 sm:ml-auto w-fit"
+            whileHover={{ scale: 1.05 }}
+          >
+            <Lock className="h-2.5 w-2.5" />
+            Sign in to unlock
+          </motion.span>
+        </div>
+        <div className="relative">
+          <div className="filter blur-[6px] pointer-events-none select-none" aria-hidden="true">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="bg-accent/40 rounded-lg p-3 border border-border/50">
+                  <div className="h-4 bg-muted-foreground/10 rounded w-3/4 mb-2" />
+                  <div className="h-3 bg-muted-foreground/10 rounded w-full mb-1" />
+                  <div className="h-3 bg-muted-foreground/10 rounded w-2/3" />
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
+            <Lock className="h-8 w-8 text-secondary/60 mb-2" />
+            <p className="text-sm font-medium text-foreground">Sign in to view Facebook Insights</p>
+            <p className="text-xs text-muted-foreground mt-1 group-hover:hidden">Requires account</p>
+            <p className="text-xs text-secondary mt-1 hidden group-hover:flex items-center gap-1">
+              Sign in to get started <ArrowRight className="h-3 w-3" />
+            </p>
+          </div>
+        </div>
+      </motion.section>
+    );
+  }
+
   return (
     <>
       <motion.section
@@ -167,10 +220,7 @@ const FacebookInsights = ({ trends, isAuthenticated, onRequireAuth }: FacebookIn
                             className="sm:opacity-0 sm:group-hover:opacity-100"
                           />
                           <button
-                            onClick={() => {
-                              if (!isAuthenticated) { onRequireAuth(); return; }
-                              setScriptIdea(idea.idea);
-                            }}
+                            onClick={() => setScriptIdea(idea.idea)}
                             className="shrink-0 p-0.5 rounded hover:bg-accent transition-colors text-muted-foreground hover:text-primary sm:opacity-0 sm:group-hover:opacity-100"
                             title="Generate Script"
                           >
