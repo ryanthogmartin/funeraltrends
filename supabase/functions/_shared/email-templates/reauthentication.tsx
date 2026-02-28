@@ -20,7 +20,7 @@ interface ReauthenticationEmailProps {
 export const ReauthenticationEmail = ({ token }: ReauthenticationEmailProps) => (
   <Html lang="en" dir="ltr">
     <Head />
-    <Preview>Your verification code for FuneralTrends</Preview>
+    <Preview>Your FuneralTrends verification code</Preview>
     <Body style={main}>
       <Container style={container}>
         <Section style={header}>
@@ -33,7 +33,7 @@ export const ReauthenticationEmail = ({ token }: ReauthenticationEmailProps) => 
           <Text style={codeStyle}>{token}</Text>
         </Section>
         <Text style={footer}>
-          This code will expire shortly. If you didn't request this, you can safely ignore this email.
+          This code will expire shortly. If you didn't request this, ignore this email.
         </Text>
       </Container>
     </Body>
@@ -50,5 +50,5 @@ const brandSub = { fontSize: '10px', color: '#999999', margin: '0 0 16px', textA
 const card = { backgroundColor: '#1F1F1F', borderRadius: '12px', padding: '32px 28px', marginBottom: '16px' }
 const h1 = { fontSize: '22px', fontWeight: 'bold' as const, fontFamily: "'Space Grotesk', Arial, sans-serif", color: '#ffffff', margin: '0 0 16px' }
 const text = { fontSize: '14px', color: '#BDBDBD', lineHeight: '1.6', margin: '0 0 20px' }
-const codeStyle = { fontFamily: 'Courier, monospace', fontSize: '28px', fontWeight: 'bold' as const, color: '#A4FF00', margin: '0 0 20px', letterSpacing: '4px' }
+const codeStyle = { fontFamily: 'Courier, monospace', fontSize: '28px', fontWeight: 'bold' as const, color: '#A4FF00', backgroundColor: '#111111', borderRadius: '8px', padding: '12px 20px', textAlign: 'center' as const, margin: '0 0 20px', letterSpacing: '4px' }
 const footer = { fontSize: '11px', color: '#999999', textAlign: 'center' as const, margin: '0' }

@@ -38,10 +38,10 @@ export const EmailChangeEmail = ({
           <Text style={brandSub}>powered by DISRUPT Media</Text>
         </Section>
         <Section style={card}>
-          <Heading style={h1}>Confirm your email change</Heading>
+          <Heading style={h1}>Confirm email change</Heading>
           <Text style={text}>
             You requested to change your email from{' '}
-            <Link href={`mailto:${email}`} style={link}>{email}</Link>{' '}to{' '}
+            <Link href={`mailto:${email}`} style={link}>{email}</Link> to{' '}
             <Link href={`mailto:${newEmail}`} style={link}>{newEmail}</Link>.
           </Text>
           <Button style={button} href={confirmationUrl}>
