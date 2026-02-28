@@ -14,7 +14,72 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      funeral_reddit_posts: {
+        Row: {
+          fetched_at: string
+          id: string
+          num_comments: number
+          posted_at: string | null
+          reddit_id: string
+          score: number
+          sentiment: string
+          subreddit: string
+          title: string
+          url: string
+        }
+        Insert: {
+          fetched_at?: string
+          id?: string
+          num_comments?: number
+          posted_at?: string | null
+          reddit_id: string
+          score?: number
+          sentiment?: string
+          subreddit: string
+          title: string
+          url: string
+        }
+        Update: {
+          fetched_at?: string
+          id?: string
+          num_comments?: number
+          posted_at?: string | null
+          reddit_id?: string
+          score?: number
+          sentiment?: string
+          subreddit?: string
+          title?: string
+          url?: string
+        }
+        Relationships: []
+      }
+      funeral_trends: {
+        Row: {
+          change_percent: number
+          fetched_at: string
+          id: string
+          keyword: string
+          sparkline: Json | null
+          volume: number
+        }
+        Insert: {
+          change_percent?: number
+          fetched_at?: string
+          id?: string
+          keyword: string
+          sparkline?: Json | null
+          volume?: number
+        }
+        Update: {
+          change_percent?: number
+          fetched_at?: string
+          id?: string
+          keyword?: string
+          sparkline?: Json | null
+          volume?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
