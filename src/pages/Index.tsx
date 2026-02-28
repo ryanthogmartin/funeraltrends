@@ -1,6 +1,7 @@
 import { Search, TrendingUp, MessageSquare, Heart, RefreshCw, Loader2 } from "lucide-react";
 import DashboardHeader from "@/components/DashboardHeader";
 import StatCard from "@/components/StatCard";
+import TrendChart from "@/components/TrendChart";
 import TrendRow from "@/components/TrendRow";
 import RedditCard from "@/components/RedditCard";
 import { mockTrends, mockRedditPosts, mockStats } from "@/lib/mockData";
@@ -89,6 +90,9 @@ const Index = () => {
             <StatCard key={stat.label} {...stat} index={i} />
           ))}
         </div>
+
+        {/* Trend Chart */}
+        <TrendChart trends={trends} />
 
         {/* Main Content */}
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
