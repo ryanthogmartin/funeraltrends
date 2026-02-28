@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Skull, BarChart3, Video, Hash, LogIn, LogOut, Bookmark } from "lucide-react";
+import { Skull, BarChart3, Video, Hash, LogIn, LogOut, Bookmark, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -88,6 +88,27 @@ const SiteLayout = ({ children }: { children: React.ReactNode }) => {
 
       {/* Content */}
       <main className="flex-1">{children}</main>
+
+      {/* CTA Banner */}
+      <section className="border-t border-border/50 mt-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 text-center">
+          <h2 className="text-xl sm:text-2xl font-display font-bold text-foreground mb-3">
+            Ready for a custom social media strategy and plan?
+          </h2>
+          <p className="text-sm text-muted-foreground mb-6 max-w-md mx-auto">
+            Let DISRUPT Media build a personalized content strategy tailored to your funeral home.
+          </p>
+          <a
+            href="https://disruptmedia.lpages.co/the-disrupt-system/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Button size="lg" className="font-semibold gap-2 px-6 sm:px-8 bg-tertiary text-tertiary-foreground hover:bg-tertiary/90">
+              Schedule a Demo with DISRUPT Media <ArrowRight className="h-4 w-4" />
+            </Button>
+          </a>
+        </div>
+      </section>
 
       {/* Footer */}
       <footer className="border-t border-border py-8 mt-12">
