@@ -1,7 +1,8 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import {
-  LineChart,
-  Line,
+  AreaChart,
+  Area,
   XAxis,
   YAxis,
   Tooltip,
@@ -26,6 +27,15 @@ interface TrendChartProps {
 
 const TrendChart = ({ trends }: TrendChartProps) => {
   const top5 = trends.slice(0, 5);
+  const [hidden, setHidden] = useState<Set<string>>(new Set());
+
+  const toggle = (keyword: string) => {
+    setHidden((prev) => {
+      const next = new Set(prev);
+      next.has(keyword) ? next.delete(keyword) : next.add(keyword);
+      return next;
+    });
+  };
 
   const chartData = MONTHS.map((month, i) => {
     const point: Record<string, string | number> = { month };
@@ -51,7 +61,15 @@ const TrendChart = ({ trends }: TrendChartProps) => {
 
       <div className="h-[280px]">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={chartData} margin={{ top: 5, right: 10, left: -10, bottom: 0 }}>
+          <AreaChart data={chartData} margin={{ top: 5, right: 10, left: -10, bottom: 0 }}>
+            <defs>
+              {top5.map((trend, i) => (
+                <linearGradient key={trend.keyword} id={`gradient-${i}`} x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor={COLORS[i]} stopOpacity={0.25} />
+                  <stop offset="100%" stopColor={COLORS[i]} stopOpacity={0} />
+                </linearGradient>
+              ))}
+            </defs>
             <CartesianGrid
               strokeDasharray="3 3"
               stroke="hsl(220, 10%, 20%)"
@@ -80,31 +98,36 @@ const TrendChart = ({ trends }: TrendChartProps) => {
               labelStyle={{ color: "hsl(40, 10%, 90%)", fontWeight: 600, marginBottom: 4 }}
             />
             {top5.map((trend, i) => (
-              <Line
+              <Area
                 key={trend.keyword}
                 type="monotone"
                 dataKey={trend.keyword}
-                stroke={COLORS[i]}
+                stroke={hidden.has(trend.keyword) ? "transparent" : COLORS[i]}
                 strokeWidth={2}
+                fill={hidden.has(trend.keyword) ? "transparent" : `url(#gradient-${i})`}
                 dot={false}
-                activeDot={{ r: 4, strokeWidth: 0 }}
+                activeDot={hidden.has(trend.keyword) ? false : { r: 4, strokeWidth: 0 }}
               />
             ))}
-          </LineChart>
+          </AreaChart>
         </ResponsiveContainer>
       </div>
 
       <div className="flex flex-wrap gap-4 mt-3 px-1">
         {top5.map((trend, i) => (
-          <div key={trend.keyword} className="flex items-center gap-1.5">
+          <button
+            key={trend.keyword}
+            onClick={() => toggle(trend.keyword)}
+            className={`flex items-center gap-1.5 transition-opacity ${hidden.has(trend.keyword) ? "opacity-40" : "opacity-100"}`}
+          >
             <span
               className="inline-block w-2.5 h-2.5 rounded-full"
               style={{ backgroundColor: COLORS[i] }}
             />
-            <span className="text-xs text-muted-foreground truncate max-w-[140px]">
+            <span className={`text-xs truncate max-w-[140px] ${hidden.has(trend.keyword) ? "line-through text-muted-foreground" : "text-muted-foreground"}`}>
               {trend.keyword}
             </span>
-          </div>
+          </button>
         ))}
       </div>
     </motion.div>
