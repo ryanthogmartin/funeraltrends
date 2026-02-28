@@ -1,11 +1,10 @@
 import { motion } from "framer-motion";
-import { Video, Sparkles, Loader2, Copy, Check, FileText, Mail } from "lucide-react";
+import { Video, Sparkles, Loader2, Copy, Check, FileText } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
 import type { TrendItem } from "@/lib/mockData";
 import ScriptModal from "./ScriptModal";
-import EmailTopicsModal from "./EmailTopicsModal";
 import SaveIdeaButton from "./SaveIdeaButton";
 import { useSaveIdea } from "@/hooks/useSaveIdea";
 import { Button } from "@/components/ui/button";
@@ -58,7 +57,6 @@ const fetchExtraTopics = async (keyword: string): Promise<{ keyword: string; ide
 const VideoTopics = ({ trends, onRequireAuth, isAuthenticated }: VideoTopicsProps) => {
   const top10Keywords = trends.slice(0, 10).map(t => t.keyword);
   const [scriptIdea, setScriptIdea] = useState<string | null>(null);
-  const [showEmailModal, setShowEmailModal] = useState(false);
   const [extraKeyword, setExtraKeyword] = useState<string | null>(null);
   const { saveIdea, saving, isSaved } = useSaveIdea();
 
@@ -98,20 +96,7 @@ const VideoTopics = ({ trends, onRequireAuth, isAuthenticated }: VideoTopicsProp
             Short-Form Video Ideas
           </h2>
           <Sparkles className="h-4 w-4 text-tertiary" />
-          <div className="ml-auto flex items-center gap-2">
-            {topics && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowEmailModal(true)}
-                className="gap-1.5 text-xs h-7"
-              >
-                <Mail className="h-3 w-3" />
-                Email Top 10
-              </Button>
-            )}
-            <span className="text-xs text-muted-foreground">Based on Top 10 Funeral Search Topics</span>
-          </div>
+          <span className="ml-auto text-xs text-muted-foreground">Based on Top 10 Funeral Search Topics</span>
         </div>
 
         {isLoading && (
@@ -184,13 +169,6 @@ const VideoTopics = ({ trends, onRequireAuth, isAuthenticated }: VideoTopicsProp
         idea={scriptIdea || ""}
       />
 
-      {topics && (
-        <EmailTopicsModal
-          open={showEmailModal}
-          onOpenChange={setShowEmailModal}
-          topics={topics}
-        />
-      )}
 
       {/* 25 More Ideas Modal */}
       <Dialog open={!!extraKeyword} onOpenChange={(open) => !open && setExtraKeyword(null)}>
