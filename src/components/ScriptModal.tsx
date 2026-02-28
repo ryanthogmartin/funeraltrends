@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Loader2, Copy, Check, FileText } from "lucide-react";
+import { Loader2, Copy, Check, FileText, Download } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { exportScriptPdf } from "@/lib/exportPdf";
 
 interface ScriptModalProps {
   open: boolean;
@@ -137,10 +138,21 @@ const ScriptModal = ({ open, onOpenChange, idea }: ScriptModalProps) => {
 
             <div className="flex items-center justify-between pt-2">
               <span className="text-xs text-muted-foreground">~{script.wordCount} words · ~45 seconds</span>
-              <Button size="sm" variant="outline" onClick={handleCopy} className="gap-1.5 text-xs">
-                {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
-                {copied ? "Copied!" : "Copy Script"}
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => exportScriptPdf(idea, script, tones.find(t => t.id === selectedTone)?.label || selectedTone || "")}
+                  className="gap-1.5 text-xs"
+                >
+                  <Download className="h-3 w-3" />
+                  PDF
+                </Button>
+                <Button size="sm" variant="outline" onClick={handleCopy} className="gap-1.5 text-xs">
+                  {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                  {copied ? "Copied!" : "Copy Script"}
+                </Button>
+              </div>
             </div>
           </div>
         )}

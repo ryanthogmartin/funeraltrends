@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Search, Sparkles, Loader2, Copy, Check, FileText, Lock } from "lucide-react";
+import { Search, Sparkles, Loader2, Copy, Check, FileText, Lock, Download } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import ScriptModal from "./ScriptModal";
+import { exportVideoIdeasPdf } from "@/lib/exportPdf";
 
 interface CustomKeywordTopicsProps {
   isAuthenticated: boolean;
@@ -140,7 +141,18 @@ const CustomKeywordTopics = ({ isAuthenticated, onRequireAuth }: CustomKeywordTo
               <h3 className="text-sm font-semibold text-tertiary uppercase tracking-wide">
                 {result.keyword}
               </h3>
-              <span className="text-xs text-muted-foreground">{result.ideas.length} ideas</span>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => exportVideoIdeasPdf(result.keyword, result.ideas)}
+                  className="gap-1.5 text-xs h-7"
+                >
+                  <Download className="h-3 w-3" />
+                  Download PDF
+                </Button>
+                <span className="text-xs text-muted-foreground">{result.ideas.length} ideas</span>
+              </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {result.ideas.map((idea, i) => (
