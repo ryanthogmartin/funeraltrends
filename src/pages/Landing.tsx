@@ -73,7 +73,7 @@ const features: FeatureItem[] = [
 ];
 
 const stats = [
-  { value: "24h", label: "Data freshness" },
+  { value: "Real-time", label: "Data freshness" },
   { value: "50+", label: "Keywords tracked" },
   { value: "AI", label: "Powered insights" },
   { value: "Free", label: "To get started" },
@@ -152,7 +152,7 @@ const Landing = () => {
               <span className="text-gradient-primary">before they peak</span>
             </h1>
             <p className="text-lg text-muted-foreground mb-8 max-w-xl mx-auto leading-relaxed">
-              Real-time search trends. Social listening from Reddit. AI-powered video ideas. Customizable scroll-stopping scripts. Hashtag intelligence - all in one dashboard for the funeral profession.
+              Real-time search trends. Social listening from Facebook, Instagram, Google, and Reddit. AI-powered video ideas. Customizable scroll-stopping scripts. Hashtag intelligence - all in one dashboard for the funeral profession.
             </p>
             <div className="flex items-center justify-center gap-3 flex-wrap">
               <Link to="/dashboard">
@@ -210,7 +210,7 @@ const Landing = () => {
               Everything you need to stay ahead
             </h2>
             <p className="text-muted-foreground max-w-lg mx-auto">
-              A comprehensive toolkit for funeral profession content creators.
+              A comprehensive content toolkit for funeral professionals.
             </p>
           </motion.div>
 
