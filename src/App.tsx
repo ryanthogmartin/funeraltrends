@@ -3,10 +3,14 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
+import Landing from "./pages/Landing";
+import Dashboard from "./pages/Dashboard";
+import VideoIdeas from "./pages/VideoIdeas";
+import Hashtags from "./pages/Hashtags";
 import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
+import SiteLayout from "./components/SiteLayout";
 
 const queryClient = new QueryClient();
 
@@ -17,10 +21,12 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Index />} />
+          <Route path="/" element={<Landing />} />
+          <Route path="/dashboard" element={<SiteLayout><Dashboard /></SiteLayout>} />
+          <Route path="/video-ideas" element={<SiteLayout><VideoIdeas /></SiteLayout>} />
+          <Route path="/hashtags" element={<SiteLayout><Hashtags /></SiteLayout>} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/reset-password" element={<ResetPassword />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

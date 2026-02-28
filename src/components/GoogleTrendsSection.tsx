@@ -31,7 +31,7 @@ const GoogleTrendsSection = ({
       className="lg:col-span-3 glass-card p-5"
     >
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-serif font-semibold text-foreground">
+        <h2 className="text-lg font-display font-semibold text-foreground">
           Google Trends — Funeral Searches
         </h2>
         <span className="text-xs text-muted-foreground">Past 24h</span>
