@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Landing from "./pages/Landing";
 import Dashboard from "./pages/Dashboard";
 import VideoIdeas from "./pages/VideoIdeas";
+import SavedIdeas from "./pages/SavedIdeas";
 import Hashtags from "./pages/Hashtags";
 import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
@@ -25,6 +26,7 @@ const App = () => (
           <Route path="/dashboard" element={<SiteLayout><Dashboard /></SiteLayout>} />
           <Route path="/video-ideas" element={<SiteLayout><VideoIdeas /></SiteLayout>} />
           <Route path="/hashtags" element={<SiteLayout><Hashtags /></SiteLayout>} />
+          <Route path="/saved" element={<SiteLayout><SavedIdeas /></SiteLayout>} />
           <Route path="/auth" element={<SiteLayout><Auth /></SiteLayout>} />
           <Route path="/reset-password" element={<SiteLayout><ResetPassword /></SiteLayout>} />
           <Route path="*" element={<NotFound />} />

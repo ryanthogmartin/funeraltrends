@@ -6,6 +6,8 @@ import { useState } from "react";
 import type { TrendItem } from "@/lib/mockData";
 import ScriptModal from "./ScriptModal";
 import EmailTopicsModal from "./EmailTopicsModal";
+import SaveIdeaButton from "./SaveIdeaButton";
+import { useSaveIdea } from "@/hooks/useSaveIdea";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
@@ -58,6 +60,7 @@ const VideoTopics = ({ trends, onRequireAuth, isAuthenticated }: VideoTopicsProp
   const [scriptIdea, setScriptIdea] = useState<string | null>(null);
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [extraKeyword, setExtraKeyword] = useState<string | null>(null);
+  const { saveIdea, saving, isSaved } = useSaveIdea();
 
   const { data: extraTopics, isLoading: extraLoading } = useQuery({
     queryKey: ['extra-video-topics', extraKeyword],
@@ -153,6 +156,11 @@ const VideoTopics = ({ trends, onRequireAuth, isAuthenticated }: VideoTopicsProp
                     <li key={j} className="flex items-start gap-1.5 group">
                       <span className="text-accent-foreground text-xs mt-0.5 shrink-0">▶</span>
                       <span className="text-xs text-foreground leading-snug flex-1">{idea}</span>
+                      <SaveIdeaButton
+                        onSave={() => saveIdea({ type: "idea", ideaText: idea, source: `Trending: ${group.keyword}` })}
+                        saved={isSaved(idea)}
+                        saving={saving}
+                      />
                       <button
                         onClick={() => setScriptIdea(idea)}
                         className="shrink-0 p-0.5 rounded hover:bg-accent transition-colors text-muted-foreground hover:text-primary"
@@ -215,6 +223,12 @@ const VideoTopics = ({ trends, onRequireAuth, isAuthenticated }: VideoTopicsProp
                     {i + 1}.
                   </span>
                   <span className="text-xs text-foreground flex-1 leading-snug">{idea}</span>
+                  <SaveIdeaButton
+                    onSave={() => saveIdea({ type: "idea", ideaText: idea, source: `Trending: ${extraKeyword}` })}
+                    saved={isSaved(idea)}
+                    saving={saving}
+                    className="opacity-0 group-hover:opacity-100"
+                  />
                   <button
                     onClick={() => { setExtraKeyword(null); setScriptIdea(idea); }}
                     className="shrink-0 p-0.5 rounded hover:bg-accent transition-colors text-muted-foreground hover:text-primary opacity-0 group-hover:opacity-100"

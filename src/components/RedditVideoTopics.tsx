@@ -5,6 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
 import type { RedditPost } from "@/lib/mockData";
 import ScriptModal from "./ScriptModal";
+import SaveIdeaButton from "./SaveIdeaButton";
+import { useSaveIdea } from "@/hooks/useSaveIdea";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
@@ -56,6 +58,7 @@ const RedditVideoTopics = ({ posts, isAuthenticated, onRequireAuth }: RedditVide
   const top5Posts = posts.slice(0, 5).map(p => ({ title: p.title, subreddit: p.subreddit }));
   const [scriptIdea, setScriptIdea] = useState<string | null>(null);
   const [extraKeyword, setExtraKeyword] = useState<string | null>(null);
+  const { saveIdea, saving, isSaved } = useSaveIdea();
 
   const { data: topics, isLoading, error } = useQuery({
     queryKey: ['reddit-video-topics', ...top5Posts.map(p => p.title)],
@@ -138,6 +141,11 @@ const RedditVideoTopics = ({ posts, isAuthenticated, onRequireAuth }: RedditVide
                     <li key={j} className="flex items-start gap-1.5 group">
                       <span className="text-accent-foreground text-xs mt-0.5 shrink-0">▶</span>
                       <span className="text-xs text-foreground leading-snug flex-1">{idea}</span>
+                      <SaveIdeaButton
+                        onSave={() => saveIdea({ type: "idea", ideaText: idea, source: `Reddit: ${group.post_title.slice(0, 50)}` })}
+                        saved={isSaved(idea)}
+                        saving={saving}
+                      />
                       <button
                         onClick={() => setScriptIdea(idea)}
                         className="shrink-0 p-0.5 rounded hover:bg-accent transition-colors text-muted-foreground hover:text-primary"
@@ -194,6 +202,12 @@ const RedditVideoTopics = ({ posts, isAuthenticated, onRequireAuth }: RedditVide
                     {i + 1}.
                   </span>
                   <span className="text-xs text-foreground flex-1 leading-snug">{idea}</span>
+                  <SaveIdeaButton
+                    onSave={() => saveIdea({ type: "idea", ideaText: idea, source: `Reddit: ${extraKeyword?.slice(0, 50)}` })}
+                    saved={isSaved(idea)}
+                    saving={saving}
+                    className="opacity-0 group-hover:opacity-100"
+                  />
                   <button
                     onClick={() => { setExtraKeyword(null); setScriptIdea(idea); }}
                     className="shrink-0 p-0.5 rounded hover:bg-accent transition-colors text-muted-foreground hover:text-primary opacity-0 group-hover:opacity-100"

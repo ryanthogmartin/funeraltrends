@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Loader2, Copy, Check, FileText, Download } from "lucide-react";
+import { Loader2, Copy, Check, FileText, Download, Bookmark } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { exportScriptPdf } from "@/lib/exportPdf";
+import { useSaveIdea } from "@/hooks/useSaveIdea";
 
 interface ScriptModalProps {
   open: boolean;
@@ -32,6 +33,7 @@ const ScriptModal = ({ open, onOpenChange, idea }: ScriptModalProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
+  const { saveIdea, saving: savingIdea, isSaved } = useSaveIdea();
 
   const generateScript = async (tone: string) => {
     setSelectedTone(tone);
@@ -139,6 +141,23 @@ const ScriptModal = ({ open, onOpenChange, idea }: ScriptModalProps) => {
             <div className="flex items-center justify-between pt-2">
               <span className="text-xs text-muted-foreground">~{script.wordCount} words · ~45 seconds</span>
               <div className="flex items-center gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => saveIdea({
+                    type: "script",
+                    ideaText: idea,
+                    scriptHook: script.hook,
+                    scriptBody: script.body,
+                    scriptCta: script.cta,
+                    scriptTone: tones.find(t => t.id === selectedTone)?.label || selectedTone || "",
+                  })}
+                  disabled={savingIdea || isSaved(idea, "script", selectedTone || "")}
+                  className="gap-1.5 text-xs"
+                >
+                  <Bookmark className="h-3 w-3" />
+                  {isSaved(idea, "script", selectedTone || "") ? "Saved" : "Save"}
+                </Button>
                 <Button
                   size="sm"
                   variant="outline"

@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import ScriptModal from "./ScriptModal";
+import SaveIdeaButton from "./SaveIdeaButton";
+import { useSaveIdea } from "@/hooks/useSaveIdea";
 import { exportVideoIdeasPdf } from "@/lib/exportPdf";
 
 interface CustomKeywordTopicsProps {
@@ -38,6 +40,7 @@ const CustomKeywordTopics = ({ isAuthenticated, onRequireAuth }: CustomKeywordTo
   const [isLoading, setIsLoading] = useState(false);
   const [scriptIdea, setScriptIdea] = useState<string | null>(null);
   const { toast } = useToast();
+  const { saveIdea, saving, isSaved } = useSaveIdea();
 
   const handleGenerate = async () => {
     if (!isAuthenticated) {
@@ -167,6 +170,12 @@ const CustomKeywordTopics = ({ isAuthenticated, onRequireAuth }: CustomKeywordTo
                     {i + 1}.
                   </span>
                   <span className="text-xs text-foreground flex-1 leading-snug">{idea}</span>
+                  <SaveIdeaButton
+                    onSave={() => saveIdea({ type: "idea", ideaText: idea, source: `Keyword: ${result.keyword}` })}
+                    saved={isSaved(idea)}
+                    saving={saving}
+                    className="opacity-0 group-hover:opacity-100"
+                  />
                   <button
                     onClick={() => setScriptIdea(idea)}
                     className="shrink-0 p-0.5 rounded hover:bg-accent transition-colors text-muted-foreground hover:text-tertiary opacity-0 group-hover:opacity-100"

@@ -110,6 +110,45 @@ export type Database = {
         }
         Relationships: []
       }
+      saved_ideas: {
+        Row: {
+          created_at: string
+          id: string
+          idea_text: string
+          script_body: string | null
+          script_cta: string | null
+          script_hook: string | null
+          script_tone: string | null
+          source: string | null
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          idea_text: string
+          script_body?: string | null
+          script_cta?: string | null
+          script_hook?: string | null
+          script_tone?: string | null
+          source?: string | null
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          idea_text?: string
+          script_body?: string | null
+          script_cta?: string | null
+          script_hook?: string | null
+          script_tone?: string | null
+          source?: string | null
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
