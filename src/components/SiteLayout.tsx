@@ -21,9 +21,12 @@ const SiteLayout = ({ children }: { children: React.ReactNode }) => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-14">
           <Link to="/" className="flex items-center gap-2 group">
             <Skull className="h-5 w-5 text-primary" />
-            <span className="font-display font-bold text-foreground text-lg tracking-tight">
-              Funeral<span className="text-primary">Trends</span>
-            </span>
+            <div>
+              <span className="font-display font-bold text-foreground text-lg tracking-tight">
+                Funeral<span className="text-primary">Trends</span>
+              </span>
+              <p className="text-[9px] text-muted-foreground leading-none -mt-0.5">powered by DISRUPT Media</p>
+            </div>
           </Link>
 
           <nav className="hidden sm:flex items-center gap-1">
@@ -91,12 +94,15 @@ const SiteLayout = ({ children }: { children: React.ReactNode }) => {
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
               <Skull className="h-4 w-4 text-primary" />
+            <div>
               <span className="font-display font-semibold text-sm text-foreground">
                 Funeral<span className="text-primary">Trends</span>
               </span>
+              <p className="text-[8px] text-muted-foreground leading-none">powered by DISRUPT Media</p>
+            </div>
             </div>
             <p className="text-xs text-muted-foreground text-center">
-              Real-time funeral industry insights · Data refreshes daily
+              Real-time funeral profession insights · Data refreshes daily
             </p>
             <div className="flex items-center gap-4">
               {navItems.map(({ to, label }) => (

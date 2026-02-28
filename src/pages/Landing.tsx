@@ -51,9 +51,12 @@ const Landing = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-14">
           <div className="flex items-center gap-2">
             <Skull className="h-5 w-5 text-primary" />
-            <span className="font-display font-bold text-foreground text-lg tracking-tight">
-              Funeral<span className="text-primary">Trends</span>
-            </span>
+            <div>
+              <span className="font-display font-bold text-foreground text-lg tracking-tight">
+                Funeral<span className="text-primary">Trends</span>
+              </span>
+              <p className="text-[9px] text-muted-foreground leading-none -mt-0.5">powered by DISRUPT Media</p>
+            </div>
           </div>
           <div className="flex items-center gap-3">
             <Link to="/auth">
@@ -82,7 +85,7 @@ const Landing = () => {
           >
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/30 bg-primary/5 text-primary text-xs font-medium mb-6">
               <Zap className="h-3 w-3" />
-              AI-Powered Funeral Industry Intelligence
+              AI-Powered Funeral Profession Intelligence
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-display font-bold text-foreground leading-tight mb-6">
               Track funeral trends
@@ -90,7 +93,7 @@ const Landing = () => {
               <span className="text-gradient-primary">before they peak</span>
             </h1>
             <p className="text-lg text-muted-foreground mb-8 max-w-xl mx-auto leading-relaxed">
-              Real-time search trends, Reddit discussions, AI-generated video ideas, and hashtag intelligence — all in one executive dashboard.
+              Real-time search trends, Reddit discussions, AI-generated video ideas, and hashtag intelligence — all in one executive dashboard for the funeral profession.
             </p>
             <div className="flex items-center justify-center gap-3">
               <Link to="/dashboard">
@@ -136,7 +139,7 @@ const Landing = () => {
               Everything you need to stay ahead
             </h2>
             <p className="text-muted-foreground max-w-lg mx-auto">
-              A comprehensive toolkit for funeral industry content creators and marketers.
+              A comprehensive toolkit for funeral profession content creators and marketers.
             </p>
           </motion.div>
 
@@ -190,12 +193,15 @@ const Landing = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <Skull className="h-4 w-4 text-primary" />
-            <span className="font-display font-semibold text-sm">
-              Funeral<span className="text-primary">Trends</span>
-            </span>
+            <div>
+              <span className="font-display font-semibold text-sm">
+                Funeral<span className="text-primary">Trends</span>
+              </span>
+              <p className="text-[8px] text-muted-foreground leading-none">powered by DISRUPT Media</p>
+            </div>
           </div>
           <p className="text-xs text-muted-foreground">
-            © 2026 FuneralTrends. AI-powered funeral industry intelligence.
+            © 2026 FuneralTrends. AI-powered funeral profession intelligence. · Powered by DISRUPT Media
           </p>
         </div>
       </footer>
