@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Sparkles, Loader2, Copy, Check, TrendingUp, Search, FileText, MessageSquare, Users, Eye, ThumbsUp, Clock, Zap } from "lucide-react";
+import { Sparkles, Loader2, Copy, Check, TrendingUp, Search, FileText, MessageSquare, Users, Eye, ThumbsUp, Clock, Zap, Lock, ArrowRight } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
@@ -94,6 +94,59 @@ const ReelsInsights = ({ trends, isAuthenticated, onRequireAuth }: ReelsInsights
     staleTime: 1000 * 60 * 30,
   });
 
+  if (!isAuthenticated) {
+    return (
+      <motion.section
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.6, duration: 0.5 }}
+        className="glass-card p-5 mt-6 relative overflow-hidden cursor-pointer group hover:border-secondary/50 hover:shadow-[0_0_20px_-5px_hsl(var(--secondary)/0.2)] transition-all duration-300"
+        onClick={onRequireAuth}
+      >
+        <div className="absolute inset-0 bg-gradient-to-t from-secondary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10" />
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-4">
+          <div className="flex items-center gap-2">
+            <div className={`w-5 h-5 rounded flex items-center justify-center bg-gradient-to-br ${IG_GRADIENT}`}>
+              <svg className="h-3 w-3 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+            </div>
+            <h2 className="text-lg font-display font-semibold text-foreground group-hover:text-secondary transition-colors duration-300">
+              Instagram Reels Ideas
+            </h2>
+            <Sparkles className="h-4 w-4 text-tertiary" />
+          </div>
+          <motion.span
+            className="flex items-center gap-1 px-2.5 py-1 rounded-full border border-secondary/30 bg-secondary/10 text-secondary text-[10px] font-medium ml-0 sm:ml-auto w-fit"
+            whileHover={{ scale: 1.05 }}
+          >
+            <Lock className="h-2.5 w-2.5" />
+            Sign in to unlock
+          </motion.span>
+        </div>
+        <div className="relative">
+          <div className="filter blur-[6px] pointer-events-none select-none" aria-hidden="true">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="bg-accent/40 rounded-lg p-3 border border-border/50">
+                  <div className="h-4 bg-muted-foreground/10 rounded w-3/4 mb-2" />
+                  <div className="h-3 bg-muted-foreground/10 rounded w-full mb-1" />
+                  <div className="h-3 bg-muted-foreground/10 rounded w-2/3" />
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
+            <Lock className="h-8 w-8 text-secondary/60 mb-2" />
+            <p className="text-sm font-medium text-foreground">Sign in to view Instagram Reels Ideas</p>
+            <p className="text-xs text-muted-foreground mt-1 group-hover:hidden">Requires account</p>
+            <p className="text-xs text-secondary mt-1 hidden group-hover:flex items-center gap-1">
+              Sign in to get started <ArrowRight className="h-3 w-3" />
+            </p>
+          </div>
+        </div>
+      </motion.section>
+    );
+  }
+
   return (
     <>
       <motion.section
@@ -129,7 +182,6 @@ const ReelsInsights = ({ trends, isAuthenticated, onRequireAuth }: ReelsInsights
             </TabsTrigger>
           </TabsList>
 
-          {/* AI-Generated Reels Ideas */}
           <TabsContent value="ideas">
             {ideasLoading && (
               <div className="flex items-center justify-center py-8 gap-2 text-muted-foreground">
@@ -169,10 +221,7 @@ const ReelsInsights = ({ trends, isAuthenticated, onRequireAuth }: ReelsInsights
                             className="sm:opacity-0 sm:group-hover:opacity-100"
                           />
                           <button
-                            onClick={() => {
-                              if (!isAuthenticated) { onRequireAuth(); return; }
-                              setScriptIdea(idea.idea);
-                            }}
+                            onClick={() => setScriptIdea(idea.idea)}
                             className="shrink-0 p-0.5 rounded hover:bg-accent transition-colors text-muted-foreground hover:text-primary sm:opacity-0 sm:group-hover:opacity-100"
                             title="Generate Script"
                           >
@@ -182,7 +231,6 @@ const ReelsInsights = ({ trends, isAuthenticated, onRequireAuth }: ReelsInsights
                         </div>
                       </div>
 
-                      {/* Hook preview */}
                       <div className="p-1.5 bg-primary/5 rounded border border-primary/15 mb-2">
                         <p className="text-[11px] text-foreground leading-snug">
                           <span className="font-semibold text-primary text-[10px] uppercase tracking-wide mr-1">Hook:</span>
@@ -211,7 +259,6 @@ const ReelsInsights = ({ trends, isAuthenticated, onRequireAuth }: ReelsInsights
             )}
           </TabsContent>
 
-          {/* Live Reels Trends */}
           <TabsContent value="trending">
             {trendsLoading && (
               <div className="flex items-center justify-center py-8 gap-2 text-muted-foreground">
