@@ -5,6 +5,7 @@ import TrendChart from "@/components/TrendChart";
 import TrendRow from "@/components/TrendRow";
 import RedditCard from "@/components/RedditCard";
 import VideoTopics from "@/components/VideoTopics";
+import RedditVideoTopics from "@/components/RedditVideoTopics";
 import { mockTrends, mockRedditPosts, mockStats } from "@/lib/mockData";
 import { fetchTrends, fetchRedditPosts, fetchDashboardStats, triggerDataRefresh } from "@/lib/api";
 import { motion } from "framer-motion";
@@ -138,8 +139,11 @@ const Index = () => {
           </motion.section>
         </div>
 
-        {/* Video Content Ideas */}
+        {/* Video Content Ideas - Trends */}
         <VideoTopics trends={trends} />
+
+        {/* Video Content Ideas - Reddit */}
+        <RedditVideoTopics posts={redditPosts} />
 
         {/* Footer */}
         <div className="mt-8 text-center">
