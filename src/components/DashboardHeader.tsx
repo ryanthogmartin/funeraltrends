@@ -23,7 +23,7 @@ const DashboardHeader = ({ lastUpdated, onRefresh, onExportCsv }: DashboardHeade
             Funeral Trends
           </h1>
         </div>
-        <p className="text-muted-foreground text-sm">Real-time funeral profession search trends & discussions - last 24 hours
+        <p className="text-muted-foreground text-sm">Real-time funeral profession search trends & discussions
 
         </p>
       </div>
