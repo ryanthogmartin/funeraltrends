@@ -199,7 +199,11 @@ const Index = () => {
         />
 
         {/* Video Content Ideas - Reddit */}
-        <RedditVideoTopics posts={redditPosts} />
+        <RedditVideoTopics
+          posts={redditPosts}
+          isAuthenticated={!!user}
+          onRequireAuth={() => navigate("/auth")}
+        />
 
         {/* TikTok Hashtag Tracker */}
         <HashtagTracker trends={trends} />
