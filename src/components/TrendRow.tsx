@@ -52,9 +52,14 @@ const TrendRow = ({ trend, index, rank }: TrendRowProps) => {
         {rank}
       </span>
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-foreground truncate group-hover:text-primary transition-colors">
+        <a
+          href={`https://trends.google.com/trends/explore?q=${encodeURIComponent(trend.keyword)}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-sm font-medium text-foreground truncate group-hover:text-primary transition-colors hover:underline block"
+        >
           {trend.keyword}
-        </p>
+        </a>
         <p className="text-xs text-muted-foreground">
           {trend.volume.toLocaleString()} searches
         </p>
