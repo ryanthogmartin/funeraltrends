@@ -94,7 +94,7 @@ const VideoTopics = ({ trends, onRequireAuth, isAuthenticated }: VideoTopicsProp
           <h2 className="text-lg font-display font-semibold text-foreground">
             Short-Form Video Ideas
           </h2>
-          <Sparkles className="h-4 w-4 text-accent-foreground" />
+          <Sparkles className="h-4 w-4 text-tertiary" />
           <div className="ml-auto flex items-center gap-2">
             {topics && (
               <Button
@@ -142,7 +142,7 @@ const VideoTopics = ({ trends, onRequireAuth, isAuthenticated }: VideoTopicsProp
                     variant="ghost"
                     size="sm"
                     onClick={() => handleGenerate25(group.keyword)}
-                    className="gap-1 text-[10px] h-6 text-muted-foreground hover:text-primary shrink-0"
+                    className="gap-1 text-[10px] h-6 text-muted-foreground hover:text-tertiary shrink-0"
                   >
                     <Sparkles className="h-3 w-3" />
                     25 More

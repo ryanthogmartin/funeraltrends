@@ -83,7 +83,7 @@ const Landing = () => {
             transition={{ duration: 0.7 }}
             className="text-center max-w-3xl mx-auto"
           >
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/30 bg-primary/5 text-primary text-xs font-medium mb-6">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-tertiary/30 bg-tertiary/5 text-tertiary text-xs font-medium mb-6">
               <Zap className="h-3 w-3" />
               AI-Powered Funeral Profession Intelligence
             </div>
@@ -97,7 +97,7 @@ const Landing = () => {
             </p>
             <div className="flex items-center justify-center gap-3">
               <Link to="/dashboard">
-                <Button size="lg" className="font-semibold gap-2 px-6">
+                <Button size="lg" className="font-semibold gap-2 px-6 bg-tertiary text-tertiary-foreground hover:bg-tertiary/90">
                   Explore Dashboard <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
@@ -151,7 +151,7 @@ const Landing = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.08, duration: 0.5 }}
-                className="section-panel hover:border-primary/20 transition-colors group"
+                className="section-panel hover:border-tertiary/30 transition-colors group"
               >
                 <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
                   <feature.icon className="h-4.5 w-4.5 text-primary" />
@@ -180,7 +180,7 @@ const Landing = () => {
               Start exploring trends, generating content ideas, and tracking hashtags — completely free.
             </p>
             <Link to="/dashboard">
-              <Button size="lg" className="font-semibold gap-2 px-8">
+              <Button size="lg" className="font-semibold gap-2 px-8 bg-tertiary text-tertiary-foreground hover:bg-tertiary/90">
                 Get Started <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>

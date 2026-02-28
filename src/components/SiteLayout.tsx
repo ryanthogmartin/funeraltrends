@@ -38,8 +38,8 @@ const SiteLayout = ({ children }: { children: React.ReactNode }) => {
                   to={to}
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
                     isActive
-                      ? "bg-accent text-primary"
-                      : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                      ? "bg-accent text-tertiary"
+                      : "text-muted-foreground hover:text-tertiary hover:bg-accent/50"
                   }`}
                 >
                   <Icon className="h-3.5 w-3.5" />
@@ -74,7 +74,7 @@ const SiteLayout = ({ children }: { children: React.ReactNode }) => {
                 key={to}
                 to={to}
                 className={`flex-1 flex items-center justify-center gap-1 py-2 text-xs font-medium transition-colors ${
-                  isActive ? "text-primary bg-accent" : "text-muted-foreground"
+                  isActive ? "text-tertiary bg-accent" : "text-muted-foreground"
                 }`}
               >
                 <Icon className="h-3.5 w-3.5" />
@@ -106,7 +106,7 @@ const SiteLayout = ({ children }: { children: React.ReactNode }) => {
             </p>
             <div className="flex items-center gap-4">
               {navItems.map(({ to, label }) => (
-                <Link key={to} to={to} className="text-xs text-muted-foreground hover:text-foreground transition-colors">
+                <Link key={to} to={to} className="text-xs text-muted-foreground hover:text-tertiary transition-colors">
                   {label}
                 </Link>
               ))}
