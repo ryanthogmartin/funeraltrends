@@ -32,7 +32,7 @@ const features = [
   {
     icon: Zap,
     title: "Script Generation",
-    description: "One-click AI script generation for any video idea — ready to record.",
+    description: "One-click AI script generation for any video idea - ready to record or customize for your funeral home.",
   },
 ];
 
