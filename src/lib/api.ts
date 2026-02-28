@@ -7,7 +7,7 @@ export async function fetchTrends(): Promise<TrendItem[]> {
     .from('funeral_trends')
     .select('*')
     .order('volume', { ascending: false })
-    .limit(12);
+    .limit(24);
 
   if (error || !data || data.length === 0) {
     console.log('Using mock trends data');
