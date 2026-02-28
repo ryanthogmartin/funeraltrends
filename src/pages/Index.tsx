@@ -7,6 +7,7 @@ import RedditCard from "@/components/RedditCard";
 import VideoTopics from "@/components/VideoTopics";
 import RedditVideoTopics from "@/components/RedditVideoTopics";
 import HashtagTracker from "@/components/HashtagTracker";
+import InstagramHashtagTracker from "@/components/InstagramHashtagTracker";
 import KeywordWatchlist from "@/components/KeywordWatchlist";
 import { mockTrends, mockRedditPosts, mockStats } from "@/lib/mockData";
 import { fetchTrends, fetchRedditPosts, fetchDashboardStats, triggerDataRefresh } from "@/lib/api";
@@ -207,6 +208,9 @@ const Index = () => {
 
         {/* TikTok Hashtag Tracker */}
         <HashtagTracker trends={trends} />
+
+        {/* Instagram Hashtag Tracker */}
+        <InstagramHashtagTracker trends={trends} />
 
         {/* Keyword Watchlist — requires auth */}
         {user && <KeywordWatchlist userId={user.id} trends={trends} />}
