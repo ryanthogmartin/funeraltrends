@@ -16,6 +16,18 @@ const FUNERAL_KEYWORDS = [
   "funeral alternatives",
   "aquamation",
   "death doula",
+  "home funeral",
+  "eco-friendly funeral",
+  "alkaline hydrolysis",
+  "funeral costs average",
+  "cremation jewelry",
+  "living funeral",
+  "tree pod burial",
+  "human composting",
+  "grief counseling",
+  "end of life planning",
+  "memorial reef",
+  "mushroom burial suit",
 ];
 
 const FUNERAL_SUBREDDITS = [
@@ -164,7 +176,7 @@ async function fetchGoogleTrendsData(): Promise<any[]> {
     }
   }
 
-  return trends.sort((a, b) => b.volume - a.volume).slice(0, 12);
+  return trends.sort((a, b) => b.volume - a.volume).slice(0, 24);
 }
 
 function isFuneralRelated(text: string): boolean {
