@@ -1,11 +1,15 @@
 import { motion } from "framer-motion";
-import { TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { TrendingUp, TrendingDown, Minus, Plus, Loader2 } from "lucide-react";
 import type { TrendItem } from "@/lib/mockData";
+import { Button } from "@/components/ui/button";
 
 interface TrendRowProps {
   trend: TrendItem;
   index: number;
   rank: number;
+  onAddToWatchlist?: (keyword: string) => void;
+  isAddingToWatchlist?: boolean;
+  addingKeyword?: string;
 }
 
 const MiniSparkline = ({ data }: { data: number[] }) => {
@@ -37,7 +41,7 @@ const MiniSparkline = ({ data }: { data: number[] }) => {
   );
 };
 
-const TrendRow = ({ trend, index, rank }: TrendRowProps) => {
+const TrendRow = ({ trend, index, rank, onAddToWatchlist, isAddingToWatchlist, addingKeyword }: TrendRowProps) => {
   const isUp = trend.change > 0;
   const isDown = trend.change < 0;
 
@@ -78,6 +82,22 @@ const TrendRow = ({ trend, index, rank }: TrendRowProps) => {
           {trend.change}%
         </span>
       </div>
+      {onAddToWatchlist && (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => onAddToWatchlist(trend.keyword)}
+          disabled={isAddingToWatchlist && addingKeyword === trend.keyword}
+          className="gap-1 text-xs h-7 text-muted-foreground hover:text-primary shrink-0"
+        >
+          {isAddingToWatchlist && addingKeyword === trend.keyword ? (
+            <Loader2 className="h-3 w-3 animate-spin" />
+          ) : (
+            <Plus className="h-3 w-3" />
+          )}
+          Watchlist
+        </Button>
+      )}
     </motion.div>
   );
 };
