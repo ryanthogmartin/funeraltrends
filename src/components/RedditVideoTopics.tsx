@@ -1,21 +1,21 @@
 import { motion } from "framer-motion";
-import { Video, Sparkles, Loader2 } from "lucide-react";
+import { Video, Sparkles, Loader2, MessageSquare } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import type { TrendItem } from "@/lib/mockData";
+import type { RedditPost } from "@/lib/mockData";
 
-interface VideoTopicsProps {
-  trends: TrendItem[];
+interface RedditVideoTopicsProps {
+  posts: RedditPost[];
 }
 
-interface TopicGroup {
-  keyword: string;
+interface RedditTopicGroup {
+  post_title: string;
   ideas: string[];
 }
 
-const fetchVideoTopics = async (keywords: string[]): Promise<TopicGroup[]> => {
-  const { data, error } = await supabase.functions.invoke('generate-video-topics', {
-    body: { keywords },
+const fetchRedditVideoTopics = async (posts: { title: string; subreddit: string }[]): Promise<RedditTopicGroup[]> => {
+  const { data, error } = await supabase.functions.invoke('generate-reddit-video-topics', {
+    body: { posts },
   });
 
   if (error) throw new Error(error.message);
@@ -23,36 +23,36 @@ const fetchVideoTopics = async (keywords: string[]): Promise<TopicGroup[]> => {
   return data.data;
 };
 
-const VideoTopics = ({ trends }: VideoTopicsProps) => {
-  const top10Keywords = trends.slice(0, 10).map(t => t.keyword);
+const RedditVideoTopics = ({ posts }: RedditVideoTopicsProps) => {
+  const top5Posts = posts.slice(0, 5).map(p => ({ title: p.title, subreddit: p.subreddit }));
 
   const { data: topics, isLoading, error } = useQuery({
-    queryKey: ['video-topics', ...top10Keywords],
-    queryFn: () => fetchVideoTopics(top10Keywords),
+    queryKey: ['reddit-video-topics', ...top5Posts.map(p => p.title)],
+    queryFn: () => fetchRedditVideoTopics(top5Posts),
     staleTime: 1000 * 60 * 30,
-    enabled: top10Keywords.length > 0,
+    enabled: top5Posts.length > 0,
   });
 
   return (
     <motion.section
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.5, duration: 0.5 }}
+      transition={{ delay: 0.6, duration: 0.5 }}
       className="glass-card p-5 mt-6"
     >
       <div className="flex items-center gap-2 mb-4">
-        <Video className="h-5 w-5 text-primary" />
+        <MessageSquare className="h-5 w-5 text-primary" />
         <h2 className="text-lg font-serif font-semibold text-foreground">
-          Short-Form Video Ideas
+          Reddit-Inspired Video Ideas
         </h2>
         <Sparkles className="h-4 w-4 text-accent-foreground" />
-        <span className="text-xs text-muted-foreground ml-auto">AI-generated from top 10 trends</span>
+        <span className="text-xs text-muted-foreground ml-auto">AI-generated from top 5 Reddit posts</span>
       </div>
 
       {isLoading && (
         <div className="flex items-center justify-center py-8 gap-2 text-muted-foreground">
           <Loader2 className="h-4 w-4 animate-spin" />
-          <span className="text-sm">Generating video ideas...</span>
+          <span className="text-sm">Generating video ideas from Reddit discussions...</span>
         </div>
       )}
 
@@ -66,14 +66,14 @@ const VideoTopics = ({ trends }: VideoTopicsProps) => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {topics.map((group, i) => (
             <motion.div
-              key={group.keyword}
+              key={group.post_title}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.08, duration: 0.4 }}
               className="bg-accent/50 rounded-lg p-3 border border-border/50"
             >
-              <h3 className="text-xs font-semibold text-primary mb-2 uppercase tracking-wide truncate">
-                {group.keyword}
+              <h3 className="text-xs font-semibold text-primary mb-2 leading-snug line-clamp-2">
+                {group.post_title}
               </h3>
               <ul className="space-y-1.5">
                 {group.ideas.map((idea, j) => (
@@ -91,4 +91,4 @@ const VideoTopics = ({ trends }: VideoTopicsProps) => {
   );
 };
 
-export default VideoTopics;
+export default RedditVideoTopics;

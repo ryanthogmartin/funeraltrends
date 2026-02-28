@@ -9,11 +9,11 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { keywords } = await req.json();
+    const { posts } = await req.json();
 
-    if (!keywords || !Array.isArray(keywords) || keywords.length === 0) {
+    if (!posts || !Array.isArray(posts) || posts.length === 0) {
       return new Response(
-        JSON.stringify({ success: false, error: 'keywords array is required' }),
+        JSON.stringify({ success: false, error: 'posts array is required' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -26,7 +26,10 @@ Deno.serve(async (req) => {
       );
     }
 
-    const topKeywords = keywords.slice(0, 10);
+    const top5 = posts.slice(0, 5);
+    const postDescriptions = top5.map((p: { title: string; subreddit: string }, i: number) =>
+      `${i + 1}. "${p.title}" (r/${p.subreddit})`
+    ).join('\n');
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
@@ -39,16 +42,17 @@ Deno.serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: 'You generate short-form video content ideas (TikTok/Reels/Shorts) for funeral industry topics. Return ONLY valid JSON, no markdown.'
+            content: 'You generate short-form video content ideas (TikTok/Reels/Shorts) inspired by Reddit discussions about the funeral industry. Return ONLY valid JSON, no markdown.'
           },
           {
             role: 'user',
-            content: `For each of these ${topKeywords.length} trending funeral search keywords, suggest exactly 3 short-form video content topics. Each topic should be a catchy, engaging title under 80 characters suitable for TikTok/Reels/Shorts.
+            content: `Based on these 5 trending Reddit discussions about funerals, suggest exactly 3 short-form video content ideas for each. Each idea should be a catchy, engaging title under 80 characters suitable for TikTok/Reels/Shorts.
 
-Keywords: ${topKeywords.join(', ')}
+Reddit posts:
+${postDescriptions}
 
 Return JSON in this exact format:
-${JSON.stringify({ topics: [{ keyword: "example", ideas: ["idea1", "idea2", "idea3"] }] })}`
+${JSON.stringify({ topics: [{ post_title: "example post", ideas: ["idea1", "idea2", "idea3"] }] })}`
           }
         ],
         temperature: 0.8,
@@ -67,8 +71,7 @@ ${JSON.stringify({ topics: [{ keyword: "example", ideas: ["idea1", "idea2", "ide
 
     const data = await response.json();
     const content = data.choices?.[0]?.message?.content || '';
-    
-    // Parse JSON from response, handling potential markdown code blocks
+
     let parsed;
     try {
       const cleaned = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
@@ -86,7 +89,7 @@ ${JSON.stringify({ topics: [{ keyword: "example", ideas: ["idea1", "idea2", "ide
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
-    console.error('Error generating video topics:', error);
+    console.error('Error generating reddit video topics:', error);
     return new Response(
       JSON.stringify({ success: false, error: error instanceof Error ? error.message : 'Unknown error' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
