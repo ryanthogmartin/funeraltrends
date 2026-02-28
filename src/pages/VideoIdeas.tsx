@@ -2,6 +2,8 @@ import VideoTopics from "@/components/VideoTopics";
 import RedditVideoTopics from "@/components/RedditVideoTopics";
 import CustomKeywordTopics from "@/components/CustomKeywordTopics";
 import QuestionSeriesGenerator from "@/components/QuestionSeriesGenerator";
+import FacebookInsights from "@/components/FacebookInsights";
+import ReelsInsights from "@/components/ReelsInsights";
 import { mockTrends, mockRedditPosts } from "@/lib/mockData";
 import { fetchTrends, fetchRedditPosts } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
@@ -11,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 const VideoIdeas = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const isAuthenticated = loading || !!user;
 
   const { data: trends = mockTrends } = useQuery({
     queryKey: ['funeral-trends'],
@@ -32,24 +35,36 @@ const VideoIdeas = () => {
       </div>
 
       <QuestionSeriesGenerator
-        isAuthenticated={loading || !!user}
+        isAuthenticated={isAuthenticated}
         onRequireAuth={() => navigate("/auth")}
       />
 
       <CustomKeywordTopics
-        isAuthenticated={loading || !!user}
+        isAuthenticated={isAuthenticated}
+        onRequireAuth={() => navigate("/auth")}
+      />
+
+      <FacebookInsights
+        trends={trends}
+        isAuthenticated={isAuthenticated}
+        onRequireAuth={() => navigate("/auth")}
+      />
+
+      <ReelsInsights
+        trends={trends}
+        isAuthenticated={isAuthenticated}
         onRequireAuth={() => navigate("/auth")}
       />
 
       <VideoTopics
         trends={trends}
-        isAuthenticated={loading || !!user}
+        isAuthenticated={isAuthenticated}
         onRequireAuth={() => navigate("/auth")}
       />
 
       <RedditVideoTopics
         posts={redditPosts}
-        isAuthenticated={loading || !!user}
+        isAuthenticated={isAuthenticated}
         onRequireAuth={() => navigate("/auth")}
       />
     </div>

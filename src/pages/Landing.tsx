@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Skull, TrendingUp, Video, Hash, ArrowRight, BarChart3, Zap, Globe, Sparkles, Lock } from "lucide-react";
+import { Skull, TrendingUp, Video, Hash, ArrowRight, BarChart3, Zap, Globe, Sparkles, Lock, Film } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -40,6 +40,20 @@ const features: FeatureItem[] = [
     description: "TikTok and Instagram hashtag tracking with growth rates and category analysis.",
     link: "/hashtags",
     requiresAuth: false,
+  },
+  {
+    icon: Globe,
+    title: "Facebook Insights",
+    description: "AI-generated Facebook post ideas and live trending funeral discussions from across the platform.",
+    link: "/video-ideas",
+    requiresAuth: true,
+  },
+  {
+    icon: Film,
+    title: "Instagram Reels Ideas",
+    description: "Scroll-stopping Reels concepts with hooks, content types, and live viral trend tracking.",
+    link: "/video-ideas",
+    requiresAuth: true,
   },
   {
     icon: Globe,
@@ -198,7 +212,7 @@ const Landing = () => {
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {features.map((feature, i) => {
               const isLocked = feature.requiresAuth && !isAuthenticated;
               return (
