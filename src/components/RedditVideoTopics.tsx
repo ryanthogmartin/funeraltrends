@@ -152,7 +152,7 @@ const RedditVideoTopics = ({ posts, isAuthenticated, onRequireAuth }: RedditVide
                           setScriptIdea(idea);
                         }}
                         className="shrink-0 p-0.5 rounded hover:bg-accent transition-colors text-muted-foreground hover:text-primary"
-                        title="Write Script"
+                        title="Generate Script"
                       >
                         <FileText className="h-3 w-3" />
                       </button>
@@ -217,7 +217,7 @@ const RedditVideoTopics = ({ posts, isAuthenticated, onRequireAuth }: RedditVide
                        setExtraKeyword(null); setScriptIdea(idea);
                      }}
                      className="shrink-0 p-0.5 rounded hover:bg-accent transition-colors text-muted-foreground hover:text-primary opacity-0 group-hover:opacity-100"
-                     title="Write Script"
+                     title="Generate Script"
                    >
                      <FileText className="h-3 w-3" />
                    </button>
