@@ -15,7 +15,7 @@
     --popover: 0 0% 12%;
     --popover-foreground: 0 0% 100%;
 
-    --primary: 49 100% 48%;
+    --primary: 84 100% 50%;
     --primary-foreground: 0 0% 0%;
 
     --secondary: 190 100% 50%;
@@ -25,14 +25,14 @@
     --muted-foreground: 0 0% 74%;
 
     --accent: 0 0% 16%;
-    --accent-foreground: 49 100% 48%;
+    --accent-foreground: 84 100% 50%;
 
     --destructive: 0 84% 50%;
     --destructive-foreground: 0 0% 100%;
 
     --border: 0 0% 20%;
     --input: 0 0% 20%;
-    --ring: 49 100% 48%;
+    --ring: 84 100% 50%;
 
     --radius: 0.75rem;
 
@@ -42,14 +42,14 @@
 
     --sidebar-background: 0 0% 5%;
     --sidebar-foreground: 0 0% 100%;
-    --sidebar-primary: 49 100% 48%;
+    --sidebar-primary: 84 100% 50%;
     --sidebar-primary-foreground: 0 0% 0%;
     --sidebar-accent: 0 0% 16%;
     --sidebar-accent-foreground: 0 0% 100%;
     --sidebar-border: 0 0% 20%;
-    --sidebar-ring: 49 100% 48%;
+    --sidebar-ring: 84 100% 50%;
 
-    --chart-1: 49 100% 48%;
+    --chart-1: 84 100% 50%;
     --chart-2: 190 100% 50%;
     --chart-3: 330 100% 60%;
     --chart-4: 142 50% 45%;
@@ -92,7 +92,7 @@
   }
 
   .text-gradient-primary {
-    background: linear-gradient(135deg, hsl(49 100% 48%), hsl(49 100% 65%));
+    background: linear-gradient(135deg, hsl(84 100% 50%), hsl(84 100% 70%));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -106,6 +106,6 @@
   }
 
   .glow-primary {
-    box-shadow: 0 0 20px hsl(49 100% 48% / 0.15), 0 0 60px hsl(49 100% 48% / 0.05);
+    box-shadow: 0 0 20px hsl(84 100% 50% / 0.15), 0 0 60px hsl(84 100% 50% / 0.05);
   }
 }
