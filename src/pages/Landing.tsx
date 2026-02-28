@@ -46,7 +46,7 @@ const features: FeatureItem[] = [
     title: "Keyword Watchlist",
     description: "Save keywords to your personal watchlist and get notified on volume spikes.",
     link: "/dashboard",
-    requiresAuth: false,
+    requiresAuth: true,
   },
   {
     icon: Zap,
