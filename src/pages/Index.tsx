@@ -8,6 +8,7 @@ import VideoTopics from "@/components/VideoTopics";
 import RedditVideoTopics from "@/components/RedditVideoTopics";
 import { mockTrends, mockRedditPosts, mockStats } from "@/lib/mockData";
 import { fetchTrends, fetchRedditPosts, fetchDashboardStats, triggerDataRefresh } from "@/lib/api";
+import { exportTrendsCsv } from "@/lib/exportCsv";
 import { motion } from "framer-motion";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -84,7 +85,11 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <DashboardHeader lastUpdated={isRefreshing ? "refreshing..." : "recently"} onRefresh={handleRefresh} />
+        <DashboardHeader
+          lastUpdated={isRefreshing ? "refreshing..." : "recently"}
+          onRefresh={handleRefresh}
+          onExportCsv={() => exportTrendsCsv(trends, redditPosts)}
+        />
 
         {/* Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">

@@ -1,13 +1,14 @@
 import { motion } from "framer-motion";
-import { Skull, RefreshCw } from "lucide-react";
+import { Skull, RefreshCw, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface DashboardHeaderProps {
   lastUpdated: string;
   onRefresh?: () => void;
+  onExportCsv?: () => void;
 }
 
-const DashboardHeader = ({ lastUpdated, onRefresh }: DashboardHeaderProps) => {
+const DashboardHeader = ({ lastUpdated, onRefresh, onExportCsv }: DashboardHeaderProps) => {
   return (
     <motion.header
       initial={{ opacity: 0, y: -20 }}
@@ -31,6 +32,17 @@ const DashboardHeader = ({ lastUpdated, onRefresh }: DashboardHeaderProps) => {
           Updated {lastUpdated}
         </span>
         <div className="h-2 w-2 rounded-full bg-trend-up animate-pulse-subtle" />
+        {onExportCsv && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onExportCsv}
+            className="gap-1.5 text-xs"
+          >
+            <Download className="h-3 w-3" />
+            Export CSV
+          </Button>
+        )}
         <Button
           variant="outline"
           size="sm"
