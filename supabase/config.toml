@@ -9,3 +9,7 @@ project_id = "gaaxslezqzzujfrtkdpo"
     verify_jwt = false
   [functions.search-facebook-trends]
     verify_jwt = false
+  [functions.generate-reels-ideas]
+    verify_jwt = false
+  [functions.search-reels-trends]
+    verify_jwt = false
