@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Skull, BarChart3, Video, Hash, LogIn, LogOut, Bookmark, ArrowRight } from "lucide-react";
+import { Skull, BarChart3, Video, Hash, LogIn, LogOut, Bookmark, Mic, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -56,6 +56,9 @@ const SiteLayout = ({ children }: { children: React.ReactNode }) => {
             {loading ? null : user ? (
               <div className="flex items-center gap-2">
                 <span className="text-xs text-muted-foreground hidden sm:inline">{user.email}</span>
+                <Button variant="ghost" size="sm" onClick={() => navigate("/voice-profile")} className="gap-1 text-xs h-8">
+                  <Mic className="h-3.5 w-3.5" /> Voice
+                </Button>
                 <Button variant="ghost" size="sm" onClick={signOut} className="gap-1 text-xs h-8">
                   <LogOut className="h-3.5 w-3.5" /> Sign Out
                 </Button>

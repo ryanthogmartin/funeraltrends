@@ -149,6 +149,60 @@ export type Database = {
         }
         Relationships: []
       }
+      voice_profiles: {
+        Row: {
+          audience_address: string
+          catchphrases: string | null
+          created_at: string
+          cta_style: string
+          funeral_home_name: string | null
+          humor_comfort: string
+          id: string
+          pacing_style: string
+          sample_script: string | null
+          specialties: string | null
+          tone_descriptor: string
+          updated_at: string
+          user_id: string
+          vocabulary_level: string
+          years_experience: string | null
+        }
+        Insert: {
+          audience_address?: string
+          catchphrases?: string | null
+          created_at?: string
+          cta_style?: string
+          funeral_home_name?: string | null
+          humor_comfort?: string
+          id?: string
+          pacing_style?: string
+          sample_script?: string | null
+          specialties?: string | null
+          tone_descriptor?: string
+          updated_at?: string
+          user_id: string
+          vocabulary_level?: string
+          years_experience?: string | null
+        }
+        Update: {
+          audience_address?: string
+          catchphrases?: string | null
+          created_at?: string
+          cta_style?: string
+          funeral_home_name?: string | null
+          humor_comfort?: string
+          id?: string
+          pacing_style?: string
+          sample_script?: string | null
+          specialties?: string | null
+          tone_descriptor?: string
+          updated_at?: string
+          user_id?: string
+          vocabulary_level?: string
+          years_experience?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
