@@ -11,6 +11,7 @@ import SavedIdeas from "./pages/SavedIdeas";
 import Hashtags from "./pages/Hashtags";
 import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
+import VoiceProfile from "./pages/VoiceProfile";
 import NotFound from "./pages/NotFound";
 import SiteLayout from "./components/SiteLayout";
 
@@ -30,6 +31,7 @@ const App = () => (
             <Route path="/hashtags" element={<SiteLayout><Hashtags /></SiteLayout>} />
             <Route path="/saved" element={<SiteLayout><SavedIdeas /></SiteLayout>} />
             <Route path="/auth" element={<SiteLayout><Auth /></SiteLayout>} />
+            <Route path="/voice-profile" element={<SiteLayout><VoiceProfile /></SiteLayout>} />
             <Route path="/reset-password" element={<SiteLayout><ResetPassword /></SiteLayout>} />
             <Route path="*" element={<NotFound />} />
           </Routes>

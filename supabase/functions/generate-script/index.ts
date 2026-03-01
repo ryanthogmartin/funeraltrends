@@ -1,7 +1,66 @@
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
+
+function buildVoicePrompt(vp: any): string {
+  const toneMap: Record<string, string> = {
+    'warm-empathetic': 'Warm, empathetic, and caring. Speak like a trusted friend who also happens to be a funeral professional.',
+    'professional-authoritative': 'Confident and authoritative. Knowledgeable expert that families trust completely.',
+    'down-to-earth': 'Casual, approachable, and real. Talk about tough topics in a relatable way.',
+    'reverent-formal': 'Dignified, respectful, and traditional. Maintain a sense of reverence.',
+  };
+
+  const vocabMap: Record<string, string> = {
+    'everyday': 'Use simple, everyday language that any family would understand. Avoid jargon.',
+    'mixed': 'Use industry terms occasionally but always explain them in plain language.',
+    'professional': 'Use professional funeral industry terminology freely.',
+  };
+
+  const pacingMap: Record<string, string> = {
+    'short-punchy': 'Use short, punchy sentences. Rapid-fire delivery. Quick beats.',
+    'mixed': 'Use a natural mix of short and longer sentences.',
+    'flowing': 'Use longer, flowing sentences with a storytelling cadence.',
+  };
+
+  const humorMap: Record<string, string> = {
+    'no-humor': 'Keep the tone strictly serious and professional. No humor.',
+    'light-humor': 'Light, gentle humor is OK when it fits naturally.',
+    'personality-driven': 'Let personality and natural humor shine through when appropriate.',
+  };
+
+  const ctaMap: Record<string, string> = {
+    'soft-ask': 'End with a soft, gentle ask — like "If this helped, consider sharing it."',
+    'direct-cta': 'End with a direct call to action — like "Follow for more and drop a comment."',
+    'question': 'End by asking the audience a question to spark comments.',
+    'emotional-close': 'End with an emotional, supportive close — like "You don\'t have to go through this alone."',
+  };
+
+  let prompt = `VOICE PROFILE — Write the script AS this funeral professional:\n\n`;
+  
+  if (vp.funeral_home_name) prompt += `They work at ${vp.funeral_home_name}. `;
+  if (vp.years_experience) prompt += `They have ${vp.years_experience} years of experience. `;
+  if (vp.specialties) prompt += `Their specialties include: ${vp.specialties}. `;
+  
+  prompt += `\n\nTONE: ${toneMap[vp.tone_descriptor] || toneMap['warm-empathetic']}`;
+  prompt += `\nVOCABULARY: ${vocabMap[vp.vocabulary_level] || vocabMap['everyday']}`;
+  prompt += `\nAUDIENCE: Address the audience as "${vp.audience_address || 'families'}".`;
+  prompt += `\nPACING: ${pacingMap[vp.pacing_style] || pacingMap['mixed']}`;
+  prompt += `\nHUMOR: ${humorMap[vp.humor_comfort] || humorMap['no-humor']}`;
+  prompt += `\nENDING STYLE: ${ctaMap[vp.cta_style] || ctaMap['soft-ask']}`;
+
+  if (vp.catchphrases?.trim()) {
+    prompt += `\n\nNATURALLY WEAVE IN these signature phrases when they fit (don't force them): ${vp.catchphrases}`;
+  }
+
+  if (vp.sample_script?.trim()) {
+    prompt += `\n\nHere's a sample of how this person actually speaks — match this voice closely:\n"${vp.sample_script.slice(0, 1500)}"`;
+  }
+
+  return prompt;
+}
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -9,7 +68,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { idea, tone } = await req.json();
+    const { idea, tone, userId } = await req.json();
 
     if (!idea || !tone) {
       return new Response(
@@ -26,6 +85,29 @@ Deno.serve(async (req) => {
       );
     }
 
+    // Try to fetch voice profile if userId is provided
+    let voiceProfilePrompt = '';
+    if (userId) {
+      try {
+        const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+        const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+        const supabase = createClient(supabaseUrl, supabaseKey);
+
+        const { data: vp } = await supabase
+          .from('voice_profiles')
+          .select('*')
+          .eq('user_id', userId)
+          .maybeSingle();
+
+        if (vp) {
+          voiceProfilePrompt = buildVoicePrompt(vp);
+        }
+      } catch (e) {
+        console.error('Failed to fetch voice profile:', e);
+      }
+    }
+
+    // Fallback tone descriptions when no voice profile
     const toneDescriptions: Record<string, string> = {
       'compassionate-educator': 'Warm, empathetic, and educational. Speak like a caring funeral director who wants to inform and comfort. Use gentle language and reassuring tone.',
       'industry-insider': 'Confident and authoritative. Share insider knowledge about the funeral industry with a "let me tell you what most people don\'t know" energy. Direct and informative.',
@@ -33,7 +115,7 @@ Deno.serve(async (req) => {
       'comforting-guide': 'Soft, supportive, and nurturing. Like a trusted friend helping someone through a difficult time. Focus on emotional support while providing practical guidance.',
     };
 
-    const toneGuide = toneDescriptions[tone] || toneDescriptions['compassionate-educator'];
+    const toneGuide = voiceProfilePrompt || `Tone: ${toneDescriptions[tone] || toneDescriptions['compassionate-educator']}`;
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
@@ -48,7 +130,7 @@ Deno.serve(async (req) => {
             role: 'system',
             content: `You write 45-second video scripts for funeral directors to use on TikTok, Instagram Reels, and YouTube Shorts. The script is written FROM the funeral director's perspective — they are the one speaking on camera as the expert. The script should be teleprompter-ready — natural spoken language, not written prose.
 
-Tone: ${toneGuide}
+${toneGuide}
 
 Format the script with:
 - A hook (first 3 seconds to grab attention)

@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { exportScriptPdf } from "@/lib/exportPdf";
 import { useSaveIdea } from "@/hooks/useSaveIdea";
+import { useAuth } from "@/hooks/useAuth";
 
 interface ScriptModalProps {
   open: boolean;
@@ -39,6 +40,7 @@ const ScriptModal = ({ open, onOpenChange, idea }: ScriptModalProps) => {
   const [editCta, setEditCta] = useState("");
   const { toast } = useToast();
   const { saveIdea, saving: savingIdea, isSaved } = useSaveIdea();
+  const { user } = useAuth();
 
   const generateScript = async (tone: string) => {
     setSelectedTone(tone);
@@ -47,7 +49,7 @@ const ScriptModal = ({ open, onOpenChange, idea }: ScriptModalProps) => {
 
     try {
       const { data, error } = await supabase.functions.invoke('generate-script', {
-        body: { idea, tone },
+        body: { idea, tone, userId: user?.id },
       });
 
       if (error) throw new Error(error.message);
