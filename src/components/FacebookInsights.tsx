@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Sparkles, Loader2, Copy, Check, TrendingUp, Search, FileText, MessageSquare, Users, Eye, ThumbsUp, Lock, ArrowRight } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { Sparkles, Loader2, Copy, Check, TrendingUp, Search, FileText, MessageSquare, Users, Eye, ThumbsUp, Lock, ArrowRight, RefreshCw } from "lucide-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -64,6 +64,8 @@ const CopyButton = ({ text }: { text: string }) => {
 const FacebookInsights = ({ trends, isAuthenticated, onRequireAuth }: FacebookInsightsProps) => {
   const [scriptIdea, setScriptIdea] = useState<string | null>(null);
   const { saveIdea, saving, isSaved } = useSaveIdea();
+  const queryClient = useQueryClient();
+  const [refreshing, setRefreshing] = useState(false);
 
   const topKeywords = trends.slice(0, 10).map(t => t.keyword);
 
@@ -163,9 +165,24 @@ const FacebookInsights = ({ trends, isAuthenticated, onRequireAuth }: FacebookIn
             </h2>
             <Sparkles className="h-4 w-4 text-tertiary" />
           </div>
-          <Badge variant="outline" className="ml-0 sm:ml-auto text-[10px] bg-[#1877F2]/10 text-[#1877F2] border-[#1877F2]/30 w-fit">
-            AI + Live Search
-          </Badge>
+          <div className="flex items-center gap-2 ml-0 sm:ml-auto">
+            <button
+              onClick={async () => {
+                setRefreshing(true);
+                await queryClient.invalidateQueries({ queryKey: ['facebook-ideas'] });
+                await queryClient.invalidateQueries({ queryKey: ['facebook-trends'] });
+                setRefreshing(false);
+              }}
+              disabled={refreshing || ideasLoading || trendsLoading}
+              className="p-1.5 rounded-md hover:bg-accent transition-colors text-muted-foreground hover:text-foreground disabled:opacity-50"
+              title="Refresh ideas"
+            >
+              <RefreshCw className={`h-3.5 w-3.5 ${refreshing || ideasLoading || trendsLoading ? 'animate-spin' : ''}`} />
+            </button>
+            <Badge variant="outline" className="text-[10px] bg-[#1877F2]/10 text-[#1877F2] border-[#1877F2]/30 w-fit">
+              AI + Live Search
+            </Badge>
+          </div>
         </div>
 
         <Tabs defaultValue="ideas" className="w-full">
