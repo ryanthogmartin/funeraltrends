@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Bookmark, Trash2, FileText, Lightbulb, Loader2 } from "lucide-react";
+import { Bookmark, Trash2, Lightbulb, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import SavedScriptCard from "@/components/SavedScriptCard";
 
 interface SavedIdea {
   id: string;
@@ -128,69 +129,60 @@ const SavedIdeas = () => {
 
       {!loading && filtered.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {filtered.map((item, i) => (
-            <motion.div
-              key={item.id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.03 }}
-              className="glass-card p-4 relative group"
-            >
-              <div className="flex items-start gap-2 mb-2">
-                {item.type === "script" ? (
-                  <FileText className="h-4 w-4 text-tertiary shrink-0 mt-0.5" />
-                ) : (
+          {filtered.map((item, i) =>
+            item.type === "script" ? (
+              <SavedScriptCard
+                key={item.id}
+                item={item}
+                index={i}
+                deletingId={deletingId}
+                onDelete={handleDelete}
+                onUpdate={(updated) =>
+                  setIdeas((prev) => prev.map((idea) => (idea.id === updated.id ? updated : idea)))
+                }
+              />
+            ) : (
+              <motion.div
+                key={item.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.03 }}
+                className="glass-card p-4 relative group"
+              >
+                <div className="flex items-start gap-2 mb-2">
                   <Lightbulb className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-                )}
-                <div className="flex-1 min-w-0">
-                  <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                    {item.type === "script" ? `Script · ${item.script_tone || ""}` : "Video Idea"}
-                    {item.source && ` · ${item.source}`}
-                  </span>
-                  <p className="text-sm text-foreground font-medium mt-0.5 leading-snug">
-                    {item.idea_text}
-                  </p>
+                  <div className="flex-1 min-w-0">
+                    <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                      Video Idea
+                      {item.source && ` · ${item.source}`}
+                    </span>
+                    <p className="text-sm text-foreground font-medium mt-0.5 leading-snug">
+                      {item.idea_text}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => handleDelete(item.id)}
+                    disabled={deletingId === item.id}
+                    className="shrink-0 p-1 rounded hover:bg-destructive/10 transition-colors text-muted-foreground hover:text-destructive sm:opacity-0 sm:group-hover:opacity-100"
+                    title="Delete"
+                  >
+                    {deletingId === item.id ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <Trash2 className="h-3.5 w-3.5" />
+                    )}
+                  </button>
                 </div>
-                <button
-                  onClick={() => handleDelete(item.id)}
-                  disabled={deletingId === item.id}
-                  className="shrink-0 p-1 rounded hover:bg-destructive/10 transition-colors text-muted-foreground hover:text-destructive sm:opacity-0 sm:group-hover:opacity-100"
-                  title="Delete"
-                >
-                  {deletingId === item.id ? (
-                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                  ) : (
-                    <Trash2 className="h-3.5 w-3.5" />
-                  )}
-                </button>
-              </div>
-
-              {item.type === "script" && item.script_hook && (
-                <div className="mt-3 space-y-2 text-xs">
-                  <div className="p-2 bg-primary/5 rounded border border-primary/20">
-                    <p className="font-semibold text-primary mb-0.5 uppercase tracking-wide text-[10px]">🎬 Hook</p>
-                    <p className="text-foreground">{item.script_hook}</p>
-                  </div>
-                  <div className="p-2 bg-accent/30 rounded border border-border/50">
-                    <p className="font-semibold text-primary mb-0.5 uppercase tracking-wide text-[10px]">📝 Script</p>
-                    <p className="text-foreground whitespace-pre-line leading-relaxed">{item.script_body}</p>
-                  </div>
-                  <div className="p-2 bg-primary/5 rounded border border-primary/20">
-                    <p className="font-semibold text-primary mb-0.5 uppercase tracking-wide text-[10px]">📣 CTA</p>
-                    <p className="text-foreground">{item.script_cta}</p>
-                  </div>
-                </div>
-              )}
-
-              <p className="text-[10px] text-muted-foreground mt-2">
-                {new Date(item.created_at).toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "numeric",
-                  year: "numeric",
-                })}
-              </p>
-            </motion.div>
-          ))}
+                <p className="text-[10px] text-muted-foreground mt-2">
+                  {new Date(item.created_at).toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                  })}
+                </p>
+              </motion.div>
+            )
+          )}
         </div>
       )}
     </div>
