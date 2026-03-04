@@ -13,3 +13,5 @@ project_id = "gaaxslezqzzujfrtkdpo"
     verify_jwt = false
   [functions.search-reels-trends]
     verify_jwt = false
+  [functions.google-ads-keywords]
+    verify_jwt = false

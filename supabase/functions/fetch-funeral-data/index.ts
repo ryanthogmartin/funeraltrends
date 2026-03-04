@@ -39,160 +39,124 @@ const FUNERAL_SUBREDDITS = [
   "askfuneraldirectors",
 ];
 
-async function fetchRedditPosts(): Promise<any[]> {
-  const posts: any[] = [];
-  const oneDayAgo = Math.floor(Date.now() / 1000) - 86400;
+// ─── Google Ads Keyword Planner ────────────────────────────────────────
 
-  for (const sub of FUNERAL_SUBREDDITS) {
-    try {
-      const searchUrl = `https://www.reddit.com/r/${sub}/search.json?q=funeral+OR+burial+OR+cremation+OR+obituary+OR+memorial&sort=hot&t=day&limit=10&restrict_sr=on`;
-      const res = await fetch(searchUrl, {
-        headers: { 'User-Agent': 'FuneralTrendsDashboard/1.0' },
-      });
-      
-      if (!res.ok) {
-        console.log(`Reddit fetch failed for r/${sub}: ${res.status}`);
-        continue;
-      }
+async function getAccessToken(): Promise<string> {
+  const clientId = Deno.env.get('GOOGLE_ADS_CLIENT_ID')!;
+  const clientSecret = Deno.env.get('GOOGLE_ADS_CLIENT_SECRET')!;
+  const refreshToken = Deno.env.get('GOOGLE_ADS_REFRESH_TOKEN')!;
 
-      const data = await res.json();
-      const children = data?.data?.children || [];
+  const res = await fetch('https://www.googleapis.com/oauth2/v3/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      grant_type: 'refresh_token',
+      client_id: clientId,
+      client_secret: clientSecret,
+      refresh_token: refreshToken,
+    }),
+  });
 
-      for (const child of children) {
-        const post = child.data;
-        if (post.created_utc >= oneDayAgo) {
-          posts.push({
-            reddit_id: post.id,
-            title: post.title,
-            subreddit: `r/${post.subreddit}`,
-            score: post.score,
-            num_comments: post.num_comments,
-            url: `https://reddit.com${post.permalink}`,
-            posted_at: new Date(post.created_utc * 1000).toISOString(),
-            sentiment: analyzeSentiment(post.title),
-          });
-        }
-      }
-    } catch (err) {
-      console.error(`Error fetching r/${sub}:`, err);
-    }
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error(`OAuth token error: ${res.status} ${errText}`);
   }
 
-  // Also search across all of Reddit for funeral topics
+  const data = await res.json();
+  return data.access_token;
+}
+
+async function fetchKeywordPlannerData(): Promise<any[]> {
+  const customerId = Deno.env.get('GOOGLE_ADS_CUSTOMER_ID')!;
+  const managerCustomerId = Deno.env.get('GOOGLE_ADS_MANAGER_CUSTOMER_ID')!;
+  const developerToken = Deno.env.get('GOOOGLE_ADS_DEVELOPER_TOKEN')!;
+
+  let accessToken: string;
   try {
-    const globalUrl = `https://www.reddit.com/search.json?q=funeral+OR+burial+OR+cremation+OR+"green+burial"+OR+"death+care"&sort=hot&t=day&limit=25`;
-    const res = await fetch(globalUrl, {
-      headers: { 'User-Agent': 'FuneralTrendsDashboard/1.0' },
+    accessToken = await getAccessToken();
+  } catch (err) {
+    console.error('Failed to get Google access token, falling back to synthetic data:', err);
+    return generateSyntheticTrends();
+  }
+
+  const url = `https://googleads.googleapis.com/v18/customers/${customerId}:generateKeywordHistoricalMetrics`;
+
+  const body = {
+    keywords: FUNERAL_KEYWORDS,
+    language: 'languageConstants/1000',
+    geoTargetConstants: ['geoTargetConstants/2840'],
+    keywordPlanNetwork: 'GOOGLE_SEARCH',
+  };
+
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'developer-token': developerToken,
+        'login-customer-id': managerCustomerId,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
     });
-    
-    if (res.ok) {
-      const data = await res.json();
-      const children = data?.data?.children || [];
-      for (const child of children) {
-        const post = child.data;
-        if (post.created_utc >= oneDayAgo && !posts.find(p => p.reddit_id === post.id)) {
-          posts.push({
-            reddit_id: post.id,
-            title: post.title,
-            subreddit: `r/${post.subreddit}`,
-            score: post.score,
-            num_comments: post.num_comments,
-            url: `https://reddit.com${post.permalink}`,
-            posted_at: new Date(post.created_utc * 1000).toISOString(),
-            sentiment: analyzeSentiment(post.title),
-          });
+
+    if (!res.ok) {
+      const errText = await res.text();
+      console.error(`Google Ads API error ${res.status}: ${errText}`);
+      return generateSyntheticTrends();
+    }
+
+    const data = await res.json();
+    const trends: any[] = [];
+
+    for (const result of (data.results || [])) {
+      const keyword = result.text || '';
+      const metrics = result.keywordMetrics || {};
+      const avgSearches = parseInt(metrics.avgMonthlySearches) || 0;
+
+      // Build sparkline from monthly search volumes
+      const monthlyVolumes = (metrics.monthlySearchVolumes || [])
+        .slice(-12)
+        .map((m: any) => parseInt(m.monthlySearches) || 0);
+
+      // Calculate change percent from last two months
+      let changePercent = 0;
+      if (monthlyVolumes.length >= 2) {
+        const recent = monthlyVolumes[monthlyVolumes.length - 1];
+        const previous = monthlyVolumes[monthlyVolumes.length - 2];
+        if (previous > 0) {
+          changePercent = Math.round(((recent - previous) / previous) * 100);
         }
       }
-    }
-  } catch (err) {
-    console.error('Error fetching global Reddit:', err);
-  }
 
-  // Sort by score descending and take top 20
-  return posts.sort((a, b) => b.score - a.score).slice(0, 20);
-}
-
-function analyzeSentiment(text: string): string {
-  const lower = text.toLowerCase();
-  const positiveWords = ['beautiful', 'love', 'wonderful', 'amazing', 'great', 'recommend', 'perfect', 'celebration', 'honor', 'peaceful', 'helpful'];
-  const negativeWords = ['scam', 'rip off', 'expensive', 'overpriced', 'terrible', 'awful', 'worst', 'angry', 'disgusting', 'predatory', 'outrage'];
-  
-  const posCount = positiveWords.filter(w => lower.includes(w)).length;
-  const negCount = negativeWords.filter(w => lower.includes(w)).length;
-  
-  if (posCount > negCount) return 'positive';
-  if (negCount > posCount) return 'negative';
-  return 'neutral';
-}
-
-async function fetchGoogleTrendsData(): Promise<any[]> {
-  const trends: any[] = [];
-
-  // Use Google Trends daily trends API
-  try {
-    const url = 'https://trends.google.com/trends/api/dailytrends?hl=en-US&tz=-300&geo=US&ns=15';
-    const res = await fetch(url);
-    
-    if (res.ok) {
-      const text = await res.text();
-      // Google Trends API returns data with a )]}' prefix
-      const jsonStr = text.replace(/^\)\]\}\'\n/, '');
-      const data = JSON.parse(jsonStr);
-      
-      const days = data?.default?.trendingSearchesDays || [];
-      for (const day of days) {
-        for (const search of (day.trendingSearches || [])) {
-          const title = search.title?.query || '';
-          const lower = title.toLowerCase();
-          // Filter for funeral-related trends
-          if (isFuneralRelated(lower)) {
-            const traffic = search.formattedTraffic || '0';
-            const volume = parseTraffic(traffic);
-            trends.push({
-              keyword: title,
-              volume,
-              change_percent: Math.floor(Math.random() * 60) - 10, // Google doesn't give exact change
-              sparkline: generateSparkline(volume),
-            });
-          }
-        }
-      }
-    }
-  } catch (err) {
-    console.error('Error fetching Google Trends:', err);
-  }
-
-  // Always ensure we have data by including our tracked keywords with estimated volumes
-  for (const keyword of FUNERAL_KEYWORDS) {
-    if (!trends.find(t => t.keyword.toLowerCase() === keyword.toLowerCase())) {
-      // Generate realistic search volume estimates
-      const baseVolume = Math.floor(Math.random() * 10000) + 1000;
       trends.push({
         keyword,
-        volume: baseVolume,
-        change_percent: Math.floor(Math.random() * 80) - 20,
-        sparkline: generateSparkline(baseVolume),
+        volume: avgSearches,
+        change_percent: changePercent,
+        sparkline: monthlyVolumes.length > 0 ? monthlyVolumes : generateSparkline(avgSearches),
+        competition: metrics.competition || 'UNSPECIFIED',
+        competition_index: parseInt(metrics.competitionIndex) || 0,
       });
     }
-  }
 
-  return trends.sort((a, b) => b.volume - a.volume).slice(0, 24);
+    console.log(`Google Ads API returned ${trends.length} keywords with real data`);
+    return trends.sort((a, b) => b.volume - a.volume).slice(0, 24);
+  } catch (err) {
+    console.error('Error calling Google Ads API:', err);
+    return generateSyntheticTrends();
+  }
 }
 
-function isFuneralRelated(text: string): boolean {
-  const funeralTerms = ['funeral', 'burial', 'cremation', 'obituary', 'memorial', 'casket', 'coffin', 'mortuary', 'cemetery', 'death', 'grieving', 'eulogy', 'wake', 'interment'];
-  return funeralTerms.some(term => text.includes(term));
-}
-
-function parseTraffic(traffic: string): number {
-  const cleaned = traffic.replace(/[^0-9KkMm+]/g, '');
-  if (cleaned.includes('M') || cleaned.includes('m')) {
-    return parseFloat(cleaned) * 1000000;
-  }
-  if (cleaned.includes('K') || cleaned.includes('k')) {
-    return parseFloat(cleaned) * 1000;
-  }
-  return parseInt(cleaned) || 0;
+function generateSyntheticTrends(): any[] {
+  return FUNERAL_KEYWORDS.map((keyword) => {
+    const baseVolume = Math.floor(Math.random() * 10000) + 1000;
+    return {
+      keyword,
+      volume: baseVolume,
+      change_percent: Math.floor(Math.random() * 80) - 20,
+      sparkline: generateSparkline(baseVolume),
+    };
+  }).sort((a, b) => b.volume - a.volume).slice(0, 24);
 }
 
 function generateSparkline(maxVolume: number): number[] {
@@ -206,6 +170,71 @@ function generateSparkline(maxVolume: number): number[] {
   return points;
 }
 
+// ─── Reddit ────────────────────────────────────────────────────────────
+
+async function fetchRedditPosts(): Promise<any[]> {
+  const posts: any[] = [];
+  const oneDayAgo = Math.floor(Date.now() / 1000) - 86400;
+
+  for (const sub of FUNERAL_SUBREDDITS) {
+    try {
+      const searchUrl = `https://www.reddit.com/r/${sub}/search.json?q=funeral+OR+burial+OR+cremation+OR+obituary+OR+memorial&sort=hot&t=day&limit=10&restrict_sr=on`;
+      const res = await fetch(searchUrl, {
+        headers: { 'User-Agent': 'FuneralTrendsDashboard/1.0' },
+      });
+      if (!res.ok) { console.log(`Reddit r/${sub}: ${res.status}`); continue; }
+      const data = await res.json();
+      for (const child of (data?.data?.children || [])) {
+        const post = child.data;
+        if (post.created_utc >= oneDayAgo) {
+          posts.push({
+            reddit_id: post.id, title: post.title,
+            subreddit: `r/${post.subreddit}`, score: post.score,
+            num_comments: post.num_comments,
+            url: `https://reddit.com${post.permalink}`,
+            posted_at: new Date(post.created_utc * 1000).toISOString(),
+            sentiment: analyzeSentiment(post.title),
+          });
+        }
+      }
+    } catch (err) { console.error(`Error r/${sub}:`, err); }
+  }
+
+  try {
+    const globalUrl = `https://www.reddit.com/search.json?q=funeral+OR+burial+OR+cremation+OR+"green+burial"+OR+"death+care"&sort=hot&t=day&limit=25`;
+    const res = await fetch(globalUrl, { headers: { 'User-Agent': 'FuneralTrendsDashboard/1.0' } });
+    if (res.ok) {
+      const data = await res.json();
+      for (const child of (data?.data?.children || [])) {
+        const post = child.data;
+        if (post.created_utc >= oneDayAgo && !posts.find(p => p.reddit_id === post.id)) {
+          posts.push({
+            reddit_id: post.id, title: post.title,
+            subreddit: `r/${post.subreddit}`, score: post.score,
+            num_comments: post.num_comments,
+            url: `https://reddit.com${post.permalink}`,
+            posted_at: new Date(post.created_utc * 1000).toISOString(),
+            sentiment: analyzeSentiment(post.title),
+          });
+        }
+      }
+    }
+  } catch (err) { console.error('Error global Reddit:', err); }
+
+  return posts.sort((a, b) => b.score - a.score).slice(0, 20);
+}
+
+function analyzeSentiment(text: string): string {
+  const lower = text.toLowerCase();
+  const pos = ['beautiful', 'love', 'wonderful', 'amazing', 'great', 'recommend', 'perfect', 'celebration', 'honor', 'peaceful', 'helpful'];
+  const neg = ['scam', 'rip off', 'expensive', 'overpriced', 'terrible', 'awful', 'worst', 'angry', 'disgusting', 'predatory', 'outrage'];
+  const p = pos.filter(w => lower.includes(w)).length;
+  const n = neg.filter(w => lower.includes(w)).length;
+  return p > n ? 'positive' : n > p ? 'negative' : 'neutral';
+}
+
+// ─── Main Handler ──────────────────────────────────────────────────────
+
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 Deno.serve(async (req) => {
@@ -218,11 +247,10 @@ Deno.serve(async (req) => {
     const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, serviceRoleKey);
 
-    console.log('Fetching funeral trends data...');
+    console.log('Fetching funeral trends data (Google Ads + Reddit)...');
 
-    // Fetch data in parallel
     const [trends, redditPosts] = await Promise.all([
-      fetchGoogleTrendsData(),
+      fetchKeywordPlannerData(),
       fetchRedditPosts(),
     ]);
 
@@ -232,7 +260,6 @@ Deno.serve(async (req) => {
     await supabase.from('funeral_trends').delete().neq('id', '00000000-0000-0000-0000-000000000000');
     await supabase.from('funeral_reddit_posts').delete().neq('id', '00000000-0000-0000-0000-000000000000');
 
-    // Insert new trends
     if (trends.length > 0) {
       const { error: trendsError } = await supabase.from('funeral_trends').insert(
         trends.map(t => ({
@@ -245,11 +272,9 @@ Deno.serve(async (req) => {
       if (trendsError) console.error('Error inserting trends:', trendsError);
     }
 
-    // Insert Reddit posts (upsert on reddit_id)
     if (redditPosts.length > 0) {
       const { error: redditError } = await supabase.from('funeral_reddit_posts').upsert(
-        redditPosts,
-        { onConflict: 'reddit_id' }
+        redditPosts, { onConflict: 'reddit_id' }
       );
       if (redditError) console.error('Error inserting reddit posts:', redditError);
     }
@@ -257,17 +282,18 @@ Deno.serve(async (req) => {
     return new Response(
       JSON.stringify({
         success: true,
+        source: trends.length > 0 && trends[0].competition ? 'google_ads_api' : 'synthetic_fallback',
         trends_count: trends.length,
         reddit_count: redditPosts.length,
         fetched_at: new Date().toISOString(),
       }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
     );
   } catch (error) {
     console.error('Error in fetch-funeral-data:', error);
     return new Response(
       JSON.stringify({ success: false, error: error.message }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
     );
   }
 });
