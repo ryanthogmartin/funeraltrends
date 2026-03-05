@@ -67,19 +67,31 @@ async function getAccessToken(): Promise<string> {
 }
 
 async function fetchKeywordPlannerData(): Promise<any[]> {
-  const customerId = Deno.env.get('GOOGLE_ADS_CUSTOMER_ID')!;
-  const managerCustomerId = Deno.env.get('GOOGLE_ADS_MANAGER_CUSTOMER_ID')!;
-  const developerToken = Deno.env.get('GOOOGLE_ADS_DEVELOPER_TOKEN')!;
+  const customerId = Deno.env.get('GOOGLE_ADS_CUSTOMER_ID');
+  const managerCustomerId = Deno.env.get('GOOGLE_ADS_MANAGER_CUSTOMER_ID');
+  const developerToken = Deno.env.get('GOOOGLE_ADS_DEVELOPER_TOKEN');
+  const clientId = Deno.env.get('GOOGLE_ADS_CLIENT_ID');
+  const clientSecret = Deno.env.get('GOOGLE_ADS_CLIENT_SECRET');
+  const refreshToken = Deno.env.get('GOOGLE_ADS_REFRESH_TOKEN');
+
+  console.log('[Google Ads] Starting fetch...');
+  console.log(`[Google Ads] Secrets present: clientId=${!!clientId}, clientSecret=${!!clientSecret}, refreshToken=${!!refreshToken}, customerId=${!!customerId}, managerId=${!!managerCustomerId}, devToken=${!!developerToken}`);
+
+  if (!clientId || !clientSecret || !refreshToken || !customerId || !managerCustomerId || !developerToken) {
+    console.error('[Google Ads] Missing required secrets, falling back to synthetic data');
+    return generateSyntheticTrends();
+  }
 
   let accessToken: string;
   try {
     accessToken = await getAccessToken();
+    console.log('[Google Ads] Got access token successfully');
   } catch (err) {
-    console.error('Failed to get Google access token, falling back to synthetic data:', err);
+    console.error('[Google Ads] Failed to get access token:', err.message || err);
     return generateSyntheticTrends();
   }
 
-  const url = `https://googleads.googleapis.com/v18/customers/${customerId}:generateKeywordHistoricalMetrics`;
+  const url = `https://googleads.googleapis.com/v21/customers/${customerId}:generateKeywordHistoricalMetrics`;
 
   const body = {
     keywords: FUNERAL_KEYWORDS,
@@ -247,7 +259,7 @@ Deno.serve(async (req) => {
     const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, serviceRoleKey);
 
-    console.log('Fetching funeral trends data (Google Ads + Reddit)...');
+    console.log('[v2] Fetching funeral trends data (Google Ads + Reddit)...');
 
     const [trends, redditPosts] = await Promise.all([
       fetchKeywordPlannerData(),
