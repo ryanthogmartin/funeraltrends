@@ -75,11 +75,10 @@ async function fetchKeywordPlannerData(): Promise<any[]> {
   const refreshToken = Deno.env.get('GOOGLE_ADS_REFRESH_TOKEN');
 
   console.log('[Google Ads] Starting fetch...');
-  console.log(`[Google Ads] Secrets present: clientId=${!!clientId}, clientSecret=${!!clientSecret}, refreshToken=${!!refreshToken}, customerId=${!!customerId}, managerId=${!!managerCustomerId}, devToken=${!!developerToken}`);
 
   if (!clientId || !clientSecret || !refreshToken || !customerId || !managerCustomerId || !developerToken) {
-    console.error('[Google Ads] Missing required secrets, falling back to synthetic data');
-    return generateSyntheticTrends();
+    console.error('[Google Ads] Missing required secrets, skipping');
+    return [];
   }
 
   let accessToken: string;
@@ -88,7 +87,7 @@ async function fetchKeywordPlannerData(): Promise<any[]> {
     console.log('[Google Ads] Got access token successfully');
   } catch (err) {
     console.error('[Google Ads] Failed to get access token:', err.message || err);
-    return generateSyntheticTrends();
+    return [];
   }
 
   const url = `https://googleads.googleapis.com/v21/customers/${customerId}:generateKeywordHistoricalMetrics`;
@@ -115,7 +114,7 @@ async function fetchKeywordPlannerData(): Promise<any[]> {
     if (!res.ok) {
       const errText = await res.text();
       console.error(`Google Ads API error ${res.status}: ${errText}`);
-      return generateSyntheticTrends();
+      return [];
     }
 
     const data = await res.json();
@@ -126,12 +125,10 @@ async function fetchKeywordPlannerData(): Promise<any[]> {
       const metrics = result.keywordMetrics || {};
       const avgSearches = parseInt(metrics.avgMonthlySearches) || 0;
 
-      // Build sparkline from monthly search volumes
       const monthlyVolumes = (metrics.monthlySearchVolumes || [])
         .slice(-12)
         .map((m: any) => parseInt(m.monthlySearches) || 0);
 
-      // Calculate change percent from last two months
       let changePercent = 0;
       if (monthlyVolumes.length >= 2) {
         const recent = monthlyVolumes[monthlyVolumes.length - 1];
@@ -148,27 +145,180 @@ async function fetchKeywordPlannerData(): Promise<any[]> {
         sparkline: monthlyVolumes.length > 0 ? monthlyVolumes : generateSparkline(avgSearches),
         competition: metrics.competition || 'UNSPECIFIED',
         competition_index: parseInt(metrics.competitionIndex) || 0,
+        source: 'google_ads',
       });
     }
 
-    console.log(`Google Ads API returned ${trends.length} keywords with real data`);
+    console.log(`[Google Ads] Returned ${trends.length} keywords with real data`);
     return trends.sort((a, b) => b.volume - a.volume).slice(0, 24);
   } catch (err) {
-    console.error('Error calling Google Ads API:', err);
-    return generateSyntheticTrends();
+    console.error('[Google Ads] Error:', err);
+    return [];
   }
 }
 
-function generateSyntheticTrends(): any[] {
-  return FUNERAL_KEYWORDS.map((keyword) => {
-    const baseVolume = Math.floor(Math.random() * 10000) + 1000;
-    return {
-      keyword,
-      volume: baseVolume,
-      change_percent: Math.floor(Math.random() * 80) - 20,
-      sparkline: generateSparkline(baseVolume),
-    };
-  }).sort((a, b) => b.volume - a.volume).slice(0, 24);
+// ─── Google Trends (fallback) ──────────────────────────────────────────
+
+async function fetchGoogleTrendsData(): Promise<any[]> {
+  console.log('[Google Trends] Starting fetch for', FUNERAL_KEYWORDS.length, 'keywords...');
+  
+  const allTrends: any[] = [];
+  
+  // Google Trends compares up to 5 keywords at a time
+  const BATCH_SIZE = 5;
+  const batches: string[][] = [];
+  for (let i = 0; i < FUNERAL_KEYWORDS.length; i += BATCH_SIZE) {
+    batches.push(FUNERAL_KEYWORDS.slice(i, i + BATCH_SIZE));
+  }
+
+  // Use a reference keyword in each batch for cross-batch normalization
+  const referenceKeyword = "cremation cost"; // highest expected volume
+
+  for (const batch of batches) {
+    try {
+      // Include reference keyword if not already in batch (for normalization)
+      const queryKeywords = batch.includes(referenceKeyword) 
+        ? batch 
+        : [referenceKeyword, ...batch].slice(0, 5);
+
+      const comparisonItems = queryKeywords.map(kw => ({
+        keyword: kw,
+        geo: "US",
+        time: "today 12-m",
+      }));
+
+      const req = JSON.stringify({
+        comparisonItem: comparisonItems,
+        category: 0,
+        property: "",
+      });
+
+      // Step 1: Get explore tokens
+      const exploreUrl = `https://trends.google.com/trends/api/explore?hl=en-US&tz=240&req=${encodeURIComponent(req)}`;
+      
+      const exploreRes = await fetch(exploreUrl, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+          'Accept': 'application/json',
+        },
+      });
+
+      if (!exploreRes.ok) {
+        console.error(`[Google Trends] Explore failed: ${exploreRes.status}`);
+        continue;
+      }
+
+      const exploreText = await exploreRes.text();
+      // Google Trends prepends ")]}'" to responses
+      const cleanedExplore = exploreText.replace(/^\)\]\}',?\n/, '');
+      const exploreData = JSON.parse(cleanedExplore);
+      
+      // Find the TIMESERIES widget
+      const timeseriesWidget = exploreData.widgets?.find(
+        (w: any) => w.id === 'TIMESERIES'
+      );
+      
+      if (!timeseriesWidget) {
+        console.error('[Google Trends] No TIMESERIES widget found');
+        continue;
+      }
+
+      const token = timeseriesWidget.token;
+      const timeseriesReq = JSON.stringify(timeseriesWidget.request);
+
+      // Step 2: Get interest over time data
+      const multilineUrl = `https://trends.google.com/trends/api/widgetdata/multiline?hl=en-US&tz=240&req=${encodeURIComponent(timeseriesReq)}&token=${token}`;
+      
+      const dataRes = await fetch(multilineUrl, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+          'Accept': 'application/json',
+        },
+      });
+
+      if (!dataRes.ok) {
+        console.error(`[Google Trends] Multiline failed: ${dataRes.status}`);
+        continue;
+      }
+
+      const dataText = await dataRes.text();
+      const cleanedData = dataText.replace(/^\)\]\}',?\n/, '');
+      const timeseriesData = JSON.parse(cleanedData);
+
+      const timelineData = timeseriesData.default?.timelineData || [];
+
+      // Process each keyword in this batch
+      for (let ki = 0; ki < queryKeywords.length; ki++) {
+        const keyword = queryKeywords[ki];
+        
+        // Skip reference keyword duplicates (it'll be processed in its own batch)
+        if (keyword === referenceKeyword && !batch.includes(referenceKeyword)) {
+          continue;
+        }
+
+        // Extract monthly sparkline (sample ~1 point per month from weekly data)
+        const weeklyValues = timelineData.map((point: any) => {
+          const val = point.value?.[ki];
+          return typeof val === 'number' ? val : 0;
+        });
+
+        // Aggregate weekly to monthly (roughly 4 weeks per month)
+        const monthlyValues: number[] = [];
+        for (let m = 0; m < 12; m++) {
+          const startWeek = m * 4;
+          const endWeek = Math.min(startWeek + 4, weeklyValues.length);
+          const slice = weeklyValues.slice(startWeek, endWeek);
+          if (slice.length > 0) {
+            const avg = Math.round(slice.reduce((a: number, b: number) => a + b, 0) / slice.length);
+            monthlyValues.push(avg);
+          }
+        }
+
+        // Calculate average interest and change
+        const avgInterest = monthlyValues.length > 0
+          ? Math.round(monthlyValues.reduce((a, b) => a + b, 0) / monthlyValues.length)
+          : 0;
+
+        let changePercent = 0;
+        if (monthlyValues.length >= 2) {
+          const recent = monthlyValues[monthlyValues.length - 1];
+          const previous = monthlyValues[monthlyValues.length - 2];
+          if (previous > 0) {
+            changePercent = Math.round(((recent - previous) / previous) * 100);
+          }
+        }
+
+        // Scale interest to approximate search volume (Google Trends is 0-100 relative)
+        // Multiply by a factor to make numbers more meaningful for display
+        const volumeEstimate = avgInterest * 100;
+
+        allTrends.push({
+          keyword,
+          volume: volumeEstimate,
+          change_percent: changePercent,
+          sparkline: monthlyValues,
+          source: 'google_trends',
+        });
+      }
+
+      // Small delay between batches to avoid rate limiting
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+    } catch (err) {
+      console.error(`[Google Trends] Error processing batch:`, err);
+    }
+  }
+
+  // Deduplicate (reference keyword may appear multiple times)
+  const seen = new Set<string>();
+  const deduped = allTrends.filter(t => {
+    if (seen.has(t.keyword)) return false;
+    seen.add(t.keyword);
+    return true;
+  });
+
+  console.log(`[Google Trends] Got data for ${deduped.length} keywords`);
+  return deduped.sort((a, b) => b.volume - a.volume).slice(0, 24);
 }
 
 function generateSparkline(maxVolume: number): number[] {
@@ -259,14 +409,26 @@ Deno.serve(async (req) => {
     const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, serviceRoleKey);
 
-    console.log('[v2] Fetching funeral trends data (Google Ads + Reddit)...');
+    console.log('[v3] Fetching funeral trends (Google Ads → Google Trends fallback) + Reddit...');
 
-    const [trends, redditPosts] = await Promise.all([
-      fetchKeywordPlannerData(),
-      fetchRedditPosts(),
-    ]);
+    // Try Google Ads first, fall back to Google Trends
+    let trends = await fetchKeywordPlannerData();
+    let source = 'google_ads_api';
+    
+    if (trends.length === 0) {
+      console.log('[Fallback] Google Ads unavailable, trying Google Trends...');
+      trends = await fetchGoogleTrendsData();
+      source = 'google_trends';
+    }
+    
+    if (trends.length === 0) {
+      console.log('[Fallback] Google Trends also failed, no trend data available');
+      source = 'none';
+    }
 
-    console.log(`Fetched ${trends.length} trends and ${redditPosts.length} Reddit posts`);
+    const redditPosts = await fetchRedditPosts();
+
+    console.log(`Fetched ${trends.length} trends (${source}) and ${redditPosts.length} Reddit posts`);
 
     // Clear old data and insert new
     await supabase.from('funeral_trends').delete().neq('id', '00000000-0000-0000-0000-000000000000');
@@ -294,7 +456,7 @@ Deno.serve(async (req) => {
     return new Response(
       JSON.stringify({
         success: true,
-        source: trends.length > 0 && trends[0].competition ? 'google_ads_api' : 'synthetic_fallback',
+        source,
         trends_count: trends.length,
         reddit_count: redditPosts.length,
         fetched_at: new Date().toISOString(),
