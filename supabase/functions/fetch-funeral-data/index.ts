@@ -302,7 +302,7 @@ async function fetchGoogleTrendsData(): Promise<any[]> {
       }
 
       // Longer delay between batches to avoid Google Trends rate limiting
-      await new Promise(resolve => setTimeout(resolve, 3000));
+      await new Promise(resolve => setTimeout(resolve, 6000));
       
     } catch (err) {
       console.error(`[Google Trends] Error processing batch:`, err);
