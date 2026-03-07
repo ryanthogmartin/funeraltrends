@@ -196,15 +196,28 @@ async function fetchGoogleTrendsData(): Promise<any[]> {
       // Step 1: Get explore tokens
       const exploreUrl = `https://trends.google.com/trends/api/explore?hl=en-US&tz=240&req=${encodeURIComponent(req)}`;
       
-      const exploreRes = await fetch(exploreUrl, {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-          'Accept': 'application/json',
-        },
-      });
+      let exploreRes: Response | null = null;
+      for (let attempt = 0; attempt < 3; attempt++) {
+        exploreRes = await fetch(exploreUrl, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Accept': 'application/json',
+          },
+        });
+        if (exploreRes.status === 429) {
+          console.log(`[Google Trends] Rate limited on explore (attempt ${attempt + 1}), waiting...`);
+          await exploreRes.text(); // consume body
+          await new Promise(resolve => setTimeout(resolve, (attempt + 1) * 5000));
+          continue;
+        }
+        break;
+      }
 
-      if (!exploreRes.ok) {
-        console.error(`[Google Trends] Explore failed: ${exploreRes.status}`);
+      if (!exploreRes || !exploreRes.ok) {
+        if (exploreRes) {
+          console.error(`[Google Trends] Explore failed: ${exploreRes.status}`);
+          await exploreRes.text();
+        }
         continue;
       }
 
