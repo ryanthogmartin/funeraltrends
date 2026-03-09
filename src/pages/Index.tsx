@@ -127,7 +127,7 @@ const Index = () => {
         <DashboardHeader
           lastUpdated={isRefreshing ? "refreshing..." : "recently"}
           onRefresh={handleRefresh}
-          onExportCsv={() => exportTrendsCsv(trends, redditPosts)}
+          onExportCsv={() => exportTrendsCsv(trends)}
         />
 
         {/* Stats */}
