@@ -22,13 +22,6 @@ const features: FeatureItem[] = [
     requiresAuth: false,
   },
   {
-    icon: BarChart3,
-    title: "Reddit Sentiment",
-    description: "Track Reddit discussions with sentiment analysis, upvotes, and engagement metrics.",
-    link: "/dashboard",
-    requiresAuth: false,
-  },
-  {
     icon: Video,
     title: "AI Video Ideas",
     description: "Generate short-form video content ideas powered by AI, based on trending topics.",
@@ -152,7 +145,7 @@ const Landing = () => {
               <span className="text-gradient-primary">before they peak</span>
             </h1>
             <p className="text-lg text-muted-foreground mb-8 max-w-xl mx-auto leading-relaxed">
-              Real-time search trends. Social listening from Facebook, Instagram, Google, and Reddit. AI-powered video ideas. Customizable scroll-stopping scripts. Hashtag intelligence - all in one dashboard for the funeral profession.
+              Real-time search trends. Social listening from Facebook, Instagram, and Google. AI-powered video ideas. Customizable scroll-stopping scripts. Hashtag intelligence - all in one dashboard for the funeral profession.
             </p>
             <div className="flex items-center justify-center gap-3 flex-wrap">
               <Link to="/dashboard">

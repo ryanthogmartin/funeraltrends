@@ -1,14 +1,13 @@
-import { Search, TrendingUp, MessageSquare, Heart, LogIn } from "lucide-react";
+import { Search, TrendingUp, LogIn } from "lucide-react";
 import DashboardHeader from "@/components/DashboardHeader";
 import StatCard from "@/components/StatCard";
 import TrendChart from "@/components/TrendChart";
 import GoogleTrendsSection from "@/components/GoogleTrendsSection";
-import RedditCard from "@/components/RedditCard";
 import KeywordWatchlist from "@/components/KeywordWatchlist";
 import FacebookInsights from "@/components/FacebookInsights";
 import ReelsInsights from "@/components/ReelsInsights";
-import { mockTrends, mockRedditPosts, mockStats } from "@/lib/mockData";
-import { fetchTrends, fetchRedditPosts, fetchDashboardStats, triggerDataRefresh } from "@/lib/api";
+import { mockTrends, mockStats } from "@/lib/mockData";
+import { fetchTrends, fetchDashboardStats, triggerDataRefresh } from "@/lib/api";
 import { exportTrendsCsv } from "@/lib/exportCsv";
 import { motion } from "framer-motion";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
@@ -33,12 +32,6 @@ const Dashboard = () => {
     staleTime: 1000 * 60 * 5,
   });
 
-  const { data: redditPosts = mockRedditPosts } = useQuery({
-    queryKey: ['funeral-reddit'],
-    queryFn: fetchRedditPosts,
-    staleTime: 1000 * 60 * 5,
-  });
-
   const { data: dashStats = mockStats } = useQuery({
     queryKey: ['funeral-stats'],
     queryFn: fetchDashboardStats,
@@ -51,7 +44,6 @@ const Dashboard = () => {
     const success = await triggerDataRefresh();
     if (success) {
       await queryClient.invalidateQueries({ queryKey: ['funeral-trends'] });
-      await queryClient.invalidateQueries({ queryKey: ['funeral-reddit'] });
       await queryClient.invalidateQueries({ queryKey: ['funeral-stats'] });
       toast({ title: "Data refreshed!" });
     } else {
@@ -86,8 +78,6 @@ const Dashboard = () => {
   const stats = [
     { label: "Total Searches", value: dashStats.totalSearches.toLocaleString(), icon: Search, detail: "Across all tracked keywords" },
     { label: "Trending Topics", value: dashStats.trendingTopics.toString(), icon: TrendingUp, detail: "Keywords trending up" },
-    { label: "Reddit Mentions", value: dashStats.redditMentions.toLocaleString(), icon: MessageSquare, detail: "Total upvotes across posts" },
-    { label: "Avg. Sentiment", value: `${Math.round(dashStats.avgSentiment * 100)}%`, icon: Heart, detail: "Positive sentiment score" },
   ];
 
   return (
@@ -95,10 +85,10 @@ const Dashboard = () => {
       <DashboardHeader
         lastUpdated={isRefreshing ? "refreshing..." : "recently"}
         onRefresh={handleRefresh}
-        onExportCsv={() => exportTrendsCsv(trends, redditPosts)}
+        onExportCsv={() => exportTrendsCsv(trends)}
       />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
         {stats.map((stat, i) => (
           <StatCard key={stat.label} {...stat} index={i} />
         ))}
@@ -106,31 +96,12 @@ const Dashboard = () => {
 
       <TrendChart trends={trends} />
 
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-        <GoogleTrendsSection
-          trends={trends}
-          handleAddToWatchlist={handleAddToWatchlist}
-          isAddingToWatchlist={addToWatchlist.isPending}
-          addingKeyword={addingKeyword || undefined}
-        />
-
-        <motion.section
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4, duration: 0.5 }}
-          className="lg:col-span-2"
-        >
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-display font-semibold text-foreground">Reddit Discussions</h2>
-            <span className="text-xs text-muted-foreground">Trending now</span>
-          </div>
-          <div className="space-y-3">
-            {redditPosts.map((post, i) => (
-              <RedditCard key={post.id} post={post} index={i} />
-            ))}
-          </div>
-        </motion.section>
-      </div>
+      <GoogleTrendsSection
+        trends={trends}
+        handleAddToWatchlist={handleAddToWatchlist}
+        isAddingToWatchlist={addToWatchlist.isPending}
+        addingKeyword={addingKeyword || undefined}
+      />
 
       <FacebookInsights
         trends={trends}
