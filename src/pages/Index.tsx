@@ -141,46 +141,16 @@ const Index = () => {
         <TrendChart trends={trends} />
 
         {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-          {/* Google Trends */}
-          <GoogleTrendsSection
-            trends={trends}
-            handleAddToWatchlist={handleAddToWatchlist}
-            isAddingToWatchlist={addToWatchlist.isPending}
-            addingKeyword={addingKeyword || undefined}
-          />
-
-          {/* Reddit */}
-          <motion.section
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4, duration: 0.5 }}
-            className="lg:col-span-2"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-serif font-semibold text-foreground">
-                Reddit Discussions
-              </h2>
-              <span className="text-xs text-muted-foreground">Trending now</span>
-            </div>
-            <div className="space-y-3">
-              {redditPosts.map((post, i) => (
-                <RedditCard key={post.id} post={post} index={i} />
-              ))}
-            </div>
-          </motion.section>
-        </div>
-
-        {/* Video Content Ideas - Trends */}
-        <VideoTopics
+        <GoogleTrendsSection
           trends={trends}
-          isAuthenticated={!!user}
-          onRequireAuth={() => navigate("/auth")}
+          handleAddToWatchlist={handleAddToWatchlist}
+          isAddingToWatchlist={addToWatchlist.isPending}
+          addingKeyword={addingKeyword || undefined}
         />
 
-        {/* Video Content Ideas - Reddit */}
-        <RedditVideoTopics
-          posts={redditPosts}
+        {/* Video Content Ideas */}
+        <VideoTopics
+          trends={trends}
           isAuthenticated={!!user}
           onRequireAuth={() => navigate("/auth")}
         />
