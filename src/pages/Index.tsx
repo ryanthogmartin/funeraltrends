@@ -41,13 +41,12 @@ const Index = () => {
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    toast({ title: "Refreshing data...", description: "Fetching latest funeral trends from Google & Reddit" });
+    toast({ title: "Refreshing data...", description: "Fetching latest funeral trends from Google Ads" });
     
     const success = await triggerDataRefresh();
     
     if (success) {
       await queryClient.invalidateQueries({ queryKey: ['funeral-trends'] });
-      await queryClient.invalidateQueries({ queryKey: ['funeral-reddit'] });
       await queryClient.invalidateQueries({ queryKey: ['funeral-stats'] });
       toast({ title: "Data refreshed!", description: "Dashboard updated with latest trends" });
     } else {
