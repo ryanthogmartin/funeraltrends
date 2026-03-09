@@ -33,12 +33,6 @@ const Index = () => {
     staleTime: 1000 * 60 * 5,
   });
 
-  const { data: redditPosts = mockRedditPosts } = useQuery({
-    queryKey: ['funeral-reddit'],
-    queryFn: fetchRedditPosts,
-    staleTime: 1000 * 60 * 5,
-  });
-
   const { data: dashStats = mockStats } = useQuery({
     queryKey: ['funeral-stats'],
     queryFn: fetchDashboardStats,
