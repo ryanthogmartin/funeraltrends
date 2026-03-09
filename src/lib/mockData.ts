@@ -19,8 +19,6 @@ export interface RedditPost {
 export interface DashboardStats {
   totalSearches: number;
   trendingTopics: number;
-  redditMentions: number;
-  avgSentiment: number;
 }
 
 export const mockTrends: TrendItem[] = [
