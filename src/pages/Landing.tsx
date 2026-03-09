@@ -22,13 +22,6 @@ const features: FeatureItem[] = [
     requiresAuth: false,
   },
   {
-    icon: BarChart3,
-    title: "Reddit Sentiment",
-    description: "Track Reddit discussions with sentiment analysis, upvotes, and engagement metrics.",
-    link: "/dashboard",
-    requiresAuth: false,
-  },
-  {
     icon: Video,
     title: "AI Video Ideas",
     description: "Generate short-form video content ideas powered by AI, based on trending topics.",
