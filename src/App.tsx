@@ -12,6 +12,7 @@ import Hashtags from "./pages/Hashtags";
 import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
 import VoiceProfile from "./pages/VoiceProfile";
+import LocalTrends from "./pages/LocalTrends";
 import NotFound from "./pages/NotFound";
 import SiteLayout from "./components/SiteLayout";
 
