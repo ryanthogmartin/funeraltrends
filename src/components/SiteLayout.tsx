@@ -1,11 +1,12 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Skull, BarChart3, Video, Hash, LogIn, LogOut, Bookmark, Mic, ArrowRight } from "lucide-react";
+import { Skull, BarChart3, Video, Hash, LogIn, LogOut, Bookmark, Mic, ArrowRight, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import ThemeToggle from "@/components/ThemeToggle";
 
 const navItems = [
   { to: "/dashboard", label: "Dashboard", icon: BarChart3 },
+  { to: "/local-trends", label: "Local Trends", icon: MapPin },
   { to: "/video-ideas", label: "Video Ideas", icon: Video },
   { to: "/hashtags", label: "Hashtags", icon: Hash },
   { to: "/saved", label: "Saved", icon: Bookmark },
