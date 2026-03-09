@@ -34,7 +34,7 @@ const GoogleTrendsSection = ({
         <h2 className="text-lg font-display font-semibold text-foreground">
           Google Trends — Funeral Searches
         </h2>
-        <span className="text-xs text-muted-foreground">Past 24h</span>
+        <span className="text-xs text-muted-foreground">🇺🇸 United States · Past 24h</span>
       </div>
       <div className="space-y-0.5">
         {visibleTrends.map((trend, i) => (
