@@ -98,6 +98,4 @@ export const mockRedditPosts: RedditPost[] = [
 export const mockStats: DashboardStats = {
   totalSearches: 58300,
   trendingTopics: 24,
-  redditMentions: 1847,
-  avgSentiment: 0.62,
 };
