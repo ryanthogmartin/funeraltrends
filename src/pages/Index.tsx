@@ -104,18 +104,6 @@ const Index = () => {
       icon: TrendingUp,
       detail: "Keywords trending up",
     },
-    {
-      label: "Reddit Mentions",
-      value: dashStats.redditMentions.toLocaleString(),
-      icon: MessageSquare,
-      detail: "Total upvotes across posts",
-    },
-    {
-      label: "Avg. Sentiment",
-      value: `${Math.round(dashStats.avgSentiment * 100)}%`,
-      icon: Heart,
-      detail: "Positive sentiment score",
-    },
   ];
 
   return (
