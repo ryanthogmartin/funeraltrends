@@ -33,6 +33,7 @@ const App = () => (
             <Route path="/saved" element={<SiteLayout><SavedIdeas /></SiteLayout>} />
             <Route path="/auth" element={<SiteLayout><Auth /></SiteLayout>} />
             <Route path="/voice-profile" element={<SiteLayout><VoiceProfile /></SiteLayout>} />
+            <Route path="/local-trends" element={<SiteLayout><LocalTrends /></SiteLayout>} />
             <Route path="/reset-password" element={<SiteLayout><ResetPassword /></SiteLayout>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
