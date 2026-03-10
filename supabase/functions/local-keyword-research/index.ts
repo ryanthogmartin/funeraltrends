@@ -140,11 +140,19 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { zipCode, keywords } = await req.json();
+    const { stateCode, stateName, keywords } = await req.json();
 
-    if (!zipCode || typeof zipCode !== 'string' || !/^\d{5}$/.test(zipCode.trim())) {
+    if (!stateCode || typeof stateCode !== 'string' || stateCode.length !== 2) {
       return new Response(
-        JSON.stringify({ success: false, error: 'Please provide a valid 5-digit US zip code' }),
+        JSON.stringify({ success: false, error: 'Please select a valid US state' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+      );
+    }
+
+    const geoTarget = STATE_GEO_TARGETS[stateCode.toUpperCase()];
+    if (!geoTarget) {
+      return new Response(
+        JSON.stringify({ success: false, error: `Unknown state code: ${stateCode}` }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
       );
     }
@@ -156,7 +164,6 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Sanitize keywords
     const cleanKeywords = keywords
       .map((k: any) => String(k).trim().slice(0, 100))
       .filter((k: string) => k.length > 0);
@@ -182,19 +189,9 @@ Deno.serve(async (req) => {
       );
     }
 
-    console.log(`[Local Research] Zip: ${zipCode.trim()}, Keywords: ${cleanKeywords.join(', ')}`);
+    console.log(`[Local Research] State: ${stateCode} (${stateName}), Keywords: ${cleanKeywords.join(', ')}`);
 
     const accessToken = await getAccessToken();
-
-    // Look up geo target for the zip code
-    const geoTarget = await lookupGeoTarget(accessToken, zipCode.trim());
-
-    if (!geoTarget) {
-      return new Response(
-        JSON.stringify({ success: false, error: `Could not find location data for zip code ${zipCode.trim()}` }),
-        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-      );
-    }
 
     // Fetch keyword data for that location
     const results = await fetchLocalKeywordData(accessToken, cleanKeywords, geoTarget);
