@@ -30,55 +30,36 @@ async function getAccessToken(): Promise<string> {
   return data.access_token;
 }
 
-// ─── Geo Target Lookup ─────────────────────────────────────────────────
-
-async function lookupGeoTarget(accessToken: string, zipCode: string): Promise<string | null> {
-  const customerId = Deno.env.get('GOOGLE_ADS_CUSTOMER_ID')!;
-  const managerCustomerId = Deno.env.get('GOOGLE_ADS_MANAGER_CUSTOMER_ID')!;
-  const developerToken = Deno.env.get('GOOOGLE_ADS_DEVELOPER_TOKEN')!;
-
-  const url = `https://googleads.googleapis.com/v21/geoTargetConstants:suggest`;
-
-  const body = {
-    locale: 'en',
-    countryCode: 'US',
-    locationNames: {
-      names: [zipCode],
-    },
-  };
-
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${accessToken}`,
-      'developer-token': developerToken,
-      'login-customer-id': managerCustomerId,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(body),
-  });
-
-  if (!res.ok) {
-    const errText = await res.text();
-    console.error(`Geo target lookup error ${res.status}: ${errText}`);
-    return null;
-  }
-
-  const data = await res.json();
-  const results = data.geoTargetConstantSuggestions || [];
-
-  if (results.length === 0) {
-    console.log(`No geo target found for zip code: ${zipCode}`);
-    return null;
-  }
-
-  // Return the resource name (e.g., "geoTargetConstants/123456")
-  const resourceName = results[0].geoTargetConstant?.resourceName;
-  const canonicalName = results[0].geoTargetConstant?.canonicalName || zipCode;
-  console.log(`Resolved zip ${zipCode} → ${resourceName} (${canonicalName})`);
-
-  return resourceName || null;
-}
+// ─── State Geo Target Constants ────────────────────────────────────────
+// Pre-mapped Google Ads geoTargetConstants for US states
+const STATE_GEO_TARGETS: Record<string, string> = {
+  AL: "geoTargetConstants/21133", AK: "geoTargetConstants/21132",
+  AZ: "geoTargetConstants/21136", AR: "geoTargetConstants/21135",
+  CA: "geoTargetConstants/21137", CO: "geoTargetConstants/21138",
+  CT: "geoTargetConstants/21139", DE: "geoTargetConstants/21141",
+  FL: "geoTargetConstants/21142", GA: "geoTargetConstants/21143",
+  HI: "geoTargetConstants/21144", ID: "geoTargetConstants/21145",
+  IL: "geoTargetConstants/21146", IN: "geoTargetConstants/21147",
+  IA: "geoTargetConstants/21148", KS: "geoTargetConstants/21149",
+  KY: "geoTargetConstants/21150", LA: "geoTargetConstants/21151",
+  ME: "geoTargetConstants/21152", MD: "geoTargetConstants/21154",
+  MA: "geoTargetConstants/21153", MI: "geoTargetConstants/21155",
+  MN: "geoTargetConstants/21156", MS: "geoTargetConstants/21157",
+  MO: "geoTargetConstants/21158", MT: "geoTargetConstants/21159",
+  NE: "geoTargetConstants/21160", NV: "geoTargetConstants/21161",
+  NH: "geoTargetConstants/21162", NJ: "geoTargetConstants/21163",
+  NM: "geoTargetConstants/21164", NY: "geoTargetConstants/21167",
+  NC: "geoTargetConstants/21165", ND: "geoTargetConstants/21166",
+  OH: "geoTargetConstants/21168", OK: "geoTargetConstants/21169",
+  OR: "geoTargetConstants/21170", PA: "geoTargetConstants/21171",
+  RI: "geoTargetConstants/21172", SC: "geoTargetConstants/21173",
+  SD: "geoTargetConstants/21174", TN: "geoTargetConstants/21175",
+  TX: "geoTargetConstants/21176", UT: "geoTargetConstants/21177",
+  VT: "geoTargetConstants/21178", VA: "geoTargetConstants/21179",
+  WA: "geoTargetConstants/21180", WV: "geoTargetConstants/21181",
+  WI: "geoTargetConstants/21182", WY: "geoTargetConstants/21183",
+  DC: "geoTargetConstants/21140",
+};
 
 // ─── Keyword Research ──────────────────────────────────────────────────
 
@@ -159,11 +140,19 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { zipCode, keywords } = await req.json();
+    const { stateCode, stateName, keywords } = await req.json();
 
-    if (!zipCode || typeof zipCode !== 'string' || !/^\d{5}$/.test(zipCode.trim())) {
+    if (!stateCode || typeof stateCode !== 'string' || stateCode.length !== 2) {
       return new Response(
-        JSON.stringify({ success: false, error: 'Please provide a valid 5-digit US zip code' }),
+        JSON.stringify({ success: false, error: 'Please select a valid US state' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+      );
+    }
+
+    const geoTarget = STATE_GEO_TARGETS[stateCode.toUpperCase()];
+    if (!geoTarget) {
+      return new Response(
+        JSON.stringify({ success: false, error: `Unknown state code: ${stateCode}` }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
       );
     }
@@ -175,7 +164,6 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Sanitize keywords
     const cleanKeywords = keywords
       .map((k: any) => String(k).trim().slice(0, 100))
       .filter((k: string) => k.length > 0);
@@ -201,29 +189,20 @@ Deno.serve(async (req) => {
       );
     }
 
-    console.log(`[Local Research] Zip: ${zipCode.trim()}, Keywords: ${cleanKeywords.join(', ')}`);
+    console.log(`[Local Research] State: ${stateCode} (${stateName}), Keywords: ${cleanKeywords.join(', ')}`);
 
     const accessToken = await getAccessToken();
 
-    // Look up geo target for the zip code
-    const geoTarget = await lookupGeoTarget(accessToken, zipCode.trim());
-
-    if (!geoTarget) {
-      return new Response(
-        JSON.stringify({ success: false, error: `Could not find location data for zip code ${zipCode.trim()}` }),
-        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-      );
-    }
-
-    // Fetch keyword data for that location
+    // Fetch keyword data for the state
     const results = await fetchLocalKeywordData(accessToken, cleanKeywords, geoTarget);
 
-    console.log(`[Local Research] Returned ${results.length} keyword results for ${zipCode.trim()}`);
+    console.log(`[Local Research] Returned ${results.length} keyword results for ${stateCode}`);
 
     return new Response(
       JSON.stringify({
         success: true,
-        zipCode: zipCode.trim(),
+        stateCode: stateCode.toUpperCase(),
+        stateName: stateName || stateCode,
         geoTarget,
         results,
         fetched_at: new Date().toISOString(),

@@ -3,6 +3,27 @@ import { motion } from "framer-motion";
 import { MapPin, Search, Loader2, Plus, X, TrendingUp, TrendingDown, Minus, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+const US_STATES = [
+  { code: "AL", name: "Alabama" }, { code: "AK", name: "Alaska" }, { code: "AZ", name: "Arizona" },
+  { code: "AR", name: "Arkansas" }, { code: "CA", name: "California" }, { code: "CO", name: "Colorado" },
+  { code: "CT", name: "Connecticut" }, { code: "DE", name: "Delaware" }, { code: "FL", name: "Florida" },
+  { code: "GA", name: "Georgia" }, { code: "HI", name: "Hawaii" }, { code: "ID", name: "Idaho" },
+  { code: "IL", name: "Illinois" }, { code: "IN", name: "Indiana" }, { code: "IA", name: "Iowa" },
+  { code: "KS", name: "Kansas" }, { code: "KY", name: "Kentucky" }, { code: "LA", name: "Louisiana" },
+  { code: "ME", name: "Maine" }, { code: "MD", name: "Maryland" }, { code: "MA", name: "Massachusetts" },
+  { code: "MI", name: "Michigan" }, { code: "MN", name: "Minnesota" }, { code: "MS", name: "Mississippi" },
+  { code: "MO", name: "Missouri" }, { code: "MT", name: "Montana" }, { code: "NE", name: "Nebraska" },
+  { code: "NV", name: "Nevada" }, { code: "NH", name: "New Hampshire" }, { code: "NJ", name: "New Jersey" },
+  { code: "NM", name: "New Mexico" }, { code: "NY", name: "New York" }, { code: "NC", name: "North Carolina" },
+  { code: "ND", name: "North Dakota" }, { code: "OH", name: "Ohio" }, { code: "OK", name: "Oklahoma" },
+  { code: "OR", name: "Oregon" }, { code: "PA", name: "Pennsylvania" }, { code: "RI", name: "Rhode Island" },
+  { code: "SC", name: "South Carolina" }, { code: "SD", name: "South Dakota" }, { code: "TN", name: "Tennessee" },
+  { code: "TX", name: "Texas" }, { code: "UT", name: "Utah" }, { code: "VT", name: "Vermont" },
+  { code: "VA", name: "Virginia" }, { code: "WA", name: "Washington" }, { code: "WV", name: "West Virginia" },
+  { code: "WI", name: "Wisconsin" }, { code: "WY", name: "Wyoming" }, { code: "DC", name: "District of Columbia" },
+];
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -66,13 +87,13 @@ const SUGGESTED_KEYWORDS = [
 ];
 
 const LocalTrends = () => {
-  const [zipCode, setZipCode] = useState("");
+  const [stateCode, setStateCode] = useState("");
   const [keywordInput, setKeywordInput] = useState("");
   const [keywords, setKeywords] = useState<string[]>([]);
   const [results, setResults] = useState<LocalResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [searchedZip, setSearchedZip] = useState<string | null>(null);
+  const [searchedState, setSearchedState] = useState<string | null>(null);
 
   const addKeyword = (kw?: string) => {
     const word = (kw || keywordInput).trim().toLowerCase();
@@ -94,8 +115,8 @@ const LocalTrends = () => {
   };
 
   const handleSearch = async () => {
-    if (!/^\d{5}$/.test(zipCode.trim())) {
-      toast.error("Please enter a valid 5-digit US zip code");
+    if (!stateCode) {
+      toast.error("Please select a state");
       return;
     }
     if (keywords.length === 0) {
@@ -107,9 +128,11 @@ const LocalTrends = () => {
     setError(null);
     setResults([]);
 
+    const stateName = US_STATES.find(s => s.code === stateCode)?.name || stateCode;
+
     try {
       const { data, error: fnError } = await supabase.functions.invoke("local-keyword-research", {
-        body: { zipCode: zipCode.trim(), keywords },
+        body: { stateCode, stateName, keywords },
       });
 
       if (fnError) throw fnError;
@@ -120,10 +143,10 @@ const LocalTrends = () => {
       }
 
       setResults(data.results || []);
-      setSearchedZip(zipCode.trim());
+      setSearchedState(stateName);
 
       if (data.results?.length === 0) {
-        toast.info("No data found for these keywords in this area");
+        toast.info("No data found for these keywords in this state");
       }
     } catch (err: any) {
       console.error("Local research error:", err);
@@ -138,7 +161,7 @@ const LocalTrends = () => {
       e.preventDefault();
       if (keywordInput.trim()) {
         addKeyword();
-      } else if (keywords.length > 0 && /^\d{5}$/.test(zipCode.trim())) {
+      } else if (keywords.length > 0 && stateCode) {
         handleSearch();
       }
     }
@@ -152,7 +175,7 @@ const LocalTrends = () => {
           Local Keyword Research
         </h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Enter a US zip code and keywords to see real Google Ads search volume data for that area.
+          Select a US state and keywords to see real Google Ads search volume data for that region.
         </p>
       </motion.div>
 
@@ -163,20 +186,20 @@ const LocalTrends = () => {
         transition={{ delay: 0.1 }}
         className="glass-card p-5 space-y-4"
       >
-        {/* Zip Code */}
+        {/* State Selection */}
         <div className="flex flex-col sm:flex-row gap-3">
-          <div className="relative flex-shrink-0 sm:w-48">
-            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="text"
-              inputMode="numeric"
-              maxLength={5}
-              placeholder="Zip code"
-              value={zipCode}
-              onChange={(e) => setZipCode(e.target.value.replace(/\D/g, "").slice(0, 5))}
-              onKeyDown={handleKeyDown}
-              className="pl-9"
-            />
+          <div className="flex-shrink-0 sm:w-56">
+            <Select value={stateCode} onValueChange={setStateCode}>
+              <SelectTrigger>
+                <MapPin className="h-4 w-4 text-muted-foreground mr-2" />
+                <SelectValue placeholder="Select a state" />
+              </SelectTrigger>
+              <SelectContent className="max-h-60">
+                {US_STATES.map((s) => (
+                  <SelectItem key={s.code} value={s.code}>{s.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -236,7 +259,7 @@ const LocalTrends = () => {
         {/* Search Button */}
         <Button
           onClick={handleSearch}
-          disabled={loading || keywords.length === 0 || !/^\d{5}$/.test(zipCode.trim())}
+          disabled={loading || keywords.length === 0 || !stateCode}
           className="w-full sm:w-auto gap-2"
         >
           {loading ? (
@@ -272,10 +295,10 @@ const LocalTrends = () => {
         >
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-display font-semibold text-foreground">
-              Results for {searchedZip}
+              Results for {searchedState}
             </h2>
             <span className="text-xs text-muted-foreground">
-              🇺🇸 Local · {results.length} keyword{results.length !== 1 ? "s" : ""}
+              🇺🇸 {searchedState} · {results.length} keyword{results.length !== 1 ? "s" : ""}
             </span>
           </div>
 
@@ -344,10 +367,10 @@ const LocalTrends = () => {
       )}
 
       {/* Empty state after search */}
-      {!loading && results.length === 0 && searchedZip && !error && (
+      {!loading && results.length === 0 && searchedState && !error && (
         <div className="text-center py-12 text-muted-foreground text-sm">
-          No search volume data found for these keywords in zip code {searchedZip}.
-          <br />Try broader keywords or a different location.
+          No search volume data found for these keywords in {searchedState}.
+          <br />Try broader keywords or a different state.
         </div>
       )}
     </div>
