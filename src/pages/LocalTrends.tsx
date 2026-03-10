@@ -186,20 +186,20 @@ const LocalTrends = () => {
         transition={{ delay: 0.1 }}
         className="glass-card p-5 space-y-4"
       >
-        {/* Zip Code */}
+        {/* State Selection */}
         <div className="flex flex-col sm:flex-row gap-3">
-          <div className="relative flex-shrink-0 sm:w-48">
-            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="text"
-              inputMode="numeric"
-              maxLength={5}
-              placeholder="Zip code"
-              value={zipCode}
-              onChange={(e) => setZipCode(e.target.value.replace(/\D/g, "").slice(0, 5))}
-              onKeyDown={handleKeyDown}
-              className="pl-9"
-            />
+          <div className="flex-shrink-0 sm:w-56">
+            <Select value={stateCode} onValueChange={setStateCode}>
+              <SelectTrigger>
+                <MapPin className="h-4 w-4 text-muted-foreground mr-2" />
+                <SelectValue placeholder="Select a state" />
+              </SelectTrigger>
+              <SelectContent className="max-h-60">
+                {US_STATES.map((s) => (
+                  <SelectItem key={s.code} value={s.code}>{s.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
