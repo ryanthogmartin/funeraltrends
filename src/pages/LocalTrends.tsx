@@ -259,7 +259,7 @@ const LocalTrends = () => {
         {/* Search Button */}
         <Button
           onClick={handleSearch}
-          disabled={loading || keywords.length === 0 || !/^\d{5}$/.test(zipCode.trim())}
+          disabled={loading || keywords.length === 0 || !stateCode}
           className="w-full sm:w-auto gap-2"
         >
           {loading ? (
