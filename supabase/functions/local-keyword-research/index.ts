@@ -193,15 +193,16 @@ Deno.serve(async (req) => {
 
     const accessToken = await getAccessToken();
 
-    // Fetch keyword data for that location
+    // Fetch keyword data for the state
     const results = await fetchLocalKeywordData(accessToken, cleanKeywords, geoTarget);
 
-    console.log(`[Local Research] Returned ${results.length} keyword results for ${zipCode.trim()}`);
+    console.log(`[Local Research] Returned ${results.length} keyword results for ${stateCode}`);
 
     return new Response(
       JSON.stringify({
         success: true,
-        zipCode: zipCode.trim(),
+        stateCode: stateCode.toUpperCase(),
+        stateName: stateName || stateCode,
         geoTarget,
         results,
         fetched_at: new Date().toISOString(),
