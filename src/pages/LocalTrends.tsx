@@ -295,10 +295,10 @@ const LocalTrends = () => {
         >
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-display font-semibold text-foreground">
-              Results for {searchedZip}
+              Results for {searchedState}
             </h2>
             <span className="text-xs text-muted-foreground">
-              🇺🇸 Local · {results.length} keyword{results.length !== 1 ? "s" : ""}
+              🇺🇸 {searchedState} · {results.length} keyword{results.length !== 1 ? "s" : ""}
             </span>
           </div>
 
