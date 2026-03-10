@@ -367,10 +367,10 @@ const LocalTrends = () => {
       )}
 
       {/* Empty state after search */}
-      {!loading && results.length === 0 && searchedZip && !error && (
+      {!loading && results.length === 0 && searchedState && !error && (
         <div className="text-center py-12 text-muted-foreground text-sm">
-          No search volume data found for these keywords in zip code {searchedZip}.
-          <br />Try broader keywords or a different location.
+          No search volume data found for these keywords in {searchedState}.
+          <br />Try broader keywords or a different state.
         </div>
       )}
     </div>
