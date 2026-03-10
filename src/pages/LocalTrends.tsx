@@ -161,7 +161,7 @@ const LocalTrends = () => {
       e.preventDefault();
       if (keywordInput.trim()) {
         addKeyword();
-      } else if (keywords.length > 0 && /^\d{5}$/.test(zipCode.trim())) {
+      } else if (keywords.length > 0 && stateCode) {
         handleSearch();
       }
     }
