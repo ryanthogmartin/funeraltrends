@@ -115,8 +115,8 @@ const LocalTrends = () => {
   };
 
   const handleSearch = async () => {
-    if (!/^\d{5}$/.test(zipCode.trim())) {
-      toast.error("Please enter a valid 5-digit US zip code");
+    if (!stateCode) {
+      toast.error("Please select a state");
       return;
     }
     if (keywords.length === 0) {
@@ -128,9 +128,11 @@ const LocalTrends = () => {
     setError(null);
     setResults([]);
 
+    const stateName = US_STATES.find(s => s.code === stateCode)?.name || stateCode;
+
     try {
       const { data, error: fnError } = await supabase.functions.invoke("local-keyword-research", {
-        body: { zipCode: zipCode.trim(), keywords },
+        body: { stateCode, stateName, keywords },
       });
 
       if (fnError) throw fnError;
@@ -141,10 +143,10 @@ const LocalTrends = () => {
       }
 
       setResults(data.results || []);
-      setSearchedZip(zipCode.trim());
+      setSearchedState(stateName);
 
       if (data.results?.length === 0) {
-        toast.info("No data found for these keywords in this area");
+        toast.info("No data found for these keywords in this state");
       }
     } catch (err: any) {
       console.error("Local research error:", err);
