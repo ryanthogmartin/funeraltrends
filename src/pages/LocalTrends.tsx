@@ -175,7 +175,7 @@ const LocalTrends = () => {
           Local Keyword Research
         </h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Enter a US zip code and keywords to see real Google Ads search volume data for that area.
+          Select a US state and keywords to see real Google Ads search volume data for that region.
         </p>
       </motion.div>
 
