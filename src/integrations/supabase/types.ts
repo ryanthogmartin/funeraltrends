@@ -151,53 +151,77 @@ export type Database = {
       }
       voice_profiles: {
         Row: {
+          anecdote_style: string
           audience_address: string
           catchphrases: string | null
+          content_pillars: string | null
           created_at: string
           cta_style: string
+          faith_lens: string
           funeral_home_name: string | null
           humor_comfort: string
           id: string
+          origin_story: string | null
           pacing_style: string
           sample_script: string | null
+          signature_opening: string | null
           specialties: string | null
+          taboo_topics: string | null
+          target_audience_age: string
           tone_descriptor: string
           updated_at: string
           user_id: string
+          video_style: string
           vocabulary_level: string
           years_experience: string | null
         }
         Insert: {
+          anecdote_style?: string
           audience_address?: string
           catchphrases?: string | null
+          content_pillars?: string | null
           created_at?: string
           cta_style?: string
+          faith_lens?: string
           funeral_home_name?: string | null
           humor_comfort?: string
           id?: string
+          origin_story?: string | null
           pacing_style?: string
           sample_script?: string | null
+          signature_opening?: string | null
           specialties?: string | null
+          taboo_topics?: string | null
+          target_audience_age?: string
           tone_descriptor?: string
           updated_at?: string
           user_id: string
+          video_style?: string
           vocabulary_level?: string
           years_experience?: string | null
         }
         Update: {
+          anecdote_style?: string
           audience_address?: string
           catchphrases?: string | null
+          content_pillars?: string | null
           created_at?: string
           cta_style?: string
+          faith_lens?: string
           funeral_home_name?: string | null
           humor_comfort?: string
           id?: string
+          origin_story?: string | null
           pacing_style?: string
           sample_script?: string | null
+          signature_opening?: string | null
           specialties?: string | null
+          taboo_topics?: string | null
+          target_audience_age?: string
           tone_descriptor?: string
           updated_at?: string
           user_id?: string
+          video_style?: string
           vocabulary_level?: string
           years_experience?: string | null
         }
