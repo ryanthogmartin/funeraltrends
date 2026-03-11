@@ -38,21 +38,70 @@ function buildVoicePrompt(vp: any): string {
     'emotional-close': 'End with an emotional, supportive close — like "You don\'t have to go through this alone."',
   };
 
+  const audienceAgeMap: Record<string, string> = {
+    'millennials': 'Target audience is Millennials (25–40). Use casual, relatable language. Pop culture references OK.',
+    'gen-x': 'Target audience is Gen X (40–55). Be practical and direct. No-nonsense tone.',
+    'boomers': 'Target audience is Boomers (55+). Use traditional, respectful language. Avoid slang.',
+    'all-ages': 'Speak to all age groups. Use universal language everyone understands.',
+  };
+
+  const videoStyleMap: Record<string, string> = {
+    'talking-head': 'Structure as a direct-to-camera talking head script. Personal, eye-contact feel.',
+    'storytelling': 'Structure as a narrative story. Build tension, deliver a lesson or emotional payoff.',
+    'quick-tips': 'Structure as numbered quick tips or a listicle. Fast, snappy, easy to follow.',
+    'emotional': 'Structure for maximum emotional impact. Build to a powerful, moving moment.',
+    'educational': 'Structure as a clear explainer. Walk through concepts step by step.',
+  };
+
+  const faithMap: Record<string, string> = {
+    'faith-based': 'This person is comfortable with faith references. Scripture, God, prayer are welcome when relevant.',
+    'secular': 'Keep all content secular. Do NOT reference God, faith, prayer, or any religion.',
+    'culturally-diverse': 'Be respectful of many faith traditions. Reference diversity of beliefs positively.',
+    'prefer-not': 'Avoid religious references unless the topic specifically calls for it.',
+  };
+
+  const anecdoteMap: Record<string, string> = {
+    'never': 'Do NOT include personal anecdotes or "I once had a family…" stories. Keep it factual.',
+    'occasionally': 'Include a brief personal anecdote only when it strongly supports the point.',
+    'frequently': 'Weave in personal stories and "I remember when…" moments — this is how they connect with their audience.',
+  };
+
   let prompt = `VOICE PROFILE — Write the script AS this funeral professional:\n\n`;
   
   if (vp.funeral_home_name) prompt += `They work at ${vp.funeral_home_name}. `;
   if (vp.years_experience) prompt += `They have ${vp.years_experience} years of experience. `;
   if (vp.specialties) prompt += `Their specialties include: ${vp.specialties}. `;
   
+  if (vp.origin_story?.trim()) {
+    prompt += `\n\nORIGIN STORY (weave this in naturally when relevant, don't force it): ${vp.origin_story}`;
+  }
+
   prompt += `\n\nTONE: ${toneMap[vp.tone_descriptor] || toneMap['warm-empathetic']}`;
   prompt += `\nVOCABULARY: ${vocabMap[vp.vocabulary_level] || vocabMap['everyday']}`;
   prompt += `\nAUDIENCE: Address the audience as "${vp.audience_address || 'families'}".`;
+  prompt += `\nTARGET DEMOGRAPHIC: ${audienceAgeMap[vp.target_audience_age] || audienceAgeMap['all-ages']}`;
+  prompt += `\nVIDEO STYLE: ${videoStyleMap[vp.video_style] || videoStyleMap['talking-head']}`;
   prompt += `\nPACING: ${pacingMap[vp.pacing_style] || pacingMap['mixed']}`;
   prompt += `\nHUMOR: ${humorMap[vp.humor_comfort] || humorMap['no-humor']}`;
+  prompt += `\nFAITH LENS: ${faithMap[vp.faith_lens] || faithMap['prefer-not']}`;
+  prompt += `\nPERSONAL STORIES: ${anecdoteMap[vp.anecdote_style] || anecdoteMap['occasionally']}`;
   prompt += `\nENDING STYLE: ${ctaMap[vp.cta_style] || ctaMap['soft-ask']}`;
+
+  if (vp.signature_opening?.trim()) {
+    prompt += `\n\nSIGNATURE OPENING — Start the hook with or inspired by: "${vp.signature_opening}"`;
+  }
+
+  if (vp.content_pillars?.trim()) {
+    const pillars = vp.content_pillars.split(',').join(', ');
+    prompt += `\n\nCONTENT PILLARS — This creator focuses on: ${pillars}. Lean into these angles when writing.`;
+  }
 
   if (vp.catchphrases?.trim()) {
     prompt += `\n\nNATURALLY WEAVE IN these signature phrases when they fit (don't force them): ${vp.catchphrases}`;
+  }
+
+  if (vp.taboo_topics?.trim()) {
+    prompt += `\n\n⚠️ HARD AVOID — NEVER mention or reference any of the following: ${vp.taboo_topics}`;
   }
 
   if (vp.sample_script?.trim()) {
