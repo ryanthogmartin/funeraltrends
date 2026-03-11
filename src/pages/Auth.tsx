@@ -135,6 +135,34 @@ const Auth = () => {
               </div>
             )}
 
+            {!showForgot && !isLogin && (
+              <div className="space-y-2">
+                <Label htmlFor="company">Company</Label>
+                <Input
+                  id="company"
+                  type="text"
+                  placeholder="Acme Funeral Home"
+                  value={company}
+                  onChange={(e) => setCompany(e.target.value)}
+                  maxLength={100}
+                />
+              </div>
+            )}
+
+            {!showForgot && !isLogin && (
+              <div className="space-y-2">
+                <Label htmlFor="jobTitle">Job Title</Label>
+                <Input
+                  id="jobTitle"
+                  type="text"
+                  placeholder="Funeral Director"
+                  value={jobTitle}
+                  onChange={(e) => setJobTitle(e.target.value)}
+                  maxLength={100}
+                />
+              </div>
+            )}
+
             {!showForgot && (
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
