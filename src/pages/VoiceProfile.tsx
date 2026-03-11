@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useVoiceProfile, VoiceProfile } from "@/hooks/useVoiceProfile";
 import { useNavigate } from "react-router-dom";
@@ -8,7 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Loader2, Mic, Save, User } from "lucide-react";
+import { Loader2, Mic, MicOff, Save, User } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const toneOptions = [
   { value: "warm-empathetic", label: "Warm & Empathetic", desc: "Caring, gentle, comforting — like talking to a trusted friend" },
@@ -55,6 +56,9 @@ const VoiceProfilePage = () => {
   const navigate = useNavigate();
   const { profile, loading, saving, save, hasProfile } = useVoiceProfile();
   const [form, setForm] = useState<VoiceProfile>(profile);
+  const [isRecording, setIsRecording] = useState(false);
+  const recognitionRef = useRef<any>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     if (!authLoading && !user) navigate("/auth");
@@ -66,6 +70,59 @@ const VoiceProfilePage = () => {
 
   const update = (field: keyof VoiceProfile, value: string) =>
     setForm((prev) => ({ ...prev, [field]: value }));
+
+  const toggleRecording = useCallback(() => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      toast({ title: "Not supported", description: "Speech recognition isn't available in this browser. Try Chrome.", variant: "destructive" });
+      return;
+    }
+
+    if (isRecording && recognitionRef.current) {
+      recognitionRef.current.stop();
+      setIsRecording(false);
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = "en-US";
+    recognitionRef.current = recognition;
+
+    let finalTranscript = form.sample_script ? form.sample_script + "\n\n" : "";
+
+    recognition.onresult = (event: any) => {
+      let interim = "";
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcript = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalTranscript += transcript;
+          update("sample_script", finalTranscript.slice(0, 2000));
+        } else {
+          interim += transcript;
+        }
+      }
+      // Show interim text so user sees live feedback
+      update("sample_script", (finalTranscript + interim).slice(0, 2000));
+    };
+
+    recognition.onerror = (event: any) => {
+      console.error("Speech recognition error:", event.error);
+      setIsRecording(false);
+      if (event.error === "not-allowed") {
+        toast({ title: "Microphone access denied", description: "Please allow microphone access and try again.", variant: "destructive" });
+      }
+    };
+
+    recognition.onend = () => {
+      setIsRecording(false);
+    };
+
+    recognition.start();
+    setIsRecording(true);
+    toast({ title: "Recording started", description: "Speak naturally — answer the prompt below." });
+  }, [isRecording, form.sample_script, toast]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -322,18 +379,50 @@ const VoiceProfilePage = () => {
         {/* Sample Script */}
         <Card className="border-border">
           <CardHeader className="pb-3">
-            <CardTitle className="text-base">Paste a script or transcript that sounds like you</CardTitle>
-            <CardDescription>This is the most powerful way to teach us your voice — even a caption or short clip transcript works</CardDescription>
+            <CardTitle className="text-base">Paste a script or record yourself speaking</CardTitle>
+            <CardDescription>This is the most powerful way to teach us your voice — type, paste, or hit record and answer the prompt below</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
+            <div className="rounded-lg border border-primary/20 bg-primary/5 p-4">
+              <p className="text-xs font-medium text-primary mb-1">🎤 Voice Prompt</p>
+              <p className="text-sm text-foreground italic">
+                "Here are 3 things I wish every consumer knew about preplanning."
+              </p>
+              <p className="text-xs text-muted-foreground mt-2">
+                Hit record, speak naturally for 30–60 seconds, then stop. We'll transcribe it for you.
+              </p>
+              <Button
+                type="button"
+                variant={isRecording ? "destructive" : "outline"}
+                size="sm"
+                className="mt-3 gap-2"
+                onClick={toggleRecording}
+              >
+                {isRecording ? (
+                  <>
+                    <MicOff className="h-4 w-4" />
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-destructive-foreground opacity-75" />
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-destructive-foreground" />
+                    </span>
+                    Stop Recording
+                  </>
+                ) : (
+                  <>
+                    <Mic className="h-4 w-4" />
+                    Start Recording
+                  </>
+                )}
+              </Button>
+            </div>
             <Textarea
-              placeholder="Paste any script, caption, or transcript you've written that sounds like you speaking on camera..."
+              placeholder="Paste any script, caption, or transcript you've written — or use the record button above to speak your answer..."
               value={form.sample_script}
               onChange={(e) => update("sample_script", e.target.value)}
               maxLength={2000}
               className="min-h-[140px]"
             />
-            <p className="text-xs text-muted-foreground mt-1">{form.sample_script.length}/2000 characters</p>
+            <p className="text-xs text-muted-foreground">{form.sample_script.length}/2000 characters</p>
           </CardContent>
         </Card>
 
