@@ -379,18 +379,50 @@ const VoiceProfilePage = () => {
         {/* Sample Script */}
         <Card className="border-border">
           <CardHeader className="pb-3">
-            <CardTitle className="text-base">Paste a script or transcript that sounds like you</CardTitle>
-            <CardDescription>This is the most powerful way to teach us your voice — even a caption or short clip transcript works</CardDescription>
+            <CardTitle className="text-base">Paste a script or record yourself speaking</CardTitle>
+            <CardDescription>This is the most powerful way to teach us your voice — type, paste, or hit record and answer the prompt below</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
+            <div className="rounded-lg border border-primary/20 bg-primary/5 p-4">
+              <p className="text-xs font-medium text-primary mb-1">🎤 Voice Prompt</p>
+              <p className="text-sm text-foreground italic">
+                "Here are 3 things I wish every consumer knew about preplanning."
+              </p>
+              <p className="text-xs text-muted-foreground mt-2">
+                Hit record, speak naturally for 30–60 seconds, then stop. We'll transcribe it for you.
+              </p>
+              <Button
+                type="button"
+                variant={isRecording ? "destructive" : "outline"}
+                size="sm"
+                className="mt-3 gap-2"
+                onClick={toggleRecording}
+              >
+                {isRecording ? (
+                  <>
+                    <MicOff className="h-4 w-4" />
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-destructive-foreground opacity-75" />
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-destructive-foreground" />
+                    </span>
+                    Stop Recording
+                  </>
+                ) : (
+                  <>
+                    <Mic className="h-4 w-4" />
+                    Start Recording
+                  </>
+                )}
+              </Button>
+            </div>
             <Textarea
-              placeholder="Paste any script, caption, or transcript you've written that sounds like you speaking on camera..."
+              placeholder="Paste any script, caption, or transcript you've written — or use the record button above to speak your answer..."
               value={form.sample_script}
               onChange={(e) => update("sample_script", e.target.value)}
               maxLength={2000}
               className="min-h-[140px]"
             />
-            <p className="text-xs text-muted-foreground mt-1">{form.sample_script.length}/2000 characters</p>
+            <p className="text-xs text-muted-foreground">{form.sample_script.length}/2000 characters</p>
           </CardContent>
         </Card>
 
