@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useVoiceProfile, VoiceProfile } from "@/hooks/useVoiceProfile";
 import { useNavigate } from "react-router-dom";
@@ -8,7 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Loader2, Mic, Save, User } from "lucide-react";
+import { Loader2, Mic, MicOff, Save, User } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const toneOptions = [
   { value: "warm-empathetic", label: "Warm & Empathetic", desc: "Caring, gentle, comforting — like talking to a trusted friend" },
