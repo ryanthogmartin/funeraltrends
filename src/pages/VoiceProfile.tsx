@@ -56,6 +56,9 @@ const VoiceProfilePage = () => {
   const navigate = useNavigate();
   const { profile, loading, saving, save, hasProfile } = useVoiceProfile();
   const [form, setForm] = useState<VoiceProfile>(profile);
+  const [isRecording, setIsRecording] = useState(false);
+  const recognitionRef = useRef<any>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     if (!authLoading && !user) navigate("/auth");
@@ -67,6 +70,59 @@ const VoiceProfilePage = () => {
 
   const update = (field: keyof VoiceProfile, value: string) =>
     setForm((prev) => ({ ...prev, [field]: value }));
+
+  const toggleRecording = useCallback(() => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      toast({ title: "Not supported", description: "Speech recognition isn't available in this browser. Try Chrome.", variant: "destructive" });
+      return;
+    }
+
+    if (isRecording && recognitionRef.current) {
+      recognitionRef.current.stop();
+      setIsRecording(false);
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = "en-US";
+    recognitionRef.current = recognition;
+
+    let finalTranscript = form.sample_script ? form.sample_script + "\n\n" : "";
+
+    recognition.onresult = (event: any) => {
+      let interim = "";
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcript = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalTranscript += transcript;
+          update("sample_script", finalTranscript.slice(0, 2000));
+        } else {
+          interim += transcript;
+        }
+      }
+      // Show interim text so user sees live feedback
+      update("sample_script", (finalTranscript + interim).slice(0, 2000));
+    };
+
+    recognition.onerror = (event: any) => {
+      console.error("Speech recognition error:", event.error);
+      setIsRecording(false);
+      if (event.error === "not-allowed") {
+        toast({ title: "Microphone access denied", description: "Please allow microphone access and try again.", variant: "destructive" });
+      }
+    };
+
+    recognition.onend = () => {
+      setIsRecording(false);
+    };
+
+    recognition.start();
+    setIsRecording(true);
+    toast({ title: "Recording started", description: "Speak naturally — answer the prompt below." });
+  }, [isRecording, form.sample_script, toast]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
