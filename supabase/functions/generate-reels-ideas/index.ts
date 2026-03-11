@@ -67,11 +67,43 @@ Return ONLY the JSON array, no markdown, no code fences.`
 
     let ideas;
     try {
-      const cleaned = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+      let cleaned = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+      // Find JSON boundaries
+      const jsonStart = cleaned.search(/[\[\{]/);
+      const lastBracket = cleaned.lastIndexOf(']');
+      const lastBrace = cleaned.lastIndexOf('}');
+      const jsonEnd = Math.max(lastBracket, lastBrace);
+      if (jsonStart !== -1 && jsonEnd !== -1) {
+        cleaned = cleaned.substring(jsonStart, jsonEnd + 1);
+      }
+      // Remove control characters and fix trailing commas
+      cleaned = cleaned
+        .replace(/[\x00-\x1F\x7F]/g, ' ')
+        .replace(/,\s*]/g, ']')
+        .replace(/,\s*}/g, '}');
       ideas = JSON.parse(cleaned);
-    } catch {
+    } catch (parseErr) {
       console.error('Failed to parse AI response:', content);
-      throw new Error('Failed to parse AI response');
+      // Try to salvage partial array
+      try {
+        let cleaned = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+        cleaned = cleaned.replace(/[\x00-\x1F\x7F]/g, ' ');
+        const arrayStart = cleaned.indexOf('[');
+        if (arrayStart !== -1) {
+          const lastComplete = cleaned.lastIndexOf('}');
+          if (lastComplete > arrayStart) {
+            const repaired = cleaned.substring(arrayStart, lastComplete + 1) + ']';
+            ideas = JSON.parse(repaired);
+            console.warn(`Recovered ${ideas.length} items from truncated response`);
+          } else {
+            throw parseErr;
+          }
+        } else {
+          throw parseErr;
+        }
+      } catch {
+        throw new Error('Failed to parse AI response');
+      }
     }
 
     return new Response(
