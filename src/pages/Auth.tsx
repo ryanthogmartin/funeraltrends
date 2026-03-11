@@ -36,7 +36,7 @@ const Auth = () => {
           password,
           options: {
             emailRedirectTo: window.location.origin,
-            data: { first_name: firstName, last_name: lastName },
+            data: { first_name: firstName, last_name: lastName, company, job_title: jobTitle },
           },
         });
         if (error) throw error;
