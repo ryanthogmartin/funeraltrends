@@ -7,8 +7,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Loader2, Mic, MicOff, Save, User } from "lucide-react";
+import { Loader2, Mic, MicOff, Save, User, Target, Video, Heart, Shield } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const toneOptions = [
@@ -51,6 +52,72 @@ const ctaOptions = [
   { value: "emotional-close", label: "Emotional Close", desc: '"Remember, you don\'t have to go through this alone"' },
 ];
 
+const contentPillarOptions = [
+  { value: "pre-planning", label: "Pre-Planning Education" },
+  { value: "grief-support", label: "Grief Support" },
+  { value: "behind-scenes", label: "Behind the Scenes" },
+  { value: "myth-busting", label: "Myth Busting" },
+  { value: "celebration-of-life", label: "Celebration of Life" },
+  { value: "cost-transparency", label: "Cost & Transparency" },
+  { value: "cultural-traditions", label: "Cultural Traditions" },
+  { value: "industry-advocacy", label: "Industry Advocacy" },
+];
+
+const targetAudienceOptions = [
+  { value: "millennials", label: "Millennials (25–40)", desc: "Casual, digital-native language" },
+  { value: "gen-x", label: "Gen X (40–55)", desc: "Practical, no-nonsense tone" },
+  { value: "boomers", label: "Boomers (55+)", desc: "Traditional, respectful approach" },
+  { value: "all-ages", label: "All Ages", desc: "Universal language that works for everyone" },
+];
+
+const videoStyleOptions = [
+  { value: "talking-head", label: "Talking Head", desc: "You on camera, speaking directly to the viewer" },
+  { value: "storytelling", label: "Storytelling", desc: "Narrative-driven, like telling a story to a friend" },
+  { value: "quick-tips", label: "Quick Tips / Listicle", desc: "Fast, numbered tips — easy to follow" },
+  { value: "emotional", label: "Emotional / Heartfelt", desc: "Pulls at heartstrings, moving and powerful" },
+  { value: "educational", label: "Educational / Explainer", desc: "Teaching something step-by-step" },
+];
+
+const faithLensOptions = [
+  { value: "faith-based", label: "Faith-Based", desc: "Comfortable referencing faith, God, scripture" },
+  { value: "secular", label: "Secular", desc: "Keep it non-religious, universal" },
+  { value: "culturally-diverse", label: "Culturally Diverse", desc: "Respectful of many traditions and beliefs" },
+  { value: "prefer-not", label: "Prefer Not to Specify", desc: "Leave it flexible — I'll adjust per video" },
+];
+
+const anecdoteOptions = [
+  { value: "never", label: "Never", desc: "I keep things factual and professional" },
+  { value: "occasionally", label: "Occasionally", desc: "Sometimes a personal story fits naturally" },
+  { value: "frequently", label: "Frequently", desc: "I love sharing stories — it's how I connect" },
+];
+
+// Reusable radio card renderer
+const RadioCard = ({ options, value, onChange, grid }: {
+  options: { value: string; label: string; desc?: string }[];
+  value: string;
+  onChange: (v: string) => void;
+  grid?: boolean;
+}) => (
+  <RadioGroup value={value} onValueChange={onChange} className={grid ? "grid grid-cols-2 sm:grid-cols-3 gap-2" : "space-y-2"}>
+    {options.map((opt) => (
+      <label
+        key={opt.value}
+        className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
+          value === opt.value
+            ? "border-primary bg-primary/5"
+            : "border-border hover:border-primary/40"
+        }`}
+      >
+        <RadioGroupItem value={opt.value} className="mt-0.5" />
+        <div>
+          <p className="text-sm font-medium text-foreground">{opt.label}</p>
+          {opt.desc && <p className="text-xs text-muted-foreground">{opt.desc}</p>}
+        </div>
+      </label>
+    ))}
+  </RadioGroup>
+);
+
 const VoiceProfilePage = () => {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
@@ -70,6 +137,16 @@ const VoiceProfilePage = () => {
 
   const update = (field: keyof VoiceProfile, value: string) =>
     setForm((prev) => ({ ...prev, [field]: value }));
+
+  const togglePillar = (pillar: string) => {
+    const current = form.content_pillars ? form.content_pillars.split(",").filter(Boolean) : [];
+    const updated = current.includes(pillar)
+      ? current.filter((p) => p !== pillar)
+      : [...current, pillar].slice(0, 4);
+    update("content_pillars", updated.join(","));
+  };
+
+  const selectedPillars = form.content_pillars ? form.content_pillars.split(",").filter(Boolean) : [];
 
   const toggleRecording = useCallback(() => {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
@@ -103,7 +180,6 @@ const VoiceProfilePage = () => {
           interim += transcript;
         }
       }
-      // Show interim text so user sees live feedback
       update("sample_script", (finalTranscript + interim).slice(0, 2000));
     };
 
@@ -196,6 +272,98 @@ const VoiceProfilePage = () => {
           </CardContent>
         </Card>
 
+        {/* Origin Story */}
+        <Card className="border-border">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Heart className="h-4 w-4 text-primary" /> Your Origin Story
+            </CardTitle>
+            <CardDescription>Why did you get into funeral service? This gives your scripts authentic backstory.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Textarea
+              placeholder="e.g. I'm a 3rd generation funeral director. My grandfather started this home in 1962, and I grew up knowing this was my calling. I got into this work because I saw how much it meant to families during their hardest days."
+              value={form.origin_story}
+              onChange={(e) => update("origin_story", e.target.value)}
+              maxLength={500}
+              className="min-h-[100px]"
+            />
+            <p className="text-xs text-muted-foreground mt-1">{form.origin_story.length}/500 characters</p>
+          </CardContent>
+        </Card>
+
+        {/* Signature Opening */}
+        <Card className="border-border">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">How do you typically open your videos?</CardTitle>
+            <CardDescription>Your go-to greeting or opening line</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Input
+              placeholder={'e.g. "Hey friends, it\'s Mike from Smith Funeral Home..." or "Listen up, I need to tell you something..."'}
+              value={form.signature_opening}
+              onChange={(e) => update("signature_opening", e.target.value)}
+              maxLength={150}
+            />
+            <p className="text-xs text-muted-foreground mt-1">Leave blank to let the AI craft hooks for each topic</p>
+          </CardContent>
+        </Card>
+
+        {/* Content Pillars */}
+        <Card className="border-border">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Target className="h-4 w-4 text-primary" /> Your Content Pillars
+            </CardTitle>
+            <CardDescription>Pick up to 4 topics you focus on most — scripts will lean into these</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 gap-2">
+              {contentPillarOptions.map((opt) => (
+                <label
+                  key={opt.value}
+                  className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors text-sm ${
+                    selectedPillars.includes(opt.value)
+                      ? "border-primary bg-primary/5 font-medium"
+                      : "border-border hover:border-primary/40"
+                  }`}
+                >
+                  <Checkbox
+                    checked={selectedPillars.includes(opt.value)}
+                    onCheckedChange={() => togglePillar(opt.value)}
+                  />
+                  {opt.label}
+                </label>
+              ))}
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">{selectedPillars.length}/4 selected</p>
+          </CardContent>
+        </Card>
+
+        {/* Target Audience Age */}
+        <Card className="border-border">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">Who are you primarily speaking to?</CardTitle>
+            <CardDescription>This adjusts language, references, and energy level</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <RadioCard options={targetAudienceOptions} value={form.target_audience_age} onChange={(v) => update("target_audience_age", v)} />
+          </CardContent>
+        </Card>
+
+        {/* Video Style */}
+        <Card className="border-border">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Video className="h-4 w-4 text-primary" /> What's your preferred video style?
+            </CardTitle>
+            <CardDescription>This shapes how scripts are structured</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <RadioCard options={videoStyleOptions} value={form.video_style} onChange={(v) => update("video_style", v)} />
+          </CardContent>
+        </Card>
+
         {/* Tone */}
         <Card className="border-border">
           <CardHeader className="pb-3">
@@ -203,24 +371,7 @@ const VoiceProfilePage = () => {
             <CardDescription>This shapes the overall feel of your scripts</CardDescription>
           </CardHeader>
           <CardContent>
-            <RadioGroup value={form.tone_descriptor} onValueChange={(v) => update("tone_descriptor", v)} className="space-y-2">
-              {toneOptions.map((opt) => (
-                <label
-                  key={opt.value}
-                  className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
-                    form.tone_descriptor === opt.value
-                      ? "border-primary bg-primary/5"
-                      : "border-border hover:border-primary/40"
-                  }`}
-                >
-                  <RadioGroupItem value={opt.value} className="mt-0.5" />
-                  <div>
-                    <p className="text-sm font-medium text-foreground">{opt.label}</p>
-                    <p className="text-xs text-muted-foreground">{opt.desc}</p>
-                  </div>
-                </label>
-              ))}
-            </RadioGroup>
+            <RadioCard options={toneOptions} value={form.tone_descriptor} onChange={(v) => update("tone_descriptor", v)} />
           </CardContent>
         </Card>
 
@@ -231,24 +382,7 @@ const VoiceProfilePage = () => {
             <CardDescription>Are you talking to families or fellow funeral professionals?</CardDescription>
           </CardHeader>
           <CardContent>
-            <RadioGroup value={form.vocabulary_level} onValueChange={(v) => update("vocabulary_level", v)} className="space-y-2">
-              {vocabOptions.map((opt) => (
-                <label
-                  key={opt.value}
-                  className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
-                    form.vocabulary_level === opt.value
-                      ? "border-primary bg-primary/5"
-                      : "border-border hover:border-primary/40"
-                  }`}
-                >
-                  <RadioGroupItem value={opt.value} className="mt-0.5" />
-                  <div>
-                    <p className="text-sm font-medium text-foreground">{opt.label}</p>
-                    <p className="text-xs text-muted-foreground">{opt.desc}</p>
-                  </div>
-                </label>
-              ))}
-            </RadioGroup>
+            <RadioCard options={vocabOptions} value={form.vocabulary_level} onChange={(v) => update("vocabulary_level", v)} />
           </CardContent>
         </Card>
 
@@ -259,21 +393,7 @@ const VoiceProfilePage = () => {
             <CardDescription>What feels natural when you're speaking to camera?</CardDescription>
           </CardHeader>
           <CardContent>
-            <RadioGroup value={form.audience_address} onValueChange={(v) => update("audience_address", v)} className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-              {audienceOptions.map((opt) => (
-                <label
-                  key={opt.value}
-                  className={`flex items-center gap-2 p-3 rounded-lg border cursor-pointer transition-colors text-sm ${
-                    form.audience_address === opt.value
-                      ? "border-primary bg-primary/5 font-medium"
-                      : "border-border hover:border-primary/40"
-                  }`}
-                >
-                  <RadioGroupItem value={opt.value} />
-                  {opt.label}
-                </label>
-              ))}
-            </RadioGroup>
+            <RadioCard options={audienceOptions} value={form.audience_address} onChange={(v) => update("audience_address", v)} grid />
           </CardContent>
         </Card>
 
@@ -283,24 +403,7 @@ const VoiceProfilePage = () => {
             <CardTitle className="text-base">How do you naturally speak?</CardTitle>
           </CardHeader>
           <CardContent>
-            <RadioGroup value={form.pacing_style} onValueChange={(v) => update("pacing_style", v)} className="space-y-2">
-              {pacingOptions.map((opt) => (
-                <label
-                  key={opt.value}
-                  className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
-                    form.pacing_style === opt.value
-                      ? "border-primary bg-primary/5"
-                      : "border-border hover:border-primary/40"
-                  }`}
-                >
-                  <RadioGroupItem value={opt.value} className="mt-0.5" />
-                  <div>
-                    <p className="text-sm font-medium text-foreground">{opt.label}</p>
-                    <p className="text-xs text-muted-foreground">{opt.desc}</p>
-                  </div>
-                </label>
-              ))}
-            </RadioGroup>
+            <RadioCard options={pacingOptions} value={form.pacing_style} onChange={(v) => update("pacing_style", v)} />
           </CardContent>
         </Card>
 
@@ -310,24 +413,31 @@ const VoiceProfilePage = () => {
             <CardTitle className="text-base">How comfortable are you with humor in your content?</CardTitle>
           </CardHeader>
           <CardContent>
-            <RadioGroup value={form.humor_comfort} onValueChange={(v) => update("humor_comfort", v)} className="space-y-2">
-              {humorOptions.map((opt) => (
-                <label
-                  key={opt.value}
-                  className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
-                    form.humor_comfort === opt.value
-                      ? "border-primary bg-primary/5"
-                      : "border-border hover:border-primary/40"
-                  }`}
-                >
-                  <RadioGroupItem value={opt.value} className="mt-0.5" />
-                  <div>
-                    <p className="text-sm font-medium text-foreground">{opt.label}</p>
-                    <p className="text-xs text-muted-foreground">{opt.desc}</p>
-                  </div>
-                </label>
-              ))}
-            </RadioGroup>
+            <RadioCard options={humorOptions} value={form.humor_comfort} onChange={(v) => update("humor_comfort", v)} />
+          </CardContent>
+        </Card>
+
+        {/* Personal Anecdote Style */}
+        <Card className="border-border">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">Do you share personal stories in your content?</CardTitle>
+            <CardDescription>Controls how much vulnerability and personal narrative the AI includes</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <RadioCard options={anecdoteOptions} value={form.anecdote_style} onChange={(v) => update("anecdote_style", v)} />
+          </CardContent>
+        </Card>
+
+        {/* Faith / Cultural Lens */}
+        <Card className="border-border">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Shield className="h-4 w-4 text-primary" /> Faith & Cultural Lens
+            </CardTitle>
+            <CardDescription>Helps the AI match (or avoid) religious references</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <RadioCard options={faithLensOptions} value={form.faith_lens} onChange={(v) => update("faith_lens", v)} />
           </CardContent>
         </Card>
 
@@ -337,24 +447,25 @@ const VoiceProfilePage = () => {
             <CardTitle className="text-base">How do you like to end your videos?</CardTitle>
           </CardHeader>
           <CardContent>
-            <RadioGroup value={form.cta_style} onValueChange={(v) => update("cta_style", v)} className="space-y-2">
-              {ctaOptions.map((opt) => (
-                <label
-                  key={opt.value}
-                  className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
-                    form.cta_style === opt.value
-                      ? "border-primary bg-primary/5"
-                      : "border-border hover:border-primary/40"
-                  }`}
-                >
-                  <RadioGroupItem value={opt.value} className="mt-0.5" />
-                  <div>
-                    <p className="text-sm font-medium text-foreground">{opt.label}</p>
-                    <p className="text-xs text-muted-foreground">{opt.desc}</p>
-                  </div>
-                </label>
-              ))}
-            </RadioGroup>
+            <RadioCard options={ctaOptions} value={form.cta_style} onChange={(v) => update("cta_style", v)} />
+          </CardContent>
+        </Card>
+
+        {/* Taboo Topics */}
+        <Card className="border-border">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">Any topics you want the AI to AVOID?</CardTitle>
+            <CardDescription>List anything off-limits — the AI will never include these in your scripts</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Textarea
+              placeholder="e.g. Never mention embalming details, avoid politics, don't reference specific religions"
+              value={form.taboo_topics}
+              onChange={(e) => update("taboo_topics", e.target.value)}
+              maxLength={300}
+              className="min-h-[80px]"
+            />
+            <p className="text-xs text-muted-foreground mt-1">{form.taboo_topics.length}/300 characters</p>
           </CardContent>
         </Card>
 

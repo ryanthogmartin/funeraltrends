@@ -16,6 +16,14 @@ export interface VoiceProfile {
   funeral_home_name: string;
   years_experience: string;
   specialties: string;
+  origin_story: string;
+  content_pillars: string;
+  target_audience_age: string;
+  signature_opening: string;
+  video_style: string;
+  faith_lens: string;
+  taboo_topics: string;
+  anecdote_style: string;
 }
 
 const defaults: VoiceProfile = {
@@ -30,6 +38,14 @@ const defaults: VoiceProfile = {
   funeral_home_name: "",
   years_experience: "",
   specialties: "",
+  origin_story: "",
+  content_pillars: "",
+  target_audience_age: "all-ages",
+  signature_opening: "",
+  video_style: "talking-head",
+  faith_lens: "prefer-not",
+  taboo_topics: "",
+  anecdote_style: "occasionally",
 };
 
 export function useVoiceProfile() {
@@ -68,6 +84,14 @@ export function useVoiceProfile() {
           funeral_home_name: d.funeral_home_name || "",
           years_experience: d.years_experience || "",
           specialties: d.specialties || "",
+          origin_story: d.origin_story || "",
+          content_pillars: d.content_pillars || "",
+          target_audience_age: d.target_audience_age || "all-ages",
+          signature_opening: d.signature_opening || "",
+          video_style: d.video_style || "talking-head",
+          faith_lens: d.faith_lens || "prefer-not",
+          taboo_topics: d.taboo_topics || "",
+          anecdote_style: d.anecdote_style || "occasionally",
         });
         setHasProfile(true);
       }
