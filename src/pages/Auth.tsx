@@ -14,6 +14,8 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [company, setCompany] = useState("");
+  const [jobTitle, setJobTitle] = useState("");
   const [loading, setLoading] = useState(false);
   const [showForgot, setShowForgot] = useState(false);
   const { toast } = useToast();
@@ -34,7 +36,7 @@ const Auth = () => {
           password,
           options: {
             emailRedirectTo: window.location.origin,
-            data: { first_name: firstName, last_name: lastName },
+            data: { first_name: firstName, last_name: lastName, company, job_title: jobTitle },
           },
         });
         if (error) throw error;
@@ -130,6 +132,34 @@ const Auth = () => {
                     required
                   />
                 </div>
+              </div>
+            )}
+
+            {!showForgot && !isLogin && (
+              <div className="space-y-2">
+                <Label htmlFor="company">Company</Label>
+                <Input
+                  id="company"
+                  type="text"
+                  placeholder="Acme Funeral Home"
+                  value={company}
+                  onChange={(e) => setCompany(e.target.value)}
+                  maxLength={100}
+                />
+              </div>
+            )}
+
+            {!showForgot && !isLogin && (
+              <div className="space-y-2">
+                <Label htmlFor="jobTitle">Job Title</Label>
+                <Input
+                  id="jobTitle"
+                  type="text"
+                  placeholder="Funeral Director"
+                  value={jobTitle}
+                  onChange={(e) => setJobTitle(e.target.value)}
+                  maxLength={100}
+                />
               </div>
             )}
 
