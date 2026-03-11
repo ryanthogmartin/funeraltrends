@@ -113,11 +113,7 @@ const HashtagTracker = ({ trends }: HashtagTrackerProps) => {
                     </a>
                   </div>
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <span>{tag.views} views</span>
-                    <span className={`flex items-center gap-0.5 font-medium ${tag.growth >= 0 ? 'text-primary' : 'text-destructive'}`}>
-                      {tag.growth >= 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
-                      {tag.growth > 0 ? '+' : ''}{tag.growth}%
-                    </span>
+                    <span className="capitalize">{tag.relatedKeyword}</span>
                   </div>
                 </div>
                 <Badge variant="outline" className={`text-[10px] shrink-0 gap-1 ${catConfig.className}`}>
