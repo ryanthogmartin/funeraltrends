@@ -300,7 +300,7 @@ const VoiceProfilePage = () => {
           </CardHeader>
           <CardContent>
             <Input
-              placeholder='e.g. "Hey friends, it\'s Mike from Smith Funeral Home…" or "Listen up, I need to tell you something…"'
+              placeholder={'e.g. "Hey friends, it\'s Mike from Smith Funeral Home..." or "Listen up, I need to tell you something..."'}
               value={form.signature_opening}
               onChange={(e) => update("signature_opening", e.target.value)}
               maxLength={150}
