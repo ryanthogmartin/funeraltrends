@@ -133,7 +133,7 @@ const LocalTrends = () => {
 
     try {
       const { data, error: fnError } = await supabase.functions.invoke("local-keyword-research", {
-        body: { stateCode, stateName, keywords },
+        body: { stateCode, stateName, keywords, city: city.trim() || undefined },
       });
 
       if (fnError) throw fnError;
