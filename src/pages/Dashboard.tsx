@@ -7,7 +7,8 @@ import KeywordWatchlist from "@/components/KeywordWatchlist";
 import FacebookInsights from "@/components/FacebookInsights";
 import ReelsInsights from "@/components/ReelsInsights";
 import { mockTrends, mockStats } from "@/lib/mockData";
-import { fetchTrends, fetchDashboardStats, triggerDataRefresh } from "@/lib/api";
+import { fetchTrends, fetchDashboardStats, triggerDataRefresh, fetchTrendSignals, triggerTrendSignalsRefresh } from "@/lib/api";
+import TrendSignals from "@/components/TrendSignals";
 import { exportTrendsCsv } from "@/lib/exportCsv";
 import { motion } from "framer-motion";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
@@ -37,6 +38,26 @@ const Dashboard = () => {
     queryFn: fetchDashboardStats,
     staleTime: 1000 * 60 * 5,
   });
+
+  const { data: trendSignals = [], isLoading: signalsLoading } = useQuery({
+    queryKey: ['trend-signals'],
+    queryFn: fetchTrendSignals,
+    staleTime: 1000 * 60 * 10,
+  });
+
+  const [isRefreshingSignals, setIsRefreshingSignals] = useState(false);
+  const handleRefreshSignals = async () => {
+    setIsRefreshingSignals(true);
+    toast({ title: "Scanning for trends...", description: "Checking AI + Google Trends for fresh signals" });
+    const success = await triggerTrendSignalsRefresh();
+    if (success) {
+      await queryClient.invalidateQueries({ queryKey: ['trend-signals'] });
+      toast({ title: "Trend signals updated!" });
+    } else {
+      toast({ title: "Signal scan failed", variant: "destructive" });
+    }
+    setIsRefreshingSignals(false);
+  };
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -93,6 +114,13 @@ const Dashboard = () => {
           <StatCard key={stat.label} {...stat} index={i} />
         ))}
       </div>
+
+      <TrendSignals
+        signals={trendSignals}
+        isLoading={signalsLoading}
+        onRefresh={handleRefreshSignals}
+        isRefreshing={isRefreshingSignals}
+      />
 
       <TrendChart trends={trends} />
 
