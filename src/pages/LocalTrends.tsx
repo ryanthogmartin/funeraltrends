@@ -88,12 +88,13 @@ const SUGGESTED_KEYWORDS = [
 
 const LocalTrends = () => {
   const [stateCode, setStateCode] = useState("");
+  const [city, setCity] = useState("");
   const [keywordInput, setKeywordInput] = useState("");
   const [keywords, setKeywords] = useState<string[]>([]);
   const [results, setResults] = useState<LocalResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [searchedState, setSearchedState] = useState<string | null>(null);
+  const [searchedLocation, setSearchedLocation] = useState<string | null>(null);
 
   const addKeyword = (kw?: string) => {
     const word = (kw || keywordInput).trim().toLowerCase();
@@ -132,7 +133,7 @@ const LocalTrends = () => {
 
     try {
       const { data, error: fnError } = await supabase.functions.invoke("local-keyword-research", {
-        body: { stateCode, stateName, keywords },
+        body: { stateCode, stateName, keywords, city: city.trim() || undefined },
       });
 
       if (fnError) throw fnError;
@@ -143,7 +144,7 @@ const LocalTrends = () => {
       }
 
       setResults(data.results || []);
-      setSearchedState(stateName);
+      setSearchedLocation(data.locationLabel || stateName);
 
       if (data.results?.length === 0) {
         toast.info("No data found for these keywords in this state");
@@ -186,7 +187,7 @@ const LocalTrends = () => {
         transition={{ delay: 0.1 }}
         className="glass-card p-5 space-y-4"
       >
-        {/* State Selection */}
+        {/* State & City Selection */}
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="flex-shrink-0 sm:w-56">
             <Select value={stateCode} onValueChange={setStateCode}>
@@ -200,6 +201,15 @@ const LocalTrends = () => {
                 ))}
               </SelectContent>
             </Select>
+          </div>
+          <div className="flex-shrink-0 sm:w-48">
+            <Input
+              type="text"
+              placeholder="City (optional)"
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+              maxLength={100}
+            />
           </div>
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -295,10 +305,10 @@ const LocalTrends = () => {
         >
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-display font-semibold text-foreground">
-              Results for {searchedState}
+              Results for {searchedLocation}
             </h2>
             <span className="text-xs text-muted-foreground">
-              🇺🇸 {searchedState} · {results.length} keyword{results.length !== 1 ? "s" : ""}
+              🇺🇸 {searchedLocation} · {results.length} keyword{results.length !== 1 ? "s" : ""}
             </span>
           </div>
 
@@ -367,10 +377,10 @@ const LocalTrends = () => {
       )}
 
       {/* Empty state after search */}
-      {!loading && results.length === 0 && searchedState && !error && (
+      {!loading && results.length === 0 && searchedLocation && !error && (
         <div className="text-center py-12 text-muted-foreground text-sm">
-          No search volume data found for these keywords in {searchedState}.
-          <br />Try broader keywords or a different state.
+          No search volume data found for these keywords in {searchedLocation}.
+          <br />Try broader keywords or a different location.
         </div>
       )}
     </div>

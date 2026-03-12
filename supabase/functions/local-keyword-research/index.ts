@@ -31,7 +31,6 @@ async function getAccessToken(): Promise<string> {
 }
 
 // ─── State Geo Target Constants ────────────────────────────────────────
-// Pre-mapped Google Ads geoTargetConstants for US states
 const STATE_GEO_TARGETS: Record<string, string> = {
   AL: "geoTargetConstants/21133", AK: "geoTargetConstants/21132",
   AZ: "geoTargetConstants/21136", AR: "geoTargetConstants/21135",
@@ -60,6 +59,62 @@ const STATE_GEO_TARGETS: Record<string, string> = {
   WI: "geoTargetConstants/21182", WY: "geoTargetConstants/21183",
   DC: "geoTargetConstants/21140",
 };
+
+// ─── Resolve City Geo Target ──────────────────────────────────────────
+
+async function resolveCityGeoTarget(
+  accessToken: string,
+  cityName: string,
+  stateCode: string,
+): Promise<string | null> {
+  const developerToken = Deno.env.get('GOOOGLE_ADS_DEVELOPER_TOKEN')!;
+  const managerCustomerId = Deno.env.get('GOOGLE_ADS_MANAGER_CUSTOMER_ID')!;
+
+  const searchQuery = `${cityName}, ${stateCode}`;
+
+  const res = await fetch('https://googleads.googleapis.com/v21/geoTargetConstants:suggest', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+      'developer-token': developerToken,
+      'login-customer-id': managerCustomerId,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      locale: 'en',
+      countryCode: 'US',
+      locationNames: { names: [searchQuery] },
+    }),
+  });
+
+  if (!res.ok) {
+    const errText = await res.text();
+    console.error(`Geo suggest error ${res.status}: ${errText}`);
+    return null;
+  }
+
+  const data = await res.json();
+  const suggestions = data.geoTargetConstantSuggestions || [];
+
+  // Find a City-type match
+  for (const s of suggestions) {
+    const gtc = s.geoTargetConstant;
+    if (gtc && gtc.targetType === 'City') {
+      console.log(`Resolved city "${searchQuery}" → ${gtc.resourceName} (${gtc.canonicalName})`);
+      return gtc.resourceName;
+    }
+  }
+
+  // Fallback: take the first result regardless of type
+  if (suggestions.length > 0 && suggestions[0].geoTargetConstant) {
+    const gtc = suggestions[0].geoTargetConstant;
+    console.log(`Resolved "${searchQuery}" → ${gtc.resourceName} (${gtc.canonicalName}) [type: ${gtc.targetType}]`);
+    return gtc.resourceName;
+  }
+
+  console.warn(`No geo target found for "${searchQuery}"`);
+  return null;
+}
 
 // ─── Keyword Research ──────────────────────────────────────────────────
 
@@ -140,7 +195,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { stateCode, stateName, keywords } = await req.json();
+    const { stateCode, stateName, keywords, city } = await req.json();
 
     if (!stateCode || typeof stateCode !== 'string' || stateCode.length !== 2) {
       return new Response(
@@ -149,8 +204,8 @@ Deno.serve(async (req) => {
       );
     }
 
-    const geoTarget = STATE_GEO_TARGETS[stateCode.toUpperCase()];
-    if (!geoTarget) {
+    const stateGeoTarget = STATE_GEO_TARGETS[stateCode.toUpperCase()];
+    if (!stateGeoTarget) {
       return new Response(
         JSON.stringify({ success: false, error: `Unknown state code: ${stateCode}` }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
@@ -175,6 +230,8 @@ Deno.serve(async (req) => {
       );
     }
 
+    const cleanCity = city ? String(city).trim().slice(0, 100) : '';
+
     const clientId = Deno.env.get('GOOGLE_ADS_CLIENT_ID');
     const clientSecret = Deno.env.get('GOOGLE_ADS_CLIENT_SECRET');
     const refreshToken = Deno.env.get('GOOGLE_ADS_REFRESH_TOKEN');
@@ -189,20 +246,37 @@ Deno.serve(async (req) => {
       );
     }
 
-    console.log(`[Local Research] State: ${stateCode} (${stateName}), Keywords: ${cleanKeywords.join(', ')}`);
-
     const accessToken = await getAccessToken();
 
-    // Fetch keyword data for the state
+    // Resolve geo target: city if provided, otherwise state
+    let geoTarget = stateGeoTarget;
+    let locationLabel = stateName || stateCode;
+
+    if (cleanCity) {
+      console.log(`[Local Research] Resolving city: "${cleanCity}" in ${stateCode}`);
+      const cityGeoTarget = await resolveCityGeoTarget(accessToken, cleanCity, stateCode);
+      if (cityGeoTarget) {
+        geoTarget = cityGeoTarget;
+        locationLabel = `${cleanCity}, ${stateName || stateCode}`;
+      } else {
+        console.warn(`City "${cleanCity}" not found, falling back to state ${stateCode}`);
+        locationLabel = `${stateName || stateCode} (city not found, using state)`;
+      }
+    }
+
+    console.log(`[Local Research] Location: ${locationLabel}, Keywords: ${cleanKeywords.join(', ')}, GeoTarget: ${geoTarget}`);
+
     const results = await fetchLocalKeywordData(accessToken, cleanKeywords, geoTarget);
 
-    console.log(`[Local Research] Returned ${results.length} keyword results for ${stateCode}`);
+    console.log(`[Local Research] Returned ${results.length} keyword results`);
 
     return new Response(
       JSON.stringify({
         success: true,
         stateCode: stateCode.toUpperCase(),
         stateName: stateName || stateCode,
+        city: cleanCity || null,
+        locationLabel,
         geoTarget,
         results,
         fetched_at: new Date().toISOString(),
