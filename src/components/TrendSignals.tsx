@@ -37,7 +37,12 @@ const signalColors: Record<string, string> = {
   emerging: "bg-accent/50 text-accent-foreground border-accent/30",
 };
 
+const INITIAL_COUNT = 5;
+
 const TrendSignals = ({ signals, isLoading, onRefresh, isRefreshing }: TrendSignalsProps) => {
+  const [expanded, setExpanded] = useState(false);
+  const visibleSignals = expanded ? signals : signals.slice(0, INITIAL_COUNT);
+  const hasMore = signals.length > INITIAL_COUNT;
   if (isLoading) {
     return (
       <motion.section initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="glass-card p-5">
