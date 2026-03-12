@@ -149,6 +149,42 @@ export type Database = {
         }
         Relationships: []
       }
+      trend_signals: {
+        Row: {
+          fetched_at: string
+          id: string
+          related_keywords: Json | null
+          relevance_score: number
+          signal_type: string
+          source: string
+          source_urls: Json | null
+          summary: string
+          title: string
+        }
+        Insert: {
+          fetched_at?: string
+          id?: string
+          related_keywords?: Json | null
+          relevance_score?: number
+          signal_type?: string
+          source?: string
+          source_urls?: Json | null
+          summary: string
+          title: string
+        }
+        Update: {
+          fetched_at?: string
+          id?: string
+          related_keywords?: Json | null
+          relevance_score?: number
+          signal_type?: string
+          source?: string
+          source_urls?: Json | null
+          summary?: string
+          title?: string
+        }
+        Relationships: []
+      }
       voice_profiles: {
         Row: {
           anecdote_style: string
