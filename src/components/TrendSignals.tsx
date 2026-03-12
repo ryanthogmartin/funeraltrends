@@ -92,66 +92,84 @@ const TrendSignals = ({ signals, isLoading, onRefresh, isRefreshing }: TrendSign
         </div>
       ) : (
         <div className="space-y-3">
-          {signals.map((signal, i) => {
-            const Icon = signalIcons[signal.signal_type] || Zap;
-            const colorClass = signalColors[signal.signal_type] || signalColors.emerging;
+          <AnimatePresence initial={false}>
+            {visibleSignals.map((signal, i) => {
+              const Icon = signalIcons[signal.signal_type] || Zap;
+              const colorClass = signalColors[signal.signal_type] || signalColors.emerging;
 
-            return (
-              <motion.div
-                key={signal.id}
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: i * 0.05 }}
-                className="rounded-lg border border-border/50 bg-card/50 p-3 hover:bg-card/80 transition-colors"
-              >
-                <div className="flex items-start gap-3">
-                  <div className={`rounded-md p-1.5 mt-0.5 border ${colorClass}`}>
-                    <Icon className="h-3.5 w-3.5" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="text-sm font-medium text-foreground truncate">{signal.title}</h3>
-                      <Badge variant="outline" className="text-[10px] shrink-0">
-                        {signal.signal_type}
-                      </Badge>
+              return (
+                <motion.div
+                  key={signal.id}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ delay: i < INITIAL_COUNT ? i * 0.05 : (i - INITIAL_COUNT) * 0.03 }}
+                  className="rounded-lg border border-border/50 bg-card/50 p-3 hover:bg-card/80 transition-colors"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className={`rounded-md p-1.5 mt-0.5 border ${colorClass}`}>
+                      <Icon className="h-3.5 w-3.5" />
                     </div>
-                    <p className="text-xs text-muted-foreground leading-relaxed mb-2">{signal.summary}</p>
-                    <div className="flex items-center gap-2 flex-wrap">
-                      {signal.related_keywords.map(kw => (
-                        <span key={kw} className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
-                          {kw}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="text-sm font-medium text-foreground truncate">{signal.title}</h3>
+                        <Badge variant="outline" className="text-[10px] shrink-0">
+                          {signal.signal_type}
+                        </Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground leading-relaxed mb-2">{signal.summary}</p>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        {signal.related_keywords.map(kw => (
+                          <span key={kw} className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
+                            {kw}
+                          </span>
+                        ))}
+                        {signal.source_urls.length > 0 && (
+                          <a
+                            href={signal.source_urls[0]}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[10px] text-primary/70 hover:text-primary flex items-center gap-0.5"
+                          >
+                            <ExternalLink className="h-2.5 w-2.5" /> Source
+                          </a>
+                        )}
+                        <span className="text-[10px] text-muted-foreground/50 ml-auto">
+                          {signal.source === 'google_trends_daily' ? '📊 Google Trends' : 
+                           signal.source === 'reddit' ? '🟠 Reddit' :
+                           signal.source === 'tiktok' ? '🎵 TikTok' :
+                           signal.source === 'facebook' ? '📘 Facebook' :
+                           signal.source === 'twitter' ? '🐦 X/Twitter' :
+                           signal.source === 'youtube' ? '▶️ YouTube' :
+                           '🤖 AI Detected'}
                         </span>
-                      ))}
-                      {signal.source_urls.length > 0 && (
-                        <a
-                          href={signal.source_urls[0]}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-[10px] text-primary/70 hover:text-primary flex items-center gap-0.5"
-                        >
-                          <ExternalLink className="h-2.5 w-2.5" /> Source
-                        </a>
-                      )}
-                      <span className="text-[10px] text-muted-foreground/50 ml-auto">
-                        {signal.source === 'google_trends_daily' ? '📊 Google Trends' : 
-                         signal.source === 'reddit' ? '🟠 Reddit' :
-                         signal.source === 'tiktok' ? '🎵 TikTok' :
-                         signal.source === 'facebook' ? '📘 Facebook' :
-                         signal.source === 'twitter' ? '🐦 X/Twitter' :
-                         signal.source === 'youtube' ? '▶️ YouTube' :
-                         '🤖 AI Detected'}
-                      </span>
+                      </div>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <div className="text-xs font-mono font-semibold text-foreground">{signal.relevance_score}</div>
+                      <div className="text-[9px] text-muted-foreground">score</div>
                     </div>
                   </div>
-                  <div className="text-right shrink-0">
-                    <div className="text-xs font-mono font-semibold text-foreground">{signal.relevance_score}</div>
-                    <div className="text-[9px] text-muted-foreground">score</div>
-                  </div>
-                </div>
-              </motion.div>
-            );
-          })}
+                </motion.div>
+              );
+            })}
+          </AnimatePresence>
         </div>
+
+        {hasMore && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setExpanded(!expanded)}
+            className="w-full mt-3 text-xs text-muted-foreground hover:text-foreground"
+          >
+            {expanded ? (
+              <>Show Less <ChevronUp className="h-3.5 w-3.5 ml-1" /></>
+            ) : (
+              <>Show All {signals.length} Signals <ChevronDown className="h-3.5 w-3.5 ml-1" /></>
+            )}
+          </Button>
+        )}
       )}
 
       {signals.length > 0 && (
