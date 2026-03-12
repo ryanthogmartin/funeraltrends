@@ -1,5 +1,6 @@
-import { motion } from "framer-motion";
-import { Zap, TrendingUp, Flame, Radio, ExternalLink, RefreshCw } from "lucide-react";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Zap, TrendingUp, Flame, Radio, ExternalLink, RefreshCw, ChevronDown, ChevronUp } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
