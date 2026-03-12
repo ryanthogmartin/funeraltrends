@@ -322,9 +322,10 @@ const TrendSignals = ({ signals, isLoading, onRefresh, isRefreshing }: TrendSign
   if (isLoading) {
     return (
       <motion.section initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="glass-card p-5">
-        <h2 className="text-lg font-display font-semibold text-foreground mb-4 flex items-center gap-2">
+        <h2 className="text-lg font-display font-semibold text-foreground mb-1 flex items-center gap-2">
           <Radio className="h-5 w-5 text-primary animate-pulse" /> Real-Time Social Trend Signals
         </h2>
+        <p className="text-sm text-muted-foreground mb-4">AI scans Google Trends, Reddit, and social platforms to surface emerging funeral industry topics before they peak. Generate video ideas from any signal.</p>
         <div className="space-y-3">
           {[1, 2, 3].map(i => (
             <div key={i} className="h-20 rounded-lg bg-muted/50 animate-pulse" />
@@ -341,7 +342,7 @@ const TrendSignals = ({ signals, isLoading, onRefresh, isRefreshing }: TrendSign
       transition={{ delay: 0.15, duration: 0.4 }}
       className="glass-card p-5"
     >
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-1">
         <h2 className="text-lg font-display font-semibold text-foreground flex items-center gap-2">
           <Radio className="h-5 w-5 text-primary" /> Real-Time Social Trend Signals
         </h2>
@@ -352,6 +353,7 @@ const TrendSignals = ({ signals, isLoading, onRefresh, isRefreshing }: TrendSign
           </Button>
         </div>
       </div>
+      <p className="text-sm text-muted-foreground mb-4">AI scans Google Trends, Reddit, and social platforms to surface emerging funeral industry topics before they peak. Generate video ideas from any signal.</p>
 
       {signals.length === 0 ? (
         <div className="text-center py-8 text-muted-foreground text-sm">

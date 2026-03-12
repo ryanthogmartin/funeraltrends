@@ -64,13 +64,14 @@ const HashtagTracker = ({ trends }: HashtagTrackerProps) => {
       transition={{ delay: 0.6, duration: 0.5 }}
       className="glass-card p-5 mt-6"
     >
-      <div className="flex items-center gap-2 mb-4">
+      <div className="flex items-center gap-2 mb-1">
         <Hash className="h-5 w-5 text-primary" />
         <h2 className="text-lg font-display font-semibold text-foreground">
           TikTok Hashtag Tracker
         </h2>
         <Badge variant="outline" className="ml-auto text-[10px] bg-tertiary/10 text-tertiary border-tertiary/30">AI-Suggested</Badge>
       </div>
+      <p className="text-sm text-muted-foreground mb-4">AI-generated TikTok hashtags based on trending funeral keywords. Categorized as trending, evergreen, or emerging to help maximize reach.</p>
 
       {isLoading && (
         <div className="flex items-center justify-center py-8 gap-2 text-muted-foreground">

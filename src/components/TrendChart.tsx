@@ -52,12 +52,13 @@ const TrendChart = ({ trends }: TrendChartProps) => {
       transition={{ delay: 0.35, duration: 0.5 }}
       className="glass-card p-5 mb-6"
     >
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-1">
         <h2 className="text-lg font-display font-semibold text-foreground">
           Search Volume Trends
         </h2>
         <span className="text-xs text-muted-foreground">Top 5 keywords · 12-month view</span>
       </div>
+      <p className="text-sm text-muted-foreground mb-4">Visual breakdown of how the top 5 funeral search keywords have trended over the past 12 months. Click a keyword in the legend to toggle it.</p>
 
       <div className="h-[280px]">
         <ResponsiveContainer width="100%" height="100%">

@@ -105,7 +105,7 @@ const QuestionSeriesGenerator = ({ isAuthenticated, onRequireAuth }: QuestionSer
         transition={{ delay: 0.1, duration: 0.5 }}
         className="glass-card p-5 mt-6"
       >
-        <div className="flex items-center gap-2 mb-4">
+        <div className="flex items-center gap-2 mb-1">
           <HelpCircle className="h-5 w-5 text-secondary" />
           <h2 className="text-lg font-display font-semibold text-foreground">
             Question → Video Series

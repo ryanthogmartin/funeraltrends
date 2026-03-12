@@ -30,12 +30,11 @@ const GoogleTrendsSection = ({
       transition={{ delay: 0.3, duration: 0.5 }}
       className="lg:col-span-3 glass-card p-5">
       
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-display font-semibold text-foreground">Google Keywords — Funeral Searches
-
-        </h2>
+      <div className="flex items-center justify-between mb-1">
+        <h2 className="text-lg font-display font-semibold text-foreground">Google Keywords — Funeral Searches</h2>
         <span className="text-xs text-muted-foreground">🇺🇸 United States · 30 Days</span>
       </div>
+      <p className="text-sm text-muted-foreground mb-4">Top funeral-related search terms ranked by monthly volume and trend direction. Add any keyword to your watchlist for spike alerts.</p>
       <div className="space-y-0.5">
         {visibleTrends.map((trend, i) =>
         <TrendRow
