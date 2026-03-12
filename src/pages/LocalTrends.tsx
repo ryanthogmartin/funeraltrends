@@ -88,12 +88,13 @@ const SUGGESTED_KEYWORDS = [
 
 const LocalTrends = () => {
   const [stateCode, setStateCode] = useState("");
+  const [city, setCity] = useState("");
   const [keywordInput, setKeywordInput] = useState("");
   const [keywords, setKeywords] = useState<string[]>([]);
   const [results, setResults] = useState<LocalResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [searchedState, setSearchedState] = useState<string | null>(null);
+  const [searchedLocation, setSearchedLocation] = useState<string | null>(null);
 
   const addKeyword = (kw?: string) => {
     const word = (kw || keywordInput).trim().toLowerCase();
