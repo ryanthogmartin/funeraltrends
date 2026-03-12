@@ -308,7 +308,7 @@ const LocalTrends = () => {
               Results for {searchedLocation}
             </h2>
             <span className="text-xs text-muted-foreground">
-              🇺🇸 {searchedState} · {results.length} keyword{results.length !== 1 ? "s" : ""}
+              🇺🇸 {searchedLocation} · {results.length} keyword{results.length !== 1 ? "s" : ""}
             </span>
           </div>
 
