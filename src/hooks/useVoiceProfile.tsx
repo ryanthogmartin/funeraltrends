@@ -123,7 +123,7 @@ export function useVoiceProfile() {
         setHasProfile(true);
       }
       setProfile(values);
-      toast({ title: "Voice profile saved", description: "Your scripts will now match your personal style." });
+      toast({ title: "Voice persona saved", description: "Your scripts will now match your personal style." });
     } catch (err: any) {
       toast({ title: "Failed to save", description: err.message, variant: "destructive" });
     } finally {
