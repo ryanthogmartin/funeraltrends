@@ -220,7 +220,7 @@ const VoiceProfilePage = () => {
           <Mic className="h-6 w-6 text-primary" />
         </div>
         <div>
-          <h1 className="text-2xl font-display font-bold text-foreground">Your Voice Profile</h1>
+          <h1 className="text-2xl font-display font-bold text-foreground">Your Custom Voice Persona</h1>
           <p className="text-sm text-muted-foreground">
             Teach us how you speak so generated scripts sound like <span className="text-primary font-medium">you</span>
           </p>

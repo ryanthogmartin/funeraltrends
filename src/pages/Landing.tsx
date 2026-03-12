@@ -58,7 +58,7 @@ const features: FeatureItem[] = [
 },
 {
   icon: Mic,
-  title: "Voice Profile",
+  title: "Custom Voice Persona",
   description: "Customize your AI-generated scripts to match your tone, style, and brand — every script sounds like you.",
   link: "/voice-profile",
   requiresAuth: true

@@ -32,7 +32,7 @@ const contentItems = [
 
 const libraryItems = [
   { to: "/saved", label: "Saved Ideas", icon: Bookmark, desc: "Your saved ideas & scripts" },
-  { to: "/voice-profile", label: "Voice Profile", icon: Mic, desc: "Custom tone & branding" },
+  { to: "/voice-profile", label: "Custom Voice Persona", icon: Mic, desc: "Custom tone & branding" },
 ];
 
 const allNavItems = [...researchItems, ...contentItems, ...libraryItems];
@@ -204,7 +204,7 @@ const SiteLayout = ({ children }: { children: React.ReactNode }) => {
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={() => navigate("/voice-profile")} className="gap-2 cursor-pointer">
                       <Mic className="h-3.5 w-3.5 text-primary" />
-                      Voice Profile
+                      Custom Voice Persona
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={signOut} className="gap-2 cursor-pointer text-destructive">
