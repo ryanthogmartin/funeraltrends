@@ -305,7 +305,7 @@ const LocalTrends = () => {
         >
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-display font-semibold text-foreground">
-              Results for {searchedState}
+              Results for {searchedLocation}
             </h2>
             <span className="text-xs text-muted-foreground">
               🇺🇸 {searchedState} · {results.length} keyword{results.length !== 1 ? "s" : ""}
