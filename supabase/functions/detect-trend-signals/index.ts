@@ -15,88 +15,153 @@ const FUNERAL_CONTEXT_KEYWORDS = [
 ];
 
 async function detectEmergingTrends(perplexityKey: string): Promise<any[]> {
-  console.log('[Perplexity] Detecting emerging funeral industry trends...');
+  console.log('[Perplexity] Detecting US funeral industry social signals...');
 
-  const response = await fetch('https://api.perplexity.ai/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${perplexityKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: 'sonar',
-      messages: [
-        {
-          role: 'system',
-          content: 'You are a funeral industry trend analyst. Return ONLY valid JSON, no markdown or extra text.',
-        },
-        {
-          role: 'user',
-          content: `Find the top 8 emerging or trending topics in the funeral and death care industry RIGHT NOW (today/this week). Focus on:
-- New regulations or legislation affecting funerals
-- Viral social media discussions about death care
-- New funeral technology or services gaining attention  
-- Consumer behavior shifts in end-of-life planning
-- Breaking news in the funeral industry
+  // Run multiple targeted searches in parallel for different platforms
+  const searches = [
+    {
+      source_label: 'reddit',
+      domain_filter: ['reddit.com'],
+      prompt: `Search Reddit (especially r/askfuneraldirectors, r/deathpositive, r/GriefSupport, r/Morticians, r/funeralhomes) for the most discussed funeral and death care topics in the United States RIGHT NOW. Look for viral posts, heated discussions, questions from families, and industry debates.
 
-For each trend, return a JSON array with objects containing:
-- "title": short headline (max 80 chars)
-- "summary": 2-3 sentence explanation of why this is trending now
-- "relevance_score": 1-100 how relevant to funeral professionals
-- "related_keywords": array of 2-4 related search terms
+Return a JSON array of 4 objects with:
+- "title": short headline summarizing the discussion (max 80 chars)
+- "summary": 2-3 sentences about what's being discussed and why it matters to US funeral professionals
+- "relevance_score": 1-100 how relevant to US funeral directors
+- "related_keywords": array of 2-4 related terms
 - "signal_type": one of "breaking", "emerging", "growing", "viral"
+- "platform": "Reddit"
 
-Return ONLY the JSON array, nothing else.`,
-        },
-      ],
-      search_recency_filter: 'day',
-      temperature: 0.3,
-    }),
-  });
+Return ONLY the JSON array.`,
+    },
+    {
+      source_label: 'tiktok',
+      domain_filter: ['tiktok.com'],
+      prompt: `Search TikTok for trending funeral industry content in the United States. Look for viral videos from funeral directors, morticians, embalmers, and death care professionals. Check hashtags like #funeraldirector #mortician #deathcare #embalmer #funeralhome #grieftok #deathtok.
 
-  if (!response.ok) {
-    const errText = await response.text();
-    console.error(`[Perplexity] API error: ${response.status} ${errText}`);
-    return [];
-  }
+What formats, sounds, or topics are going viral among US funeral professionals on TikTok right now?
 
-  const data = await response.json();
-  const content = data.choices?.[0]?.message?.content || '';
-  const citations = data.citations || [];
+Return a JSON array of 3 objects with:
+- "title": short headline about the trending content (max 80 chars)
+- "summary": 2-3 sentences about why this is trending and how a funeral home could create similar content
+- "relevance_score": 1-100 how relevant to US funeral directors
+- "related_keywords": array of 2-4 related hashtags or terms
+- "signal_type": one of "breaking", "emerging", "growing", "viral"
+- "platform": "TikTok"
 
-  console.log('[Perplexity] Raw response length:', content.length);
+Return ONLY the JSON array.`,
+    },
+    {
+      source_label: 'facebook',
+      domain_filter: ['facebook.com'],
+      prompt: `Search Facebook for trending discussions in US funeral industry groups and pages. Look at funeral director communities, NFDA groups, state funeral director association pages, and grief support communities. What are American funeral professionals talking about, sharing, or debating on Facebook right now?
 
-  // Parse JSON from response (handle markdown code blocks)
-  let trends: any[] = [];
-  try {
-    const cleaned = content
-      .replace(/```json\s*/gi, '')
-      .replace(/```\s*/g, '')
-      .trim();
-    trends = JSON.parse(cleaned);
-  } catch (e) {
-    // Try to find JSON array in the text
-    const match = content.match(/\[[\s\S]*\]/);
-    if (match) {
+Return a JSON array of 3 objects with:
+- "title": short headline about the trending topic (max 80 chars)
+- "summary": 2-3 sentences about the discussion and its relevance to US funeral homes
+- "relevance_score": 1-100 how relevant to US funeral directors
+- "related_keywords": array of 2-4 related terms
+- "signal_type": one of "breaking", "emerging", "growing", "viral"
+- "platform": "Facebook"
+
+Return ONLY the JSON array.`,
+    },
+    {
+      source_label: 'twitter',
+      domain_filter: ['twitter.com', 'x.com'],
+      prompt: `Search X/Twitter for trending funeral and death care discussions in the United States. Look for tweets from funeral directors, morticians, the NFDA, state associations, and death care thought leaders. Check for breaking news, policy changes, viral moments, or industry debates happening right now.
+
+Return a JSON array of 2 objects with:
+- "title": short headline (max 80 chars)
+- "summary": 2-3 sentences about what's being discussed
+- "relevance_score": 1-100 how relevant to US funeral directors
+- "related_keywords": array of 2-4 related terms
+- "signal_type": one of "breaking", "emerging", "growing", "viral"
+- "platform": "X/Twitter"
+
+Return ONLY the JSON array.`,
+    },
+    {
+      source_label: 'youtube',
+      domain_filter: ['youtube.com'],
+      prompt: `Search YouTube for trending funeral industry videos in the United States. Look at channels like Ask a Mortician, Kari the Mortician, and other death care creators. What funeral-related video topics are getting high views or engagement right now?
+
+Return a JSON array of 2 objects with:
+- "title": short headline about the trending video topic (max 80 chars)
+- "summary": 2-3 sentences about why this content is performing well and how a funeral home could adapt it
+- "relevance_score": 1-100 how relevant to US funeral directors
+- "related_keywords": array of 2-4 related terms
+- "signal_type": one of "breaking", "emerging", "growing", "viral"
+- "platform": "YouTube"
+
+Return ONLY the JSON array.`,
+    },
+  ];
+
+  const results = await Promise.all(
+    searches.map(async (search) => {
       try {
-        trends = JSON.parse(match[0]);
-      } catch (e2) {
-        console.error('[Perplexity] Failed to parse response:', e2);
+        const response = await fetch('https://api.perplexity.ai/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${perplexityKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'sonar',
+            messages: [
+              {
+                role: 'system',
+                content: 'You are a US funeral industry social media analyst. Focus ONLY on trends relevant to funeral professionals in the United States. Return ONLY valid JSON, no markdown or extra text.',
+              },
+              { role: 'user', content: search.prompt },
+            ],
+            search_domain_filter: search.domain_filter,
+            search_recency_filter: 'week',
+            temperature: 0.3,
+          }),
+        });
+
+        if (!response.ok) {
+          const errText = await response.text();
+          console.error(`[Perplexity][${search.source_label}] API error: ${response.status} ${errText}`);
+          return [];
+        }
+
+        const data = await response.json();
+        const content = data.choices?.[0]?.message?.content || '';
+        const citations = data.citations || [];
+
+        let trends: any[] = [];
+        try {
+          const cleaned = content.replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
+          trends = JSON.parse(cleaned);
+        } catch {
+          const match = content.match(/\[[\s\S]*\]/);
+          if (match) {
+            try { trends = JSON.parse(match[0]); } catch { return []; }
+          }
+        }
+
+        return trends.map((t: any) => ({
+          signal_type: t.signal_type || 'emerging',
+          title: (t.title || '').slice(0, 200),
+          summary: `[${t.platform || search.source_label}] ${(t.summary || '').slice(0, 480)}`,
+          relevance_score: Math.min(100, Math.max(1, parseInt(t.relevance_score) || 50)),
+          source: search.source_label,
+          source_urls: citations.slice(0, 3),
+          related_keywords: (t.related_keywords || []).slice(0, 5),
+        }));
+      } catch (err) {
+        console.error(`[Perplexity][${search.source_label}] Error:`, err);
         return [];
       }
-    }
-  }
+    })
+  );
 
-  // Attach citation URLs
-  return trends.map((t: any) => ({
-    signal_type: t.signal_type || 'emerging',
-    title: (t.title || '').slice(0, 200),
-    summary: (t.summary || '').slice(0, 500),
-    relevance_score: Math.min(100, Math.max(1, parseInt(t.relevance_score) || 50)),
-    source: 'perplexity',
-    source_urls: citations.slice(0, 5),
-    related_keywords: (t.related_keywords || []).slice(0, 5),
-  }));
+  const allTrends = results.flat();
+  console.log(`[Perplexity] Got ${allTrends.length} total social signals across ${searches.length} platforms`);
+  return allTrends;
 }
 
 async function fetchGoogleTrendsDailyInterest(): Promise<any[]> {
