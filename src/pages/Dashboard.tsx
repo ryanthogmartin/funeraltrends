@@ -39,6 +39,26 @@ const Dashboard = () => {
     staleTime: 1000 * 60 * 5,
   });
 
+  const { data: trendSignals = [], isLoading: signalsLoading } = useQuery({
+    queryKey: ['trend-signals'],
+    queryFn: fetchTrendSignals,
+    staleTime: 1000 * 60 * 10,
+  });
+
+  const [isRefreshingSignals, setIsRefreshingSignals] = useState(false);
+  const handleRefreshSignals = async () => {
+    setIsRefreshingSignals(true);
+    toast({ title: "Scanning for trends...", description: "Checking AI + Google Trends for fresh signals" });
+    const success = await triggerTrendSignalsRefresh();
+    if (success) {
+      await queryClient.invalidateQueries({ queryKey: ['trend-signals'] });
+      toast({ title: "Trend signals updated!" });
+    } else {
+      toast({ title: "Signal scan failed", variant: "destructive" });
+    }
+    setIsRefreshingSignals(false);
+  };
+
   const handleRefresh = async () => {
     setIsRefreshing(true);
     toast({ title: "Refreshing data...", description: "Fetching latest funeral trends" });
