@@ -43,3 +43,46 @@ export async function triggerDataRefresh(): Promise<boolean> {
     return false;
   }
 }
+
+export interface TrendSignal {
+  id: string;
+  signal_type: string;
+  title: string;
+  summary: string;
+  relevance_score: number;
+  source: string;
+  source_urls: string[];
+  related_keywords: string[];
+  fetched_at: string;
+}
+
+export async function fetchTrendSignals(): Promise<TrendSignal[]> {
+  const { data, error } = await supabase
+    .from('trend_signals')
+    .select('*')
+    .order('relevance_score', { ascending: false })
+    .limit(15);
+
+  if (error || !data) return [];
+
+  return data.map((row: any) => ({
+    id: row.id,
+    signal_type: row.signal_type,
+    title: row.title,
+    summary: row.summary,
+    relevance_score: row.relevance_score,
+    source: row.source,
+    source_urls: row.source_urls || [],
+    related_keywords: row.related_keywords || [],
+    fetched_at: row.fetched_at,
+  }));
+}
+
+export async function triggerTrendSignalsRefresh(): Promise<boolean> {
+  try {
+    const { error } = await supabase.functions.invoke('detect-trend-signals');
+    return !error;
+  } catch {
+    return false;
+  }
+}

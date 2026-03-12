@@ -115,6 +115,13 @@ const Dashboard = () => {
         ))}
       </div>
 
+      <TrendSignals
+        signals={trendSignals}
+        isLoading={signalsLoading}
+        onRefresh={handleRefreshSignals}
+        isRefreshing={isRefreshingSignals}
+      />
+
       <TrendChart trends={trends} />
 
       <GoogleTrendsSection
