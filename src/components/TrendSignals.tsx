@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Zap, TrendingUp, Flame, Radio, ExternalLink, RefreshCw, ChevronDown, ChevronUp, Video, Loader2, Copy, Check, Download, Bookmark } from "lucide-react";
+import { Zap, TrendingUp, Flame, Radio, ExternalLink, RefreshCw, ChevronDown, ChevronUp, Video, Loader2, Copy, Check, Download, Bookmark, FileText, Mic, User } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useSaveIdea } from "@/hooks/useSaveIdea";
+import { useVoiceProfile } from "@/hooks/useVoiceProfile";
 import { exportScriptPdf } from "@/lib/exportPdf";
 
 interface TrendSignal {
@@ -27,6 +29,14 @@ interface VideoIdea {
   body: string;
   cta: string;
   wordCount: number;
+}
+
+interface GeneratedScript {
+  hook: string;
+  body: string;
+  cta: string;
+  wordCount: number;
+  personaLabel: string;
 }
 
 interface TrendSignalsProps {
@@ -52,6 +62,13 @@ const signalColors: Record<string, string> = {
 
 const INITIAL_COUNT = 5;
 
+const presetPersonas = [
+  { id: "compassionate-educator", label: "Compassionate Educator", desc: "Warm, empathetic, educational", icon: "💛" },
+  { id: "industry-insider", label: "Industry Insider", desc: "Confident, authoritative, insider knowledge", icon: "🎯" },
+  { id: "myth-buster", label: "Myth Buster", desc: "Bold, provocative, challenges misconceptions", icon: "💥" },
+  { id: "comforting-guide", label: "Comforting Guide", desc: "Soft, supportive, nurturing", icon: "🤝" },
+];
+
 const sourceLabel = (source: string) => {
   switch (source) {
     case 'google_trends_daily': return '📊 Google Trends';
@@ -65,11 +82,50 @@ const sourceLabel = (source: string) => {
 };
 
 function VideoIdeaCard({ idea, signalTitle }: { idea: VideoIdea; signalTitle: string }) {
-  const [expandedScript, setExpandedScript] = useState(false);
+  const [script, setScript] = useState<GeneratedScript | null>(null);
+  const [generatingScript, setGeneratingScript] = useState(false);
+  const [showScript, setShowScript] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [popoverOpen, setPopoverOpen] = useState(false);
   const { saveIdea, saving, isSaved } = useSaveIdea();
+  const { user } = useAuth();
+  const { hasProfile } = useVoiceProfile();
+  const { toast } = useToast();
 
-  const fullScript = `${idea.hook}\n\n${idea.body}\n\n${idea.cta}`;
+  const handleSelectPersona = async (personaId: string, personaLabel: string) => {
+    setPopoverOpen(false);
+    setGeneratingScript(true);
+    setShowScript(true);
+
+    try {
+      const isCustom = personaId === "custom-voice";
+      const { data, error } = await supabase.functions.invoke('generate-script', {
+        body: {
+          idea: idea.title,
+          tone: isCustom ? "compassionate-educator" : personaId,
+          userId: isCustom ? user?.id : undefined,
+        },
+      });
+
+      if (error) throw new Error(error.message);
+      if (!data?.success) throw new Error(data?.error || 'Failed to generate script');
+
+      setScript({
+        hook: data.data.hook,
+        body: data.data.body,
+        cta: data.data.cta,
+        wordCount: data.data.wordCount || 120,
+        personaLabel,
+      });
+    } catch (err: any) {
+      toast({ title: "Script generation failed", description: err.message, variant: "destructive" });
+      setShowScript(false);
+    } finally {
+      setGeneratingScript(false);
+    }
+  };
+
+  const fullScript = script ? `${script.hook}\n\n${script.body}\n\n${script.cta}` : "";
 
   const handleCopy = () => {
     navigator.clipboard.writeText(fullScript);
@@ -80,17 +136,61 @@ function VideoIdeaCard({ idea, signalTitle }: { idea: VideoIdea; signalTitle: st
   return (
     <div className="rounded-md border border-border/40 bg-background/50 p-2.5">
       <div className="flex items-start justify-between gap-2">
-        <button
-          onClick={() => setExpandedScript(!expandedScript)}
-          className="flex-1 text-left"
-        >
-          <p className="text-xs font-medium text-foreground leading-snug">{idea.title}</p>
-        </button>
-        <ChevronDown className={`h-3.5 w-3.5 text-muted-foreground shrink-0 mt-0.5 transition-transform ${expandedScript ? 'rotate-180' : ''}`} />
+        <p className="flex-1 text-xs font-medium text-foreground leading-snug">{idea.title}</p>
+        <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-7 px-2 text-[10px] gap-1 shrink-0"
+              disabled={generatingScript}
+            >
+              {generatingScript ? (
+                <Loader2 className="h-3 w-3 animate-spin" />
+              ) : (
+                <FileText className="h-3 w-3" />
+              )}
+              Script
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent align="end" className="w-64 p-2">
+            <p className="text-xs font-semibold text-foreground px-2 py-1.5 mb-1">Choose a Voice Persona</p>
+            <div className="space-y-0.5">
+              {presetPersonas.map((persona) => (
+                <button
+                  key={persona.id}
+                  onClick={() => handleSelectPersona(persona.id, persona.label)}
+                  className="w-full text-left flex items-start gap-2.5 px-2 py-2 rounded-md hover:bg-accent transition-colors"
+                >
+                  <span className="text-sm mt-0.5">{persona.icon}</span>
+                  <div>
+                    <p className="text-xs font-medium text-foreground">{persona.label}</p>
+                    <p className="text-[10px] text-muted-foreground">{persona.desc}</p>
+                  </div>
+                </button>
+              ))}
+              {user && hasProfile && (
+                <>
+                  <div className="border-t border-border my-1" />
+                  <button
+                    onClick={() => handleSelectPersona("custom-voice", "My Custom Voice Persona")}
+                    className="w-full text-left flex items-start gap-2.5 px-2 py-2 rounded-md hover:bg-accent transition-colors"
+                  >
+                    <Mic className="h-4 w-4 mt-0.5 text-primary shrink-0" />
+                    <div>
+                      <p className="text-xs font-medium text-primary">My Custom Voice Persona</p>
+                      <p className="text-[10px] text-muted-foreground">Script in your unique voice & style</p>
+                    </div>
+                  </button>
+                </>
+              )}
+            </div>
+          </PopoverContent>
+        </Popover>
       </div>
 
       <AnimatePresence>
-        {expandedScript && (
+        {showScript && (
           <motion.div
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
@@ -98,56 +198,74 @@ function VideoIdeaCard({ idea, signalTitle }: { idea: VideoIdea; signalTitle: st
             transition={{ duration: 0.2 }}
             className="overflow-hidden"
           >
-            <div className="mt-2 space-y-2">
-              <div className="p-2 bg-primary/5 rounded border border-primary/20">
-                <p className="text-[10px] font-semibold text-primary uppercase tracking-wide mb-0.5">🎬 Hook</p>
-                <p className="text-xs text-foreground">{idea.hook}</p>
+            {generatingScript ? (
+              <div className="mt-2 space-y-1.5">
+                {[1, 2, 3].map(i => (
+                  <div key={i} className="h-10 rounded bg-muted/40 animate-pulse" />
+                ))}
+                <p className="text-[10px] text-muted-foreground text-center pt-1">Generating script…</p>
               </div>
-              <div className="p-2 bg-accent/30 rounded border border-border/30">
-                <p className="text-[10px] font-semibold text-primary uppercase tracking-wide mb-0.5">📝 Script</p>
-                <p className="text-xs text-foreground whitespace-pre-line leading-relaxed">{idea.body}</p>
-              </div>
-              <div className="p-2 bg-primary/5 rounded border border-primary/20">
-                <p className="text-[10px] font-semibold text-primary uppercase tracking-wide mb-0.5">📣 CTA</p>
-                <p className="text-xs text-foreground">{idea.cta}</p>
-              </div>
-              <div className="flex items-center justify-between pt-1">
-                <span className="text-[10px] text-muted-foreground">~{idea.wordCount} words · ~45s</span>
-                <div className="flex items-center gap-1.5">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => saveIdea({
-                      type: "script",
-                      ideaText: idea.title,
-                      scriptHook: idea.hook,
-                      scriptBody: idea.body,
-                      scriptCta: idea.cta,
-                      scriptTone: "trend-generated",
-                      source: signalTitle,
-                    })}
-                    disabled={saving || isSaved(idea.title, "script", "trend-generated")}
-                    className="h-6 px-2 text-[10px] gap-1"
-                  >
-                    <Bookmark className="h-2.5 w-2.5" />
-                    {isSaved(idea.title, "script", "trend-generated") ? "Saved" : "Save"}
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => exportScriptPdf(idea.title, { hook: idea.hook, body: idea.body, cta: idea.cta, wordCount: idea.wordCount }, "Trend Signal")}
-                    className="h-6 px-2 text-[10px] gap-1"
-                  >
-                    <Download className="h-2.5 w-2.5" />
-                    PDF
-                  </Button>
-                  <Button size="sm" variant="outline" onClick={handleCopy} className="h-6 px-2 text-[10px] gap-1">
-                    {copied ? <Check className="h-2.5 w-2.5" /> : <Copy className="h-2.5 w-2.5" />}
-                    {copied ? "Copied" : "Copy"}
-                  </Button>
+            ) : script ? (
+              <div className="mt-2 space-y-2">
+                <div className="flex items-center gap-1.5 mb-1">
+                  <Badge variant="secondary" className="text-[10px] gap-1">
+                    <User className="h-2.5 w-2.5" />
+                    {script.personaLabel}
+                  </Badge>
+                  <button onClick={() => setShowScript(false)} className="ml-auto text-muted-foreground hover:text-foreground">
+                    <ChevronUp className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+                <div className="p-2 bg-primary/5 rounded border border-primary/20">
+                  <p className="text-[10px] font-semibold text-primary uppercase tracking-wide mb-0.5">🎬 Hook</p>
+                  <p className="text-xs text-foreground">{script.hook}</p>
+                </div>
+                <div className="p-2 bg-accent/30 rounded border border-border/30">
+                  <p className="text-[10px] font-semibold text-primary uppercase tracking-wide mb-0.5">📝 Script</p>
+                  <p className="text-xs text-foreground whitespace-pre-line leading-relaxed">{script.body}</p>
+                </div>
+                <div className="p-2 bg-primary/5 rounded border border-primary/20">
+                  <p className="text-[10px] font-semibold text-primary uppercase tracking-wide mb-0.5">📣 CTA</p>
+                  <p className="text-xs text-foreground">{script.cta}</p>
+                </div>
+                <div className="flex items-center justify-between pt-1">
+                  <span className="text-[10px] text-muted-foreground">~{script.wordCount} words · ~45s</span>
+                  <div className="flex items-center gap-1.5">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => saveIdea({
+                        type: "script",
+                        ideaText: idea.title,
+                        scriptHook: script.hook,
+                        scriptBody: script.body,
+                        scriptCta: script.cta,
+                        scriptTone: script.personaLabel,
+                        source: signalTitle,
+                      })}
+                      disabled={saving || isSaved(idea.title, "script", script.personaLabel)}
+                      className="h-6 px-2 text-[10px] gap-1"
+                    >
+                      <Bookmark className="h-2.5 w-2.5" />
+                      {isSaved(idea.title, "script", script.personaLabel) ? "Saved" : "Save"}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => exportScriptPdf(idea.title, { hook: script.hook, body: script.body, cta: script.cta, wordCount: script.wordCount }, "Trend Signal")}
+                      className="h-6 px-2 text-[10px] gap-1"
+                    >
+                      <Download className="h-2.5 w-2.5" />
+                      PDF
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={handleCopy} className="h-6 px-2 text-[10px] gap-1">
+                      {copied ? <Check className="h-2.5 w-2.5" /> : <Copy className="h-2.5 w-2.5" />}
+                      {copied ? "Copied" : "Copy"}
+                    </Button>
+                  </div>
                 </div>
               </div>
-            </div>
+            ) : null}
           </motion.div>
         )}
       </AnimatePresence>
@@ -172,7 +290,6 @@ const TrendSignals = ({ signals, isLoading, onRefresh, isRefreshing }: TrendSign
       return;
     }
 
-    // If already generated, just toggle visibility
     if (ideasMap[signal.id]) {
       setExpandedIdeas(prev => ({ ...prev, [signal.id]: !prev[signal.id] }));
       return;
@@ -206,7 +323,7 @@ const TrendSignals = ({ signals, isLoading, onRefresh, isRefreshing }: TrendSign
     return (
       <motion.section initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="glass-card p-5">
         <h2 className="text-lg font-display font-semibold text-foreground mb-4 flex items-center gap-2">
-          <Radio className="h-5 w-5 text-primary animate-pulse" /> Real-Time Trend Signals
+          <Radio className="h-5 w-5 text-primary animate-pulse" /> Real-Time Social Trend Signals
         </h2>
         <div className="space-y-3">
           {[1, 2, 3].map(i => (
@@ -226,7 +343,7 @@ const TrendSignals = ({ signals, isLoading, onRefresh, isRefreshing }: TrendSign
     >
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-display font-semibold text-foreground flex items-center gap-2">
-          <Radio className="h-5 w-5 text-primary" /> Real-Time Trend Signals
+          <Radio className="h-5 w-5 text-primary" /> Real-Time Social Trend Signals
         </h2>
         <div className="flex items-center gap-2">
           <span className="text-xs text-muted-foreground">AI + Google Trends</span>
