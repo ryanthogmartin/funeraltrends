@@ -185,7 +185,6 @@ const FacebookInsights = ({ trends, isAuthenticated, onRequireAuth }: FacebookIn
           </div>
         </div>
         <p className="text-sm text-muted-foreground mb-4">AI-powered Facebook post ideas and live trending topics for the funeral industry. Get engagement tips and turn ideas into scripts.</p>
-        </div>
 
         <Tabs defaultValue="ideas" className="w-full">
           <TabsList className="mb-4 bg-accent/50">
