@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Skull, TrendingUp, Video, Hash, ArrowRight, BarChart3, Zap, Globe, Sparkles, Lock, Film } from "lucide-react";
+import { Skull, TrendingUp, Video, Hash, ArrowRight, BarChart3, Zap, Globe, Sparkles, Lock, Film, Radio, MapPin, Bookmark, Mic } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -17,54 +17,60 @@ const features: FeatureItem[] = [
   {
     icon: TrendingUp,
     title: "Google Trends Tracking",
-    description: "Monitor real-time funeral-related search trends with volume data and sparkline charts.",
+    description: "Monitor real-time funeral-related search trends with volume data, sparkline charts, and US-focused keyword intelligence.",
+    link: "/dashboard",
+    requiresAuth: false,
+  },
+  {
+    icon: Radio,
+    title: "Real-Time Trend Signals",
+    description: "AI-detected emerging trends from Reddit, TikTok, Facebook, X, and YouTube — with one-click video idea generation.",
     link: "/dashboard",
     requiresAuth: false,
   },
   {
     icon: Video,
-    title: "AI Video Ideas",
-    description: "Generate short-form video content ideas powered by AI, based on trending topics.",
+    title: "AI Video Ideas & Scripts",
+    description: "Generate short-form video ideas with full 45-second scripts (hook, body, CTA) — ready to record for TikTok, Reels, or Shorts.",
     link: "/video-ideas",
     requiresAuth: true,
   },
   {
     icon: Hash,
     title: "Hashtag Intelligence",
-    description: "TikTok and Instagram hashtag tracking with growth rates and category analysis.",
+    description: "TikTok and Instagram hashtag tracking with growth rates, category analysis, and trending tag discovery.",
     link: "/hashtags",
     requiresAuth: false,
   },
   {
     icon: Globe,
-    title: "Facebook Insights",
-    description: "AI-generated Facebook post ideas and live trending funeral discussions from across the platform.",
-    link: "/video-ideas",
-    requiresAuth: true,
-  },
-  {
-    icon: Film,
-    title: "Instagram Reels Ideas",
-    description: "Scroll-stopping Reels concepts with hooks, content types, and live viral trend tracking.",
-    link: "/video-ideas",
-    requiresAuth: true,
-  },
-  {
-    icon: Globe,
-    title: "Keyword Watchlist",
-    description: "Save keywords to your personal watchlist and get notified on volume spikes.",
+    title: "Facebook & Reels Insights",
+    description: "AI-generated Facebook post ideas, Instagram Reels concepts, and live trending funeral discussions across social platforms.",
     link: "/dashboard",
     requiresAuth: true,
   },
   {
-    icon: Zap,
-    title: "Script Generation",
-    description: "One-click AI script generation for any video idea - ready to record or customize for your funeral home.",
-    link: "/video-ideas",
+    icon: MapPin,
+    title: "Local Trends",
+    description: "Hyper-local keyword research by city and state — discover what families in your area are searching for.",
+    link: "/local-trends",
+    requiresAuth: true,
+  },
+  {
+    icon: Mic,
+    title: "Voice Profile",
+    description: "Customize your AI-generated scripts to match your tone, style, and brand — every script sounds like you.",
+    link: "/voice-profile",
+    requiresAuth: true,
+  },
+  {
+    icon: Bookmark,
+    title: "Saved Ideas & Watchlist",
+    description: "Save video ideas, scripts, and keywords to your personal library. Track keyword spikes with your watchlist.",
+    link: "/saved",
     requiresAuth: true,
   },
 ];
-
 const stats = [
   { value: "Real-time", label: "Data freshness" },
   { value: "50+", label: "Keywords tracked" },
