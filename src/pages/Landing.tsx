@@ -14,69 +14,69 @@ interface FeatureItem {
 }
 
 const features: FeatureItem[] = [
-  {
-    icon: TrendingUp,
-    title: "Google Trends Tracking",
-    description: "Monitor real-time funeral-related search trends with volume data, sparkline charts, and US-focused keyword intelligence.",
-    link: "/dashboard",
-    requiresAuth: false,
-  },
-  {
-    icon: Radio,
-    title: "Real-Time Trend Signals",
-    description: "AI-detected emerging trends from Reddit, TikTok, Facebook, X, and YouTube — with one-click video idea generation.",
-    link: "/dashboard",
-    requiresAuth: false,
-  },
-  {
-    icon: Video,
-    title: "AI Video Ideas & Scripts",
-    description: "Generate short-form video ideas with full 45-second scripts (hook, body, CTA) — ready to record for TikTok, Reels, or Shorts.",
-    link: "/video-ideas",
-    requiresAuth: true,
-  },
-  {
-    icon: Hash,
-    title: "Hashtag Intelligence",
-    description: "TikTok and Instagram hashtag tracking with growth rates, category analysis, and trending tag discovery.",
-    link: "/hashtags",
-    requiresAuth: false,
-  },
-  {
-    icon: Globe,
-    title: "Facebook & Reels Insights",
-    description: "AI-generated Facebook post ideas, Instagram Reels concepts, and live trending funeral discussions across social platforms.",
-    link: "/dashboard",
-    requiresAuth: true,
-  },
-  {
-    icon: MapPin,
-    title: "Local Trends",
-    description: "Hyper-local keyword research by city and state — discover what families in your area are searching for.",
-    link: "/local-trends",
-    requiresAuth: true,
-  },
-  {
-    icon: Mic,
-    title: "Voice Profile",
-    description: "Customize your AI-generated scripts to match your tone, style, and brand — every script sounds like you.",
-    link: "/voice-profile",
-    requiresAuth: true,
-  },
-  {
-    icon: Bookmark,
-    title: "Saved Ideas & Watchlist",
-    description: "Save video ideas, scripts, and keywords to your personal library. Track keyword spikes with your watchlist.",
-    link: "/saved",
-    requiresAuth: true,
-  },
-];
+{
+  icon: TrendingUp,
+  title: "Google Trends Tracking",
+  description: "Monitor real-time funeral-related search trends with volume data, sparkline charts, and US-focused keyword intelligence.",
+  link: "/dashboard",
+  requiresAuth: false
+},
+{
+  icon: Radio,
+  title: "Real-Time Trend Signals",
+  description: "AI-detected emerging trends from Reddit, TikTok, Facebook, X, and YouTube — with one-click video idea generation.",
+  link: "/dashboard",
+  requiresAuth: false
+},
+{
+  icon: Video,
+  title: "AI Video Ideas & Scripts",
+  description: "Generate short-form video ideas with full 45-second scripts (hook, body, CTA) — ready to record for TikTok, Reels, or Shorts.",
+  link: "/video-ideas",
+  requiresAuth: true
+},
+{
+  icon: Hash,
+  title: "Hashtag Intelligence",
+  description: "TikTok and Instagram hashtag tracking with growth rates, category analysis, and trending tag discovery.",
+  link: "/hashtags",
+  requiresAuth: false
+},
+{
+  icon: Globe,
+  title: "Facebook & Reels Insights",
+  description: "AI-generated Facebook post ideas, Instagram Reels concepts, and live trending funeral discussions across social platforms.",
+  link: "/dashboard",
+  requiresAuth: true
+},
+{
+  icon: MapPin,
+  title: "Local Trends",
+  description: "Hyper-local keyword research by city and state — discover what families in your area are searching for.",
+  link: "/local-trends",
+  requiresAuth: true
+},
+{
+  icon: Mic,
+  title: "Voice Profile",
+  description: "Customize your AI-generated scripts to match your tone, style, and brand — every script sounds like you.",
+  link: "/voice-profile",
+  requiresAuth: true
+},
+{
+  icon: Bookmark,
+  title: "Saved Ideas & Watchlist",
+  description: "Save video ideas, scripts, and keywords to your personal library. Track keyword spikes with your watchlist.",
+  link: "/saved",
+  requiresAuth: true
+}];
+
 const stats = [
-  { value: "Real-time", label: "Data freshness" },
-  { value: "50+", label: "Keywords tracked" },
-  { value: "AI", label: "Powered insights" },
-  { value: "Free", label: "To get started" },
-];
+{ value: "Real-time", label: "Data freshness" },
+{ value: "50+", label: "Keywords tracked" },
+{ value: "AI", label: "Powered insights" },
+{ value: "Free", label: "To get started" }];
+
 
 const Landing = () => {
   const { user, loading: authLoading } = useAuth();
@@ -115,13 +115,13 @@ const Landing = () => {
           </div>
           <div className="flex items-center gap-3">
             <ThemeToggle />
-            {!authLoading && !user && (
-              <Link to="/auth">
+            {!authLoading && !user &&
+            <Link to="/auth">
                 <Button variant="ghost" size="sm" className="text-muted-foreground text-xs">
                   Sign In
                 </Button>
               </Link>
-            )}
+            }
             <Link to="/dashboard">
               <Button size="sm" className="text-xs font-semibold gap-1">
                 Open Dashboard <ArrowRight className="h-3.5 w-3.5" />
@@ -139,8 +139,8 @@ const Landing = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7 }}
-            className="text-center max-w-3xl mx-auto"
-          >
+            className="text-center max-w-3xl mx-auto">
+            
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-tertiary/30 bg-tertiary/5 text-tertiary text-xs font-medium mb-6">
               <Zap className="h-3 w-3" />
               AI-Powered Funeral Profession Intelligence
@@ -151,7 +151,7 @@ const Landing = () => {
               <span className="text-gradient-primary">before they peak</span>
             </h1>
             <p className="text-lg text-muted-foreground mb-8 max-w-xl mx-auto leading-relaxed">
-              Real-time search trends. Social listening from Facebook, Instagram, and Google. AI-powered video ideas. Customizable scroll-stopping scripts. Hashtag intelligence - all in one dashboard for the funeral profession.
+              Real-time Google search trends. Social listening from Facebook, Instagram, TikTok, Youtube, Reddit, and X. AI-powered video ideas. Customizable scroll-stopping scripts. Hashtag intelligence - all in one dashboard for the funeral profession.
             </p>
             <div className="flex items-center justify-center gap-3 flex-wrap">
               <Link to="/dashboard">
@@ -163,19 +163,19 @@ const Landing = () => {
                 size="lg"
                 variant="outline"
                 onClick={handleGenerateIdeas}
-                className="font-semibold gap-2 px-6 border-secondary/50 text-secondary hover:bg-secondary/10"
-              >
+                className="font-semibold gap-2 px-6 border-secondary/50 text-secondary hover:bg-secondary/10">
+                
                 <Sparkles className="h-4 w-4" />
                 Generate Video Ideas
                 {!isAuthenticated && <Lock className="h-3 w-3 ml-1 text-muted-foreground" />}
               </Button>
-              {!authLoading && !user && (
-                <Link to="/auth">
+              {!authLoading && !user &&
+              <Link to="/auth">
                   <Button variant="ghost" size="lg" className="font-semibold px-6 text-muted-foreground hover:text-foreground">
                     Create Account
                   </Button>
                 </Link>
-              )}
+              }
             </div>
           </motion.div>
 
@@ -184,14 +184,14 @@ const Landing = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4, duration: 0.6 }}
-            className="mt-16 grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-2xl mx-auto"
-          >
-            {stats.map((stat) => (
-              <div key={stat.label} className="text-center p-4 rounded-xl border border-border bg-card/50">
+            className="mt-16 grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-2xl mx-auto">
+            
+            {stats.map((stat) =>
+            <div key={stat.label} className="text-center p-4 rounded-xl border border-border bg-card/50">
                 <p className="text-2xl font-display font-bold text-primary">{stat.value}</p>
                 <p className="text-xs text-muted-foreground mt-1">{stat.label}</p>
               </div>
-            ))}
+            )}
           </motion.div>
         </div>
       </section>
@@ -203,8 +203,8 @@ const Landing = () => {
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            className="text-center mb-12"
-          >
+            className="text-center mb-12">
+            
             <h2 className="text-3xl font-display font-bold text-foreground mb-3">
               Everything you need to stay ahead
             </h2>
@@ -225,62 +225,62 @@ const Landing = () => {
                   transition={{ delay: i * 0.08, duration: 0.5 }}
                   onClick={() => handleFeatureClick(feature)}
                   className={`section-panel transition-all duration-300 group cursor-pointer relative overflow-hidden ${
-                    isLocked
-                      ? "hover:border-secondary/50 hover:shadow-[0_0_20px_-5px_hsl(var(--secondary)/0.2)]"
-                      : "hover:border-tertiary/30"
-                  }`}
-                >
+                  isLocked ?
+                  "hover:border-secondary/50 hover:shadow-[0_0_20px_-5px_hsl(var(--secondary)/0.2)]" :
+                  "hover:border-tertiary/30"}`
+                  }>
+                  
                   {/* Locked overlay gradient on hover */}
-                  {isLocked && (
-                    <div className="absolute inset-0 bg-gradient-to-t from-secondary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
-                  )}
+                  {isLocked &&
+                  <div className="absolute inset-0 bg-gradient-to-t from-secondary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                  }
 
                   <div className="flex items-start justify-between mb-4 relative">
                     <div className={`w-9 h-9 rounded-lg flex items-center justify-center transition-colors duration-300 ${
-                      isLocked
-                        ? "bg-secondary/10 group-hover:bg-secondary/20"
-                        : "bg-primary/10"
-                    }`}>
+                    isLocked ?
+                    "bg-secondary/10 group-hover:bg-secondary/20" :
+                    "bg-primary/10"}`
+                    }>
                       <feature.icon className={`h-4.5 w-4.5 transition-colors duration-300 ${
-                        isLocked ? "text-secondary" : "text-primary"
-                      }`} />
+                      isLocked ? "text-secondary" : "text-primary"}`
+                      } />
                     </div>
-                    {isLocked && (
-                      <motion.span
-                        className="flex items-center gap-1 px-2.5 py-1 rounded-full border border-secondary/30 bg-secondary/10 text-secondary text-[10px] font-medium"
-                        whileHover={{ scale: 1.05 }}
-                      >
+                    {isLocked &&
+                    <motion.span
+                      className="flex items-center gap-1 px-2.5 py-1 rounded-full border border-secondary/30 bg-secondary/10 text-secondary text-[10px] font-medium"
+                      whileHover={{ scale: 1.05 }}>
+                      
                         <Lock className="h-2.5 w-2.5" />
                         Sign in to unlock
                       </motion.span>
-                    )}
+                    }
                   </div>
                   <h3 className={`font-display font-semibold mb-2 transition-colors duration-300 ${
-                    isLocked
-                      ? "text-foreground group-hover:text-secondary"
-                      : "text-foreground group-hover:text-primary"
-                  }`}>{feature.title}</h3>
+                  isLocked ?
+                  "text-foreground group-hover:text-secondary" :
+                  "text-foreground group-hover:text-primary"}`
+                  }>{feature.title}</h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
                   <div className={`mt-3 flex items-center gap-1 text-xs transition-all duration-300 ${
-                    isLocked
-                      ? "text-muted-foreground group-hover:text-secondary"
-                      : "text-muted-foreground group-hover:text-primary"
-                  }`}>
-                    {isLocked ? (
-                      <>
+                  isLocked ?
+                  "text-muted-foreground group-hover:text-secondary" :
+                  "text-muted-foreground group-hover:text-primary"}`
+                  }>
+                    {isLocked ?
+                    <>
                         <Lock className="h-3 w-3" />
                         <span className="group-hover:hidden">Requires account</span>
                         <span className="hidden group-hover:inline">Sign in to get started</span>
                         <ArrowRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </>
-                    ) : (
-                      <>
+                      </> :
+
+                    <>
                         Explore <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
                       </>
-                    )}
+                    }
                   </div>
-                </motion.div>
-              );
+                </motion.div>);
+
             })}
           </div>
         </div>
@@ -293,8 +293,8 @@ const Landing = () => {
             initial={{ opacity: 0, scale: 0.98 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            className="section-panel text-center py-12 px-6 glow-primary"
-          >
+            className="section-panel text-center py-12 px-6 glow-primary">
+            
             <h2 className="text-2xl sm:text-3xl font-display font-bold text-foreground mb-3">
               Ready to track what matters?
             </h2>
@@ -311,8 +311,8 @@ const Landing = () => {
                 size="lg"
                 variant="outline"
                 onClick={handleGenerateIdeas}
-                className="font-semibold gap-2 px-6 border-secondary/50 text-secondary hover:bg-secondary/10"
-              >
+                className="font-semibold gap-2 px-6 border-secondary/50 text-secondary hover:bg-secondary/10">
+                
                 <Sparkles className="h-4 w-4" />
                 Generate Video Ideas
               </Button>
@@ -338,8 +338,8 @@ const Landing = () => {
           </p>
         </div>
       </footer>
-    </div>
-  );
+    </div>);
+
 };
 
 export default Landing;
