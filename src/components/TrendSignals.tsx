@@ -90,6 +90,7 @@ const TrendSignals = ({ signals, isLoading, onRefresh, isRefreshing }: TrendSign
           <Radio className="h-8 w-8 mx-auto mb-2 opacity-40" />
           <p>No signals detected yet. Click refresh to scan for emerging trends.</p>
         </div>
+      ) : (
         <>
           <div className="space-y-3">
             <AnimatePresence initial={false}>
