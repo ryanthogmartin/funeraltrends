@@ -186,7 +186,7 @@ const ReelsInsights = ({ trends, isAuthenticated, onRequireAuth }: ReelsInsights
             </Badge>
           </div>
         </div>
-
+        <p className="text-sm text-muted-foreground mb-4">AI-generated Instagram Reels ideas with hooks and engagement tips based on trending funeral topics. Turn any idea into a full script.</p>
         <Tabs defaultValue="ideas" className="w-full">
           <TabsList className="mb-4 bg-accent/50">
             <TabsTrigger value="ideas" className="gap-1.5 text-xs">
