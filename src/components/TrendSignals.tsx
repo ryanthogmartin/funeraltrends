@@ -156,20 +156,21 @@ const TrendSignals = ({ signals, isLoading, onRefresh, isRefreshing }: TrendSign
           </AnimatePresence>
         </div>
 
-        {hasMore && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setExpanded(!expanded)}
-            className="w-full mt-3 text-xs text-muted-foreground hover:text-foreground"
-          >
-            {expanded ? (
-              <>Show Less <ChevronUp className="h-3.5 w-3.5 ml-1" /></>
-            ) : (
-              <>Show All {signals.length} Signals <ChevronDown className="h-3.5 w-3.5 ml-1" /></>
-            )}
-          </Button>
-        )}
+          {hasMore && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setExpanded(!expanded)}
+              className="w-full mt-3 text-xs text-muted-foreground hover:text-foreground"
+            >
+              {expanded ? (
+                <>Show Less <ChevronUp className="h-3.5 w-3.5 ml-1" /></>
+              ) : (
+                <>Show All {signals.length} Signals <ChevronDown className="h-3.5 w-3.5 ml-1" /></>
+              )}
+            </Button>
+          )}
+        </>
       )}
 
       {signals.length > 0 && (
