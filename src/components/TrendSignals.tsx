@@ -127,7 +127,13 @@ const TrendSignals = ({ signals, isLoading, onRefresh, isRefreshing }: TrendSign
                         </a>
                       )}
                       <span className="text-[10px] text-muted-foreground/50 ml-auto">
-                        {signal.source === 'google_trends_daily' ? '📊 Google Trends' : '🤖 AI Detected'}
+                        {signal.source === 'google_trends_daily' ? '📊 Google Trends' : 
+                         signal.source === 'reddit' ? '🟠 Reddit' :
+                         signal.source === 'tiktok' ? '🎵 TikTok' :
+                         signal.source === 'facebook' ? '📘 Facebook' :
+                         signal.source === 'twitter' ? '🐦 X/Twitter' :
+                         signal.source === 'youtube' ? '▶️ YouTube' :
+                         '🤖 AI Detected'}
                       </span>
                     </div>
                   </div>
