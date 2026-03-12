@@ -187,7 +187,7 @@ const LocalTrends = () => {
         transition={{ delay: 0.1 }}
         className="glass-card p-5 space-y-4"
       >
-        {/* State Selection */}
+        {/* State & City Selection */}
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="flex-shrink-0 sm:w-56">
             <Select value={stateCode} onValueChange={setStateCode}>
@@ -201,6 +201,15 @@ const LocalTrends = () => {
                 ))}
               </SelectContent>
             </Select>
+          </div>
+          <div className="flex-shrink-0 sm:w-48">
+            <Input
+              type="text"
+              placeholder="City (optional)"
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+              maxLength={100}
+            />
           </div>
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
