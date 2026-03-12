@@ -267,7 +267,13 @@ const TrendSignals = ({ signals, isLoading, onRefresh, isRefreshing }: TrendSign
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <h3 className="text-sm font-medium text-foreground truncate">{signal.title}</h3>
+                          {signal.source_urls.length > 0 ? (
+                            <a href={signal.source_urls[0]} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-foreground truncate hover:text-primary hover:underline transition-colors">
+                              {signal.title}
+                            </a>
+                          ) : (
+                            <h3 className="text-sm font-medium text-foreground truncate">{signal.title}</h3>
+                          )}
                           <Badge variant="outline" className="text-[10px] shrink-0">{signal.signal_type}</Badge>
                         </div>
                         <p className="text-xs text-muted-foreground leading-relaxed mb-2">{signal.summary}</p>
