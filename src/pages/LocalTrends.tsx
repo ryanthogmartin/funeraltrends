@@ -144,7 +144,7 @@ const LocalTrends = () => {
       }
 
       setResults(data.results || []);
-      setSearchedState(stateName);
+      setSearchedLocation(data.locationLabel || stateName);
 
       if (data.results?.length === 0) {
         toast.info("No data found for these keywords in this state");
