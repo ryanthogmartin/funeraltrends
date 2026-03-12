@@ -64,13 +64,14 @@ const InstagramHashtagTracker = ({ trends }: InstagramHashtagTrackerProps) => {
       transition={{ delay: 0.7, duration: 0.5 }}
       className="glass-card p-5 mt-6"
     >
-      <div className="flex items-center gap-2 mb-4">
+      <div className="flex items-center gap-2 mb-1">
         <Hash className="h-5 w-5 text-primary" />
         <h2 className="text-lg font-display font-semibold text-foreground">
           Instagram Hashtag Tracker
         </h2>
         <Badge variant="outline" className="ml-auto text-[10px] bg-muted/50 text-muted-foreground border-border">AI-Suggested</Badge>
       </div>
+      <p className="text-sm text-muted-foreground mb-4">AI-suggested Instagram hashtags tailored for funeral professionals. Track growth and discover which tags are gaining traction in the industry.</p>
 
       {isLoading && (
         <div className="flex items-center justify-center py-8 gap-2 text-muted-foreground">

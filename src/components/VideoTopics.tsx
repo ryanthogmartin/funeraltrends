@@ -90,7 +90,7 @@ const VideoTopics = ({ trends, onRequireAuth, isAuthenticated }: VideoTopicsProp
         transition={{ delay: 0.5, duration: 0.5 }}
         className="glass-card p-5 mt-6"
       >
-        <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-1">
           <div className="flex items-center gap-2">
             <Video className="h-5 w-5 text-primary" />
             <h2 className="text-lg font-display font-semibold text-foreground">
@@ -100,6 +100,7 @@ const VideoTopics = ({ trends, onRequireAuth, isAuthenticated }: VideoTopicsProp
           </div>
           <span className="sm:ml-auto text-xs text-muted-foreground">Based on Top 10 Funeral Search Topics</span>
         </div>
+        <p className="text-sm text-muted-foreground mb-4">AI-generated short-form video ideas pulled from the top 10 trending funeral search terms. Expand any keyword to see ideas and generate scripts.</p>
 
         {isLoading && (
           <div className="flex items-center justify-center py-8 gap-2 text-muted-foreground">

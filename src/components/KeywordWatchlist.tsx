@@ -125,7 +125,7 @@ const KeywordWatchlist = ({ userId, trends }: KeywordWatchlistProps) => {
         transition={{ delay: 0.6, duration: 0.5 }}
         className="glass-card p-5 mt-6"
       >
-        <div className="flex items-center gap-2 mb-4">
+        <div className="flex items-center gap-2 mb-1">
           <Eye className="h-5 w-5 text-primary" />
           <h2 className="text-lg font-display font-semibold text-foreground">
             Keyword Watchlist
@@ -139,6 +139,7 @@ const KeywordWatchlist = ({ userId, trends }: KeywordWatchlistProps) => {
             {watchlist.length} keyword{watchlist.length !== 1 ? "s" : ""}
           </span>
         </div>
+        <p className="text-sm text-muted-foreground mb-4">Track specific funeral keywords you care about. Get alerted when search volume spikes and generate video ideas from any keyword on your list.</p>
 
         {/* Add keyword form */}
         <form onSubmit={handleAdd} className="flex gap-2 mb-4">
