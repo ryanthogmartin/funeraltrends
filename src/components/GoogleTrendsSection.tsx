@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, RefreshCw } from "lucide-react";
 import TrendRow from "./TrendRow";
 import { Button } from "@/components/ui/button";
 import type { TrendItem } from "@/lib/mockData";
@@ -10,6 +10,8 @@ interface GoogleTrendsSectionProps {
   handleAddToWatchlist: (keyword: string) => void;
   isAddingToWatchlist: boolean;
   addingKeyword?: string;
+  onRefreshKeywords?: () => void;
+  isRefreshingKeywords?: boolean;
 }
 
 const INITIAL_COUNT = 12;
