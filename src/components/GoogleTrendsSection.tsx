@@ -36,7 +36,20 @@ const GoogleTrendsSection = ({
       
       <div className="flex items-center justify-between mb-1">
         <h2 className="text-lg font-display font-semibold text-foreground">Google Keywords — Funeral Searches</h2>
-        <span className="text-xs text-muted-foreground">🇺🇸 United States · 30 Days</span>
+        <div className="flex items-center gap-2">
+          {onRefreshKeywords && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onRefreshKeywords}
+              disabled={isRefreshingKeywords}
+              className="gap-1.5 text-xs">
+              <RefreshCw className={`h-3 w-3 ${isRefreshingKeywords ? 'animate-spin' : ''}`} />
+              {isRefreshingKeywords ? 'Refreshing…' : 'Refresh Keywords'}
+            </Button>
+          )}
+          <span className="text-xs text-muted-foreground">🇺🇸 United States · 30 Days</span>
+        </div>
       </div>
       <p className="text-sm text-muted-foreground mb-4">Top funeral-related search terms ranked by monthly volume and trend direction. Add any keyword to your watchlist for spike alerts.</p>
       <div className="space-y-0.5">
