@@ -129,6 +129,8 @@ const Dashboard = () => {
         handleAddToWatchlist={handleAddToWatchlist}
         isAddingToWatchlist={addToWatchlist.isPending}
         addingKeyword={addingKeyword || undefined}
+        onRefreshKeywords={handleRefresh}
+        isRefreshingKeywords={isRefreshing}
       />
 
       <FacebookInsights
