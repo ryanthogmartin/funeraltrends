@@ -3,40 +3,134 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
 
-const FUNERAL_KEYWORDS = [
-  "green burial",
-  "cremation cost",
-  "celebration of life",
-  "water cremation",
-  "funeral pre-planning",
-  "biodegradable casket",
-  "memorial livestream",
-  "direct cremation",
-  "natural burial",
-  "funeral alternatives",
-  "aquamation",
-  "death doula",
-  "home funeral",
-  "eco-friendly funeral",
-  "alkaline hydrolysis",
-  "funeral costs average",
-  "cremation jewelry",
-  "living funeral",
-  "tree pod burial",
-  "human composting",
-  "grief counseling",
-  "end of life planning",
-  "memorial reef",
-  "mushroom burial suit",
-];
+// ─── Master keyword list (225 keywords, 15 categories) ────────────────
+
+const KEYWORD_CATEGORIES: Record<string, string[]> = {
+  "funeral-general": [
+    "funeral", "funeral services", "funeral directors", "funeral arrangements", "funeral planning",
+    "funeral etiquette", "what to wear to a funeral", "funeral flowers", "funeral flower arrangements",
+    "funeral music", "what to say at a funeral", "funeral parlor", "funeral home", "funeral procession",
+    "funeral reception ideas",
+  ],
+  "cremation": [
+    "cremation", "cremation services", "direct cremation", "direct cremation cost",
+    "how much does cremation cost", "cremation vs burial", "what is direct cremation",
+    "full service cremation", "cremation urns", "what to do with ashes after cremation",
+    "how long does cremation take", "aquamation water cremation", "affordable cremation services",
+    "cremation cost by state", "scattering ashes laws",
+  ],
+  "death-burial": [
+    "caskets", "coffins", "burial services", "burial plots", "embalming", "hearse",
+    "graveside service", "direct burial", "immediate burial", "burial vault", "mausoleum",
+    "what is a burial vault", "open casket funeral", "military burial", "headstones and grave markers",
+  ],
+  "death-certificates": [
+    "how to get a death certificate", "death certificate copy", "death certificate request",
+    "certified copy of death certificate", "how long does a death certificate take",
+    "how many death certificates do I need", "death certificate cost", "death certificate apostille",
+    "how to obtain a death certificate for a parent", "death certificate name change",
+    "death certificate vs death notice", "online death certificate request",
+    "vital records death certificate", "replace lost death certificate",
+    "death certificate after cremation",
+  ],
+  "eco-friendly": [
+    "green burial", "natural burial", "eco friendly burial", "biodegradable casket",
+    "conservation burial", "water cremation aquamation", "human composting burial",
+    "natural burial vs cremation", "shroud burial", "green burial cost", "biodegradable urn",
+    "forest burial", "alkaline hydrolysis", "what is a green burial", "green burial cemetery",
+  ],
+  "funeral-pricing": [
+    "how much does a funeral cost", "average funeral cost", "funeral cost breakdown",
+    "cheap funeral options", "affordable funeral services", "funeral pre-planning costs",
+    "funeral price list", "direct cremation cost vs burial", "funeral home price comparison",
+    "low cost funeral options", "funeral expenses who pays", "prepaid funeral plans",
+    "funeral insurance", "burial insurance", "final expense insurance",
+  ],
+  "preplanning": [
+    "funeral pre-planning", "prepaid funeral plans", "how to pre-plan a funeral",
+    "funeral prearrangement", "pre-need funeral planning", "funeral pre-planning costs",
+    "benefits of pre-planning a funeral", "funeral planning checklist",
+    "pre-planned funeral vs prepaid funeral", "how to plan a funeral in advance",
+    "funeral wishes document", "end of life planning", "advance funeral directive",
+    "what happens if you don't pre-plan a funeral", "funeral pre-planning for aging parents",
+  ],
+  "funeral-products": [
+    "funeral urns", "casket prices", "keepsake urns", "memorial jewelry from ashes",
+    "biodegradable urns", "funeral program templates", "memorial candles", "cremation jewelry",
+    "funeral wreaths", "memorial plaques", "sympathy gift baskets", "memorial wind chimes",
+    "personalized urns", "funeral casket sprays", "memorial stones and garden markers",
+  ],
+  "cemetery": [
+    "cemetery", "burial plots cost", "cemetery plot prices", "national cemetery",
+    "veterans cemetery", "cemetery records", "how to find a grave", "cemetery memorial gardens",
+    "pet cemetery", "conservation cemetery", "mausoleum cost", "cemetery maintenance fees",
+    "cemetery plot transfer", "columbarium", "find a grave online",
+  ],
+  "pet-services": [
+    "pet cremation", "pet cremation cost", "pet funeral services", "how to handle pet loss",
+    "pet burial options", "dog cremation", "cat cremation", "pet memorial ideas", "pet cemetery",
+    "pet urns", "pet loss grief support", "in-home pet euthanasia", "pet memorial jewelry",
+    "biodegradable pet urns", "paw print memorial keepsakes",
+  ],
+  "grief-healing": [
+    "grief support", "grief counseling", "stages of grief", "how to cope with loss",
+    "bereavement support", "grief support groups", "coping with the death of a parent",
+    "coping with the death of a spouse", "grief after loss of a child", "how long does grief last",
+    "grief therapist", "complicated grief", "anticipatory grief", "online grief support",
+    "grief books and resources",
+  ],
+  "veteran-services": [
+    "veteran burial benefits", "VA burial allowance", "free burial for veterans",
+    "veterans national cemetery", "military funeral honors", "how to apply for VA burial benefits",
+    "veteran cremation benefits", "military funeral flag ceremony", "presidential memorial certificate",
+    "veteran headstone application", "military funeral honors eligibility",
+    "VA burial benefit reimbursement", "veteran survivor benefits", "TRICARE funeral benefits",
+    "veteran pre-need burial eligibility",
+  ],
+  "aftercare-services": [
+    "funeral aftercare services", "bereavement follow up", "grief support after funeral",
+    "estate settlement assistance", "what to do after a funeral", "post funeral checklist",
+    "survivor benefits after death", "notifying agencies after death", "closing accounts after death",
+    "how to cancel subscriptions after death", "transferring assets after death",
+    "probate process after death", "memorial anniversary support", "bereavement leave resources",
+    "digital estate planning after death",
+  ],
+  "funeral-home-marketing": [
+    "funeral home website design", "funeral home SEO", "funeral home social media marketing",
+    "funeral home Google ads", "funeral home reputation management", "funeral home email marketing",
+    "funeral home branding", "funeral home online reviews", "funeral home digital marketing",
+    "funeral home content marketing", "funeral home Google Business Profile",
+    "funeral home video marketing", "funeral home community outreach",
+    "funeral home PPC advertising", "funeral home obituary marketing",
+  ],
+  "celebration-of-life": [
+    "celebration of life", "celebration of life ideas", "celebration of life vs funeral",
+    "how to plan a celebration of life", "celebration of life themes", "celebration of life venues",
+    "outdoor celebration of life ideas", "celebration of life decorations",
+    "celebration of life invitations", "celebration of life food ideas",
+    "celebration of life music playlist", "virtual celebration of life",
+    "celebration of life speech ideas", "celebration of life activities for guests",
+    "unique celebration of life ideas",
+  ],
+};
+
+function getAllKeywords(): string[] {
+  return Object.values(KEYWORD_CATEGORIES).flat();
+}
+
+function getCategoryForKeyword(keyword: string): string {
+  const lower = keyword.toLowerCase();
+  for (const [cat, keywords] of Object.entries(KEYWORD_CATEGORIES)) {
+    if (keywords.some(k => k.toLowerCase() === lower)) return cat;
+  }
+  return "custom";
+}
+
+// ─── Reddit subreddits ────────────────────────────────────────────────
 
 const FUNERAL_SUBREDDITS = [
-  "funeral",
-  "DeathPositive",
-  "GriefSupport",
-  "personalfinance+funeral",
-  "Futurology",
-  "askfuneraldirectors",
+  "funeral", "DeathPositive", "GriefSupport", "personalfinance+funeral",
+  "Futurology", "askfuneraldirectors",
 ];
 
 // ─── Google Ads Keyword Planner ────────────────────────────────────────
@@ -66,7 +160,76 @@ async function getAccessToken(): Promise<string> {
   return data.access_token;
 }
 
-async function fetchKeywordPlannerData(): Promise<any[]> {
+async function fetchKeywordBatch(
+  accessToken: string,
+  keywords: string[],
+  customerId: string,
+  managerCustomerId: string,
+  developerToken: string,
+): Promise<any[]> {
+  const url = `https://googleads.googleapis.com/v21/customers/${customerId}:generateKeywordHistoricalMetrics`;
+
+  const body = {
+    keywords,
+    language: 'languageConstants/1000',
+    geoTargetConstants: ['geoTargetConstants/2840'],
+    keywordPlanNetwork: 'GOOGLE_SEARCH',
+  };
+
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+      'developer-token': developerToken,
+      'login-customer-id': managerCustomerId,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!res.ok) {
+    const errText = await res.text();
+    console.error(`Google Ads API error ${res.status}: ${errText}`);
+    return [];
+  }
+
+  const data = await res.json();
+  const results: any[] = [];
+
+  for (const result of (data.results || [])) {
+    const keyword = result.text || '';
+    const metrics = result.keywordMetrics || {};
+    const avgSearches = parseInt(metrics.avgMonthlySearches) || 0;
+
+    const monthlyVolumes = (metrics.monthlySearchVolumes || [])
+      .slice(-12)
+      .map((m: any) => parseInt(m.monthlySearches) || 0);
+
+    let changePercent = 0;
+    if (monthlyVolumes.length >= 2) {
+      const recent = monthlyVolumes[monthlyVolumes.length - 1];
+      const previous = monthlyVolumes[monthlyVolumes.length - 2];
+      if (previous > 0) {
+        changePercent = Math.round(((recent - previous) / previous) * 100);
+      }
+    }
+
+    results.push({
+      keyword,
+      volume: avgSearches,
+      change_percent: changePercent,
+      sparkline: monthlyVolumes.length > 0 ? monthlyVolumes : generateSparkline(avgSearches),
+      competition: metrics.competition || 'UNSPECIFIED',
+      competition_index: parseInt(metrics.competitionIndex) || 0,
+      category: getCategoryForKeyword(keyword),
+      source: 'google_ads',
+    });
+  }
+
+  return results;
+}
+
+async function fetchKeywordPlannerData(extraKeywords: string[] = []): Promise<any[]> {
   const customerId = Deno.env.get('GOOGLE_ADS_CUSTOMER_ID');
   const managerCustomerId = Deno.env.get('GOOGLE_ADS_MANAGER_CUSTOMER_ID');
   const developerToken = Deno.env.get('GOOOGLE_ADS_DEVELOPER_TOKEN');
@@ -90,248 +253,22 @@ async function fetchKeywordPlannerData(): Promise<any[]> {
     return [];
   }
 
-  const url = `https://googleads.googleapis.com/v21/customers/${customerId}:generateKeywordHistoricalMetrics`;
+  // Combine master list + any user-added keywords
+  const allKeywords = [...new Set([...getAllKeywords(), ...extraKeywords])];
+  console.log(`[Google Ads] Total keywords to fetch: ${allKeywords.length}`);
 
-  const body = {
-    keywords: FUNERAL_KEYWORDS,
-    language: 'languageConstants/1000',
-    geoTargetConstants: ['geoTargetConstants/2840'],
-    keywordPlanNetwork: 'GOOGLE_SEARCH',
-  };
+  const BATCH_SIZE = 200;
+  const allResults: any[] = [];
 
-  try {
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-        'developer-token': developerToken,
-        'login-customer-id': managerCustomerId,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(body),
-    });
-
-    if (!res.ok) {
-      const errText = await res.text();
-      console.error(`Google Ads API error ${res.status}: ${errText}`);
-      return [];
-    }
-
-    const data = await res.json();
-    const trends: any[] = [];
-
-    for (const result of (data.results || [])) {
-      const keyword = result.text || '';
-      const metrics = result.keywordMetrics || {};
-      const avgSearches = parseInt(metrics.avgMonthlySearches) || 0;
-
-      const monthlyVolumes = (metrics.monthlySearchVolumes || [])
-        .slice(-12)
-        .map((m: any) => parseInt(m.monthlySearches) || 0);
-
-      let changePercent = 0;
-      if (monthlyVolumes.length >= 2) {
-        const recent = monthlyVolumes[monthlyVolumes.length - 1];
-        const previous = monthlyVolumes[monthlyVolumes.length - 2];
-        if (previous > 0) {
-          changePercent = Math.round(((recent - previous) / previous) * 100);
-        }
-      }
-
-      trends.push({
-        keyword,
-        volume: avgSearches,
-        change_percent: changePercent,
-        sparkline: monthlyVolumes.length > 0 ? monthlyVolumes : generateSparkline(avgSearches),
-        competition: metrics.competition || 'UNSPECIFIED',
-        competition_index: parseInt(metrics.competitionIndex) || 0,
-        source: 'google_ads',
-      });
-    }
-
-    console.log(`[Google Ads] Returned ${trends.length} keywords with real data`);
-    return trends.sort((a, b) => b.volume - a.volume).slice(0, 24);
-  } catch (err) {
-    console.error('[Google Ads] Error:', err);
-    return [];
-  }
-}
-
-// ─── Google Trends (fallback) ──────────────────────────────────────────
-
-async function fetchGoogleTrendsData(): Promise<any[]> {
-  console.log('[Google Trends] Starting fetch for', FUNERAL_KEYWORDS.length, 'keywords...');
-  
-  const allTrends: any[] = [];
-  
-  // Google Trends compares up to 5 keywords at a time
-  const BATCH_SIZE = 5;
-  const batches: string[][] = [];
-  for (let i = 0; i < FUNERAL_KEYWORDS.length; i += BATCH_SIZE) {
-    batches.push(FUNERAL_KEYWORDS.slice(i, i + BATCH_SIZE));
+  for (let i = 0; i < allKeywords.length; i += BATCH_SIZE) {
+    const batch = allKeywords.slice(i, i + BATCH_SIZE);
+    console.log(`[Google Ads] Fetching batch ${Math.floor(i / BATCH_SIZE) + 1} (${batch.length} keywords)...`);
+    const results = await fetchKeywordBatch(accessToken, batch, customerId!, managerCustomerId!, developerToken!);
+    allResults.push(...results);
   }
 
-  // Use a reference keyword in each batch for cross-batch normalization
-  const referenceKeyword = "cremation cost"; // highest expected volume
-
-  for (const batch of batches) {
-    try {
-      // Include reference keyword if not already in batch (for normalization)
-      const queryKeywords = batch.includes(referenceKeyword) 
-        ? batch 
-        : [referenceKeyword, ...batch].slice(0, 5);
-
-      const comparisonItems = queryKeywords.map(kw => ({
-        keyword: kw,
-        geo: "US",
-        time: "today 12-m",
-      }));
-
-      const req = JSON.stringify({
-        comparisonItem: comparisonItems,
-        category: 0,
-        property: "",
-      });
-
-      // Step 1: Get explore tokens
-      const exploreUrl = `https://trends.google.com/trends/api/explore?hl=en-US&tz=240&req=${encodeURIComponent(req)}`;
-      
-      let exploreRes: Response | null = null;
-      for (let attempt = 0; attempt < 3; attempt++) {
-        exploreRes = await fetch(exploreUrl, {
-          headers: {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            'Accept': 'application/json',
-          },
-        });
-        if (exploreRes.status === 429) {
-          console.log(`[Google Trends] Rate limited on explore (attempt ${attempt + 1}), waiting...`);
-          await exploreRes.text(); // consume body
-          await new Promise(resolve => setTimeout(resolve, (attempt + 1) * 5000));
-          continue;
-        }
-        break;
-      }
-
-      if (!exploreRes || !exploreRes.ok) {
-        if (exploreRes) {
-          console.error(`[Google Trends] Explore failed: ${exploreRes.status}`);
-          await exploreRes.text();
-        }
-        continue;
-      }
-
-      const exploreText = await exploreRes.text();
-      // Google Trends prepends ")]}'" to responses
-      const cleanedExplore = exploreText.replace(/^\)\]\}',?\n/, '');
-      const exploreData = JSON.parse(cleanedExplore);
-      
-      // Find the TIMESERIES widget
-      const timeseriesWidget = exploreData.widgets?.find(
-        (w: any) => w.id === 'TIMESERIES'
-      );
-      
-      if (!timeseriesWidget) {
-        console.error('[Google Trends] No TIMESERIES widget found');
-        continue;
-      }
-
-      const token = timeseriesWidget.token;
-      const timeseriesReq = JSON.stringify(timeseriesWidget.request);
-
-      // Step 2: Get interest over time data
-      const multilineUrl = `https://trends.google.com/trends/api/widgetdata/multiline?hl=en-US&tz=240&req=${encodeURIComponent(timeseriesReq)}&token=${token}`;
-      
-      const dataRes = await fetch(multilineUrl, {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-          'Accept': 'application/json',
-        },
-      });
-
-      if (!dataRes.ok) {
-        console.error(`[Google Trends] Multiline failed: ${dataRes.status}`);
-        continue;
-      }
-
-      const dataText = await dataRes.text();
-      const cleanedData = dataText.replace(/^\)\]\}',?\n/, '');
-      const timeseriesData = JSON.parse(cleanedData);
-
-      const timelineData = timeseriesData.default?.timelineData || [];
-
-      // Process each keyword in this batch
-      for (let ki = 0; ki < queryKeywords.length; ki++) {
-        const keyword = queryKeywords[ki];
-        
-        // Skip reference keyword duplicates (it'll be processed in its own batch)
-        if (keyword === referenceKeyword && !batch.includes(referenceKeyword)) {
-          continue;
-        }
-
-        // Extract monthly sparkline (sample ~1 point per month from weekly data)
-        const weeklyValues = timelineData.map((point: any) => {
-          const val = point.value?.[ki];
-          return typeof val === 'number' ? val : 0;
-        });
-
-        // Aggregate weekly to monthly (roughly 4 weeks per month)
-        const monthlyValues: number[] = [];
-        for (let m = 0; m < 12; m++) {
-          const startWeek = m * 4;
-          const endWeek = Math.min(startWeek + 4, weeklyValues.length);
-          const slice = weeklyValues.slice(startWeek, endWeek);
-          if (slice.length > 0) {
-            const avg = Math.round(slice.reduce((a: number, b: number) => a + b, 0) / slice.length);
-            monthlyValues.push(avg);
-          }
-        }
-
-        // Calculate average interest and change
-        const avgInterest = monthlyValues.length > 0
-          ? Math.round(monthlyValues.reduce((a, b) => a + b, 0) / monthlyValues.length)
-          : 0;
-
-        let changePercent = 0;
-        if (monthlyValues.length >= 2) {
-          const recent = monthlyValues[monthlyValues.length - 1];
-          const previous = monthlyValues[monthlyValues.length - 2];
-          if (previous > 0) {
-            changePercent = Math.round(((recent - previous) / previous) * 100);
-          }
-        }
-
-        // Scale interest to approximate search volume (Google Trends is 0-100 relative)
-        // Multiply by a factor to make numbers more meaningful for display
-        const volumeEstimate = avgInterest * 100;
-
-        allTrends.push({
-          keyword,
-          volume: volumeEstimate,
-          change_percent: changePercent,
-          sparkline: monthlyValues,
-          source: 'google_trends',
-        });
-      }
-
-      // Longer delay between batches to avoid Google Trends rate limiting
-      await new Promise(resolve => setTimeout(resolve, 6000));
-      
-    } catch (err) {
-      console.error(`[Google Trends] Error processing batch:`, err);
-    }
-  }
-
-  // Deduplicate (reference keyword may appear multiple times)
-  const seen = new Set<string>();
-  const deduped = allTrends.filter(t => {
-    if (seen.has(t.keyword)) return false;
-    seen.add(t.keyword);
-    return true;
-  });
-
-  console.log(`[Google Trends] Got data for ${deduped.length} keywords`);
-  return deduped.sort((a, b) => b.volume - a.volume).slice(0, 24);
+  console.log(`[Google Ads] Returned ${allResults.length} keywords with real data`);
+  return allResults.sort((a, b) => b.volume - a.volume);
 }
 
 function generateSparkline(maxVolume: number): number[] {
@@ -422,22 +359,16 @@ Deno.serve(async (req) => {
     const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, serviceRoleKey);
 
-    console.log('[v3] Fetching funeral trends (Google Ads → Google Trends fallback) + Reddit...');
+    console.log('[v4] Fetching funeral trends (225 keywords, 15 categories) + Reddit...');
 
-    // Try Google Ads first, fall back to Google Trends
-    let trends = await fetchKeywordPlannerData();
-    let source = 'google_ads_api';
-    
-    if (trends.length === 0) {
-      console.log('[Fallback] Google Ads unavailable, trying Google Trends...');
-      trends = await fetchGoogleTrendsData();
-      source = 'google_trends';
-    }
-    
-    if (trends.length === 0) {
-      console.log('[Fallback] Google Trends also failed, no trend data available');
-      source = 'none';
-    }
+    // Fetch any user-added keywords to include in the API call
+    const { data: userKeywords } = await supabase.from('user_keywords').select('keyword');
+    const extraKeywords = (userKeywords || []).map((r: any) => r.keyword);
+    console.log(`[User Keywords] Found ${extraKeywords.length} user-added keywords`);
+
+    // Fetch Google Ads data for all keywords
+    const trends = await fetchKeywordPlannerData(extraKeywords);
+    const source = trends.length > 0 ? 'google_ads_api' : 'none';
 
     const redditPosts = await fetchRedditPosts();
 
@@ -448,15 +379,21 @@ Deno.serve(async (req) => {
     await supabase.from('funeral_reddit_posts').delete().neq('id', '00000000-0000-0000-0000-000000000000');
 
     if (trends.length > 0) {
-      const { error: trendsError } = await supabase.from('funeral_trends').insert(
-        trends.map(t => ({
-          keyword: t.keyword,
-          volume: t.volume,
-          change_percent: t.change_percent,
-          sparkline: t.sparkline,
-        }))
-      );
-      if (trendsError) console.error('Error inserting trends:', trendsError);
+      // Insert in batches of 100 to avoid payload limits
+      const BATCH = 100;
+      for (let i = 0; i < trends.length; i += BATCH) {
+        const batch = trends.slice(i, i + BATCH);
+        const { error: trendsError } = await supabase.from('funeral_trends').insert(
+          batch.map(t => ({
+            keyword: t.keyword,
+            volume: t.volume,
+            change_percent: t.change_percent,
+            sparkline: t.sparkline,
+            category: t.category,
+          }))
+        );
+        if (trendsError) console.error(`Error inserting trends batch ${i}:`, trendsError);
+      }
     }
 
     if (redditPosts.length > 0) {
@@ -472,6 +409,7 @@ Deno.serve(async (req) => {
         source,
         trends_count: trends.length,
         reddit_count: redditPosts.length,
+        categories: Object.keys(KEYWORD_CATEGORIES).length,
         fetched_at: new Date().toISOString(),
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
