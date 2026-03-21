@@ -6,8 +6,7 @@ export async function fetchTrends(): Promise<TrendItem[]> {
   const { data, error } = await supabase
     .from('funeral_trends')
     .select('*')
-    .order('volume', { ascending: false })
-    .limit(24);
+    .order('volume', { ascending: false });
 
   if (error || !data || data.length === 0) {
     console.log('Using mock trends data');
@@ -19,7 +18,55 @@ export async function fetchTrends(): Promise<TrendItem[]> {
     volume: row.volume,
     change: Number(row.change_percent),
     sparkline: row.sparkline || [],
+    category: (row as any).category || 'general',
   }));
+}
+
+export interface UserKeyword {
+  id: string;
+  keyword: string;
+  category: string;
+  is_public: boolean;
+  user_id: string;
+  created_at: string;
+}
+
+export async function fetchUserKeywords(userId: string): Promise<UserKeyword[]> {
+  const { data, error } = await supabase
+    .from('user_keywords')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
+
+  if (error || !data) return [];
+  return data as UserKeyword[];
+}
+
+export async function fetchCommunityKeywords(userId: string): Promise<UserKeyword[]> {
+  const { data, error } = await supabase
+    .from('user_keywords')
+    .select('*')
+    .eq('is_public', true)
+    .neq('user_id', userId)
+    .order('created_at', { ascending: false });
+
+  if (error || !data) return [];
+  return data as UserKeyword[];
+}
+
+export async function addUserKeyword(userId: string, keyword: string, category: string = 'custom', isPublic: boolean = true): Promise<boolean> {
+  const { error } = await supabase.from('user_keywords').insert({
+    user_id: userId,
+    keyword: keyword.trim(),
+    category,
+    is_public: isPublic,
+  });
+  return !error;
+}
+
+export async function removeUserKeyword(id: string): Promise<boolean> {
+  const { error } = await supabase.from('user_keywords').delete().eq('id', id);
+  return !error;
 }
 
 export async function fetchDashboardStats(): Promise<DashboardStats> {

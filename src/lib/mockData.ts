@@ -3,6 +3,8 @@ export interface TrendItem {
   volume: number;
   change: number; // percentage
   sparkline: number[];
+  category?: string;
+  source?: 'master' | 'user' | 'community';
 }
 
 export interface RedditPost {
