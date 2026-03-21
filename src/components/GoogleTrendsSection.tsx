@@ -199,25 +199,22 @@ const GoogleTrendsSection = ({
         </div>
       </div>
 
-      {/* Category Filter Pills */}
-      <div className="flex flex-wrap gap-1.5 mb-4">
-        <Badge
-          variant={selectedCategory === "all" ? "default" : "outline"}
-          className="cursor-pointer text-xs"
-          onClick={() => setSelectedCategory("all")}
-        >
-          All ({categoryCounts.all || 0})
-        </Badge>
-        {KEYWORD_CATEGORIES.map(cat => (
-          <Badge
-            key={cat.id}
-            variant={selectedCategory === cat.id ? "default" : "outline"}
-            className="cursor-pointer text-xs"
-            onClick={() => setSelectedCategory(cat.id)}
-          >
-            {cat.emoji} {cat.label} ({categoryCounts[cat.id] || 0})
-          </Badge>
-        ))}
+      {/* Category Filter Dropdown */}
+      <div className="flex items-center gap-2 mb-4">
+        <label className="text-xs text-muted-foreground">Category:</label>
+        <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+          <SelectTrigger className="h-8 w-[240px] text-xs">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Categories ({categoryCounts.all || 0})</SelectItem>
+            {KEYWORD_CATEGORIES.map(cat => (
+              <SelectItem key={cat.id} value={cat.id}>
+                {cat.emoji} {cat.label} ({categoryCounts[cat.id] || 0})
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Add Keyword Form (visible when in "mine" mode or always for logged in users) */}
