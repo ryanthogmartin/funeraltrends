@@ -20,7 +20,9 @@ const GoogleTrendsSection = ({
   trends,
   handleAddToWatchlist,
   isAddingToWatchlist,
-  addingKeyword
+  addingKeyword,
+  onRefreshKeywords,
+  isRefreshingKeywords,
 }: GoogleTrendsSectionProps) => {
   const [expanded, setExpanded] = useState(false);
   const visibleTrends = expanded ? trends : trends.slice(0, INITIAL_COUNT);
