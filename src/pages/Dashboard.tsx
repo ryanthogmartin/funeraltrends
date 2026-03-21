@@ -1,13 +1,12 @@
 import { Search, TrendingUp, LogIn } from "lucide-react";
 import DashboardHeader from "@/components/DashboardHeader";
 import StatCard from "@/components/StatCard";
-import TrendChart from "@/components/TrendChart";
 import GoogleTrendsSection from "@/components/GoogleTrendsSection";
 import KeywordWatchlist from "@/components/KeywordWatchlist";
 import FacebookInsights from "@/components/FacebookInsights";
 import ReelsInsights from "@/components/ReelsInsights";
 import { mockTrends, mockStats } from "@/lib/mockData";
-import { fetchTrends, fetchDashboardStats, triggerDataRefresh, fetchTrendSignals, triggerTrendSignalsRefresh } from "@/lib/api";
+import { fetchTrends, fetchDashboardStats, triggerDataRefresh, fetchTrendSignals, triggerTrendSignalsRefresh, fetchUserKeywords, fetchCommunityKeywords } from "@/lib/api";
 import TrendSignals from "@/components/TrendSignals";
 import { exportTrendsCsv } from "@/lib/exportCsv";
 import { motion } from "framer-motion";
@@ -45,6 +44,20 @@ const Dashboard = () => {
     staleTime: 1000 * 60 * 10,
   });
 
+  const { data: userKeywords = [] } = useQuery({
+    queryKey: ['user-keywords', user?.id],
+    queryFn: () => fetchUserKeywords(user!.id),
+    enabled: !!user,
+    staleTime: 1000 * 60 * 2,
+  });
+
+  const { data: communityKeywords = [] } = useQuery({
+    queryKey: ['community-keywords', user?.id],
+    queryFn: () => fetchCommunityKeywords(user!.id),
+    enabled: !!user,
+    staleTime: 1000 * 60 * 5,
+  });
+
   const [isRefreshingSignals, setIsRefreshingSignals] = useState(false);
   const handleRefreshSignals = async () => {
     setIsRefreshingSignals(true);
@@ -61,7 +74,7 @@ const Dashboard = () => {
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    toast({ title: "Refreshing data...", description: "Fetching latest funeral trends" });
+    toast({ title: "Refreshing data...", description: "Fetching latest funeral trends for 225 keywords" });
     const success = await triggerDataRefresh();
     if (success) {
       await queryClient.invalidateQueries({ queryKey: ['funeral-trends'] });
@@ -122,8 +135,6 @@ const Dashboard = () => {
         isRefreshing={isRefreshingSignals}
       />
 
-      
-
       <GoogleTrendsSection
         trends={trends}
         handleAddToWatchlist={handleAddToWatchlist}
@@ -131,6 +142,9 @@ const Dashboard = () => {
         addingKeyword={addingKeyword || undefined}
         onRefreshKeywords={handleRefresh}
         isRefreshingKeywords={isRefreshing}
+        userId={user?.id}
+        userKeywords={userKeywords}
+        communityKeywords={communityKeywords}
       />
 
       <FacebookInsights

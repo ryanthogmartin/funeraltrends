@@ -55,6 +55,7 @@ export type Database = {
       }
       funeral_trends: {
         Row: {
+          category: string | null
           change_percent: number
           fetched_at: string
           id: string
@@ -63,6 +64,7 @@ export type Database = {
           volume: number
         }
         Insert: {
+          category?: string | null
           change_percent?: number
           fetched_at?: string
           id?: string
@@ -71,6 +73,7 @@ export type Database = {
           volume?: number
         }
         Update: {
+          category?: string | null
           change_percent?: number
           fetched_at?: string
           id?: string
@@ -182,6 +185,33 @@ export type Database = {
           source_urls?: Json | null
           summary?: string
           title?: string
+        }
+        Relationships: []
+      }
+      user_keywords: {
+        Row: {
+          category: string | null
+          created_at: string
+          id: string
+          is_public: boolean | null
+          keyword: string
+          user_id: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          id?: string
+          is_public?: boolean | null
+          keyword: string
+          user_id: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          id?: string
+          is_public?: boolean | null
+          keyword?: string
+          user_id?: string
         }
         Relationships: []
       }
