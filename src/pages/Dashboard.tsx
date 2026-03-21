@@ -122,7 +122,7 @@ const Dashboard = () => {
         isRefreshing={isRefreshingSignals}
       />
 
-      <TrendChart trends={trends} />
+      
 
       <GoogleTrendsSection
         trends={trends}
