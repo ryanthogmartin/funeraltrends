@@ -38,7 +38,7 @@ const GoogleTrendsSection = ({
   isRefreshingKeywords,
   userId,
   userKeywords = [],
-  communityKeywords = [],
+  communityKeywords = []
 }: GoogleTrendsSectionProps) => {
   const [expanded, setExpanded] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
@@ -57,19 +57,19 @@ const GoogleTrendsSection = ({
     if (viewMode === "master") {
       list = trends;
     } else if (viewMode === "mine") {
-      const myKeywordSet = new Set(userKeywords.map(k => k.keyword.toLowerCase()));
-      list = trends.filter(t => myKeywordSet.has(t.keyword.toLowerCase()));
+      const myKeywordSet = new Set(userKeywords.map((k) => k.keyword.toLowerCase()));
+      list = trends.filter((t) => myKeywordSet.has(t.keyword.toLowerCase()));
       // Also show user keywords that don't have trend data yet
       for (const uk of userKeywords) {
-        if (!list.find(t => t.keyword.toLowerCase() === uk.keyword.toLowerCase())) {
+        if (!list.find((t) => t.keyword.toLowerCase() === uk.keyword.toLowerCase())) {
           list.push({ keyword: uk.keyword, volume: 0, change: 0, sparkline: [], category: uk.category, source: "user" });
         }
       }
     } else if (viewMode === "community") {
-      const communityKeywordSet = new Set(communityKeywords.map(k => k.keyword.toLowerCase()));
-      list = trends.filter(t => communityKeywordSet.has(t.keyword.toLowerCase()));
+      const communityKeywordSet = new Set(communityKeywords.map((k) => k.keyword.toLowerCase()));
+      list = trends.filter((t) => communityKeywordSet.has(t.keyword.toLowerCase()));
       for (const ck of communityKeywords) {
-        if (!list.find(t => t.keyword.toLowerCase() === ck.keyword.toLowerCase())) {
+        if (!list.find((t) => t.keyword.toLowerCase() === ck.keyword.toLowerCase())) {
           list.push({ keyword: ck.keyword, volume: 0, change: 0, sparkline: [], category: ck.category, source: "community" });
         }
       }
@@ -77,7 +77,7 @@ const GoogleTrendsSection = ({
 
     // Apply category filter
     if (selectedCategory !== "all") {
-      list = list.filter(t => (t.category || "general") === selectedCategory);
+      list = list.filter((t) => (t.category || "general") === selectedCategory);
     }
 
     return list;
@@ -133,26 +133,26 @@ const GoogleTrendsSection = ({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ delay: 0.3, duration: 0.5 }}
-      className="lg:col-span-3 glass-card p-5"
-    >
+      className="lg:col-span-3 glass-card p-5">
+      
       {/* Header */}
       <div className="flex items-center justify-between mb-1">
         <h2 className="text-lg font-display font-semibold text-foreground">
-          Google Keywords — Funeral Searches
+          Google Keyword Tool — Funeral Searches
         </h2>
         <div className="flex items-center gap-2">
-          {onRefreshKeywords && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onRefreshKeywords}
-              disabled={isRefreshingKeywords}
-              className="gap-1.5 text-xs"
-            >
+          {onRefreshKeywords &&
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onRefreshKeywords}
+            disabled={isRefreshingKeywords}
+            className="gap-1.5 text-xs">
+            
               <RefreshCw className={`h-3 w-3 ${isRefreshingKeywords ? "animate-spin" : ""}`} />
               {isRefreshingKeywords ? "Refreshing…" : "Refresh Keywords"}
             </Button>
-          )}
+          }
           <span className="text-xs text-muted-foreground">🇺🇸 United States · 30 Days</span>
         </div>
       </div>
@@ -166,33 +166,33 @@ const GoogleTrendsSection = ({
           <button
             onClick={() => setViewMode("master")}
             className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-colors ${
-              viewMode === "master"
-                ? "bg-primary text-primary-foreground"
-                : "bg-background text-muted-foreground hover:text-foreground"
-            }`}
-          >
+            viewMode === "master" ?
+            "bg-primary text-primary-foreground" :
+            "bg-background text-muted-foreground hover:text-foreground"}`
+            }>
+            
             <Database className="h-3 w-3" />
             Master List ({trends.length})
           </button>
           <button
             onClick={() => setViewMode("mine")}
             className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-colors border-l border-border ${
-              viewMode === "mine"
-                ? "bg-primary text-primary-foreground"
-                : "bg-background text-muted-foreground hover:text-foreground"
-            }`}
-          >
+            viewMode === "mine" ?
+            "bg-primary text-primary-foreground" :
+            "bg-background text-muted-foreground hover:text-foreground"}`
+            }>
+            
             <User className="h-3 w-3" />
             My Keywords ({userKeywords.length})
           </button>
           <button
             onClick={() => setViewMode("community")}
             className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-colors border-l border-border ${
-              viewMode === "community"
-                ? "bg-primary text-primary-foreground"
-                : "bg-background text-muted-foreground hover:text-foreground"
-            }`}
-          >
+            viewMode === "community" ?
+            "bg-primary text-primary-foreground" :
+            "bg-background text-muted-foreground hover:text-foreground"}`
+            }>
+            
             <Users className="h-3 w-3" />
             Community ({communityKeywords.length})
           </button>
@@ -208,27 +208,27 @@ const GoogleTrendsSection = ({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Categories ({categoryCounts.all || 0})</SelectItem>
-            {KEYWORD_CATEGORIES.map(cat => (
-              <SelectItem key={cat.id} value={cat.id}>
+            {KEYWORD_CATEGORIES.map((cat) =>
+            <SelectItem key={cat.id} value={cat.id}>
                 {cat.emoji} {cat.label} ({categoryCounts[cat.id] || 0})
               </SelectItem>
-            ))}
+            )}
           </SelectContent>
         </Select>
       </div>
 
       {/* Add Keyword Form (visible when in "mine" mode or always for logged in users) */}
-      {userId && (viewMode === "mine" || viewMode === "master") && (
-        <div className="flex flex-wrap items-end gap-2 mb-4 p-3 rounded-lg bg-secondary/30 border border-border">
+      {userId && (viewMode === "mine" || viewMode === "master") &&
+      <div className="flex flex-wrap items-end gap-2 mb-4 p-3 rounded-lg bg-secondary/30 border border-border">
           <div className="flex-1 min-w-[200px]">
             <label className="text-xs text-muted-foreground mb-1 block">Add a keyword to track</label>
             <Input
-              value={newKeyword}
-              onChange={e => setNewKeyword(e.target.value)}
-              placeholder="e.g. memorial service ideas"
-              className="h-8 text-sm"
-              onKeyDown={e => e.key === "Enter" && handleAddKeyword()}
-            />
+            value={newKeyword}
+            onChange={(e) => setNewKeyword(e.target.value)}
+            placeholder="e.g. memorial service ideas"
+            className="h-8 text-sm"
+            onKeyDown={(e) => e.key === "Enter" && handleAddKeyword()} />
+          
           </div>
           <div className="w-[160px]">
             <label className="text-xs text-muted-foreground mb-1 block">Category</label>
@@ -238,103 +238,103 @@ const GoogleTrendsSection = ({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="custom">Custom</SelectItem>
-                {KEYWORD_CATEGORIES.map(c => (
-                  <SelectItem key={c.id} value={c.id}>
+                {KEYWORD_CATEGORIES.map((c) =>
+              <SelectItem key={c.id} value={c.id}>
                     {c.emoji} {c.label}
                   </SelectItem>
-                ))}
+              )}
               </SelectContent>
             </Select>
           </div>
           <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsPublic(!isPublic)}
-            className="h-8 gap-1 text-xs"
-            title={isPublic ? "Visible to community" : "Private keyword"}
-          >
+          variant="ghost"
+          size="sm"
+          onClick={() => setIsPublic(!isPublic)}
+          className="h-8 gap-1 text-xs"
+          title={isPublic ? "Visible to community" : "Private keyword"}>
+          
             {isPublic ? <Globe className="h-3 w-3" /> : <Lock className="h-3 w-3" />}
             {isPublic ? "Public" : "Private"}
           </Button>
           <Button
-            size="sm"
-            onClick={handleAddKeyword}
-            disabled={isAdding || !newKeyword.trim()}
-            className="h-8 gap-1 text-xs"
-          >
+          size="sm"
+          onClick={handleAddKeyword}
+          disabled={isAdding || !newKeyword.trim()}
+          className="h-8 gap-1 text-xs">
+          
             <Plus className="h-3 w-3" />
             Add ({userKeywords.length}/25)
           </Button>
         </div>
-      )}
+      }
 
       {/* Keywords List */}
       <div className="space-y-0.5">
-        {visibleTrends.map((trend, i) => (
-          <div key={`${trend.keyword}-${i}`} className="flex items-center">
+        {visibleTrends.map((trend, i) =>
+        <div key={`${trend.keyword}-${i}`} className="flex items-center">
             <div className="flex-1">
               <TrendRow
-                trend={trend}
-                index={i}
-                rank={i + 1}
-                onAddToWatchlist={handleAddToWatchlist}
-                isAddingToWatchlist={isAddingToWatchlist}
-                addingKeyword={addingKeyword}
-              />
+              trend={trend}
+              index={i}
+              rank={i + 1}
+              onAddToWatchlist={handleAddToWatchlist}
+              isAddingToWatchlist={isAddingToWatchlist}
+              addingKeyword={addingKeyword} />
+            
             </div>
             {/* Show remove button for user's own keywords */}
-            {viewMode === "mine" && userId && (
-              (() => {
-                const uk = userKeywords.find(k => k.keyword.toLowerCase() === trend.keyword.toLowerCase());
-                return uk ? (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleRemoveKeyword(uk.id)}
-                    className="h-7 w-7 p-0 text-muted-foreground hover:text-destructive shrink-0"
-                  >
+            {viewMode === "mine" && userId &&
+          (() => {
+            const uk = userKeywords.find((k) => k.keyword.toLowerCase() === trend.keyword.toLowerCase());
+            return uk ?
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => handleRemoveKeyword(uk.id)}
+              className="h-7 w-7 p-0 text-muted-foreground hover:text-destructive shrink-0">
+              
                     <Trash2 className="h-3 w-3" />
-                  </Button>
-                ) : null;
-              })()
-            )}
-          </div>
-        ))}
-        {filteredTrends.length === 0 && (
-          <div className="text-center py-8 text-muted-foreground text-sm">
-            {viewMode === "mine"
-              ? "You haven't added any custom keywords yet. Use the form above to start tracking!"
-              : viewMode === "community"
-              ? "No community keywords yet. Keywords added by other users will appear here."
-              : "No keywords found for this category."}
+                  </Button> :
+            null;
+          })()
+          }
           </div>
         )}
+        {filteredTrends.length === 0 &&
+        <div className="text-center py-8 text-muted-foreground text-sm">
+            {viewMode === "mine" ?
+          "You haven't added any custom keywords yet. Use the form above to start tracking!" :
+          viewMode === "community" ?
+          "No community keywords yet. Keywords added by other users will appear here." :
+          "No keywords found for this category."}
+          </div>
+        }
       </div>
 
-      {filteredTrends.length > INITIAL_COUNT && (
-        <div className="mt-3 text-center">
+      {filteredTrends.length > INITIAL_COUNT &&
+      <div className="mt-3 text-center">
           <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setExpanded(!expanded)}
-            className="gap-1.5 text-xs text-muted-foreground hover:text-primary"
-          >
-            {expanded ? (
-              <>
+          variant="ghost"
+          size="sm"
+          onClick={() => setExpanded(!expanded)}
+          className="gap-1.5 text-xs text-muted-foreground hover:text-primary">
+          
+            {expanded ?
+          <>
                 <ChevronUp className="h-3.5 w-3.5" />
                 Show Less
-              </>
-            ) : (
-              <>
+              </> :
+
+          <>
                 <ChevronDown className="h-3.5 w-3.5" />
                 See All {filteredTrends.length} Keywords
               </>
-            )}
+          }
           </Button>
         </div>
-      )}
-    </motion.section>
-  );
+      }
+    </motion.section>);
+
 };
 
 export default GoogleTrendsSection;
