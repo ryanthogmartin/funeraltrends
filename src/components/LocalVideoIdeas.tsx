@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Video, Sparkles, Loader2, Copy, Check } from "lucide-react";
+import { Video, Sparkles, Loader2, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import ScriptModal from "./ScriptModal";
