@@ -9,35 +9,35 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+  DropdownMenuTrigger } from
+"@/components/ui/dropdown-menu";
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+  SheetTrigger } from
+"@/components/ui/sheet";
 import { useState } from "react";
 
 const researchItems = [
-  { to: "/dashboard", label: "Dashboard", icon: BarChart3, desc: "Trends overview & stats" },
-  { to: "/local-trends", label: "Local Trends", icon: MapPin, desc: "City & state keyword research" },
-];
+{ to: "/dashboard", label: "Dashboard", icon: BarChart3, desc: "Trends overview & stats" },
+{ to: "/local-trends", label: "Local Trends", icon: MapPin, desc: "City & state keyword research" }];
+
 
 const contentItems = [
-  { to: "/video-ideas", label: "Video Ideas", icon: Video, desc: "AI-generated video topics & scripts" },
-  { to: "/hashtags", label: "Hashtags", icon: Hash, desc: "TikTok & Instagram tracking" },
-];
+{ to: "/video-ideas", label: "Video Ideas", icon: Video, desc: "AI-generated video topics & scripts" },
+{ to: "/hashtags", label: "Hashtags", icon: Hash, desc: "TikTok & Instagram tracking" }];
+
 
 const libraryItems = [
-  { to: "/saved", label: "Saved Ideas", icon: Bookmark, desc: "Your saved ideas & scripts" },
-  { to: "/voice-profile", label: "Custom Voice Persona", icon: Mic, desc: "Custom tone & branding" },
-];
+{ to: "/saved", label: "Saved Ideas", icon: Bookmark, desc: "Your saved ideas & scripts" },
+{ to: "/voice-profile", label: "Custom Voice Persona", icon: Mic, desc: "Custom tone & branding" }];
+
 
 const allNavItems = [...researchItems, ...contentItems, ...libraryItems];
 
-const SiteLayout = ({ children }: { children: React.ReactNode }) => {
+const SiteLayout = ({ children }: {children: React.ReactNode;}) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, loading, signOut } = useAuth();
@@ -45,42 +45,42 @@ const SiteLayout = ({ children }: { children: React.ReactNode }) => {
 
   const isActive = (path: string) => location.pathname === path;
 
-  const NavDropdown = ({ label, icon: Icon, items }: { label: string; icon: React.ElementType; items: typeof researchItems }) => {
+  const NavDropdown = ({ label, icon: Icon, items }: {label: string;icon: React.ElementType;items: typeof researchItems;}) => {
     const groupActive = items.some((item) => isActive(item.to));
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <button
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors outline-none ${
-              groupActive
-                ? "bg-accent text-accent-foreground"
-                : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
-            }`}
-          >
+            groupActive ?
+            "bg-accent text-accent-foreground" :
+            "text-muted-foreground hover:text-foreground hover:bg-accent/50"}`
+            }>
+            
             <Icon className="h-3.5 w-3.5" />
             {label}
             <ChevronDown className="h-3 w-3 opacity-60" />
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start" className="w-56">
-          {items.map(({ to, label: itemLabel, icon: ItemIcon, desc }) => (
-            <DropdownMenuItem
-              key={to}
-              onClick={() => navigate(to)}
-              className={`flex items-start gap-3 p-3 cursor-pointer ${
-                isActive(to) ? "bg-accent text-accent-foreground" : ""
-              }`}
-            >
+          {items.map(({ to, label: itemLabel, icon: ItemIcon, desc }) =>
+          <DropdownMenuItem
+            key={to}
+            onClick={() => navigate(to)}
+            className={`flex items-start gap-3 p-3 cursor-pointer ${
+            isActive(to) ? "bg-accent text-accent-foreground" : ""}`
+            }>
+            
               <ItemIcon className="h-4 w-4 mt-0.5 shrink-0 text-primary" />
               <div className="flex flex-col gap-0.5">
                 <span className="text-sm font-medium">{itemLabel}</span>
                 <span className="text-xs text-muted-foreground">{desc}</span>
               </div>
             </DropdownMenuItem>
-          ))}
+          )}
         </DropdownMenuContent>
-      </DropdownMenu>
-    );
+      </DropdownMenu>);
+
   };
 
   return (
@@ -126,69 +126,69 @@ const SiteLayout = ({ children }: { children: React.ReactNode }) => {
                 </SheetHeader>
                 <div className="py-2">
                   <p className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Research</p>
-                  {researchItems.map(({ to, label, icon: Icon }) => (
-                    <Link
-                      key={to}
-                      to={to}
-                      onClick={() => setMobileOpen(false)}
-                      className={`flex items-center gap-3 px-4 py-2.5 text-sm transition-colors ${
-                        isActive(to) ? "bg-accent text-accent-foreground font-medium" : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
-                      }`}
-                    >
+                  {researchItems.map(({ to, label, icon: Icon }) =>
+                  <Link
+                    key={to}
+                    to={to}
+                    onClick={() => setMobileOpen(false)}
+                    className={`flex items-center gap-3 px-4 py-2.5 text-sm transition-colors ${
+                    isActive(to) ? "bg-accent text-accent-foreground font-medium" : "text-muted-foreground hover:text-foreground hover:bg-accent/50"}`
+                    }>
+                    
                       <Icon className="h-4 w-4 text-primary" />
                       {label}
                     </Link>
-                  ))}
+                  )}
 
                   <p className="px-4 py-2 mt-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Content</p>
-                  {contentItems.map(({ to, label, icon: Icon }) => (
-                    <Link
-                      key={to}
-                      to={to}
-                      onClick={() => setMobileOpen(false)}
-                      className={`flex items-center gap-3 px-4 py-2.5 text-sm transition-colors ${
-                        isActive(to) ? "bg-accent text-accent-foreground font-medium" : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
-                      }`}
-                    >
+                  {contentItems.map(({ to, label, icon: Icon }) =>
+                  <Link
+                    key={to}
+                    to={to}
+                    onClick={() => setMobileOpen(false)}
+                    className={`flex items-center gap-3 px-4 py-2.5 text-sm transition-colors ${
+                    isActive(to) ? "bg-accent text-accent-foreground font-medium" : "text-muted-foreground hover:text-foreground hover:bg-accent/50"}`
+                    }>
+                    
                       <Icon className="h-4 w-4 text-primary" />
                       {label}
                     </Link>
-                  ))}
+                  )}
 
                   <p className="px-4 py-2 mt-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Library</p>
-                  {libraryItems.map(({ to, label, icon: Icon }) => (
-                    <Link
-                      key={to}
-                      to={to}
-                      onClick={() => setMobileOpen(false)}
-                      className={`flex items-center gap-3 px-4 py-2.5 text-sm transition-colors ${
-                        isActive(to) ? "bg-accent text-accent-foreground font-medium" : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
-                      }`}
-                    >
+                  {libraryItems.map(({ to, label, icon: Icon }) =>
+                  <Link
+                    key={to}
+                    to={to}
+                    onClick={() => setMobileOpen(false)}
+                    className={`flex items-center gap-3 px-4 py-2.5 text-sm transition-colors ${
+                    isActive(to) ? "bg-accent text-accent-foreground font-medium" : "text-muted-foreground hover:text-foreground hover:bg-accent/50"}`
+                    }>
+                    
                       <Icon className="h-4 w-4 text-primary" />
                       {label}
                     </Link>
-                  ))}
+                  )}
 
-                  {user && (
-                    <>
+                  {user &&
+                  <>
                       <div className="border-t border-border my-2" />
                       <button
-                        onClick={() => { signOut(); setMobileOpen(false); }}
-                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:bg-accent/50 w-full"
-                      >
+                      onClick={() => {signOut();setMobileOpen(false);}}
+                      className="flex items-center gap-3 px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:bg-accent/50 w-full">
+                      
                         <LogOut className="h-4 w-4" />
                         Sign Out
                       </button>
                     </>
-                  )}
+                  }
                 </div>
               </SheetContent>
             </Sheet>
 
             {/* Auth controls (desktop) */}
-            {loading ? null : user ? (
-              <div className="hidden md:flex items-center gap-1">
+            {loading ? null : user ?
+            <div className="hidden md:flex items-center gap-1">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="sm" className="gap-1.5 text-xs h-8">
@@ -213,12 +213,12 @@ const SiteLayout = ({ children }: { children: React.ReactNode }) => {
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-              </div>
-            ) : (
-              <Button variant="outline" size="sm" onClick={() => navigate("/auth")} className="gap-1 text-xs h-8 border-primary/30 text-primary hover:bg-primary/10">
+              </div> :
+
+            <Button variant="outline" size="sm" onClick={() => navigate("/auth")} className="gap-1 text-xs h-8 border-primary/30 text-primary hover:bg-primary/10">
                 <LogIn className="h-3.5 w-3.5" /> Sign In
               </Button>
-            )}
+            }
           </div>
         </div>
       </header>
@@ -238,8 +238,8 @@ const SiteLayout = ({ children }: { children: React.ReactNode }) => {
           <a
             href="https://disruptmedia.lpages.co/the-disrupt-system/"
             target="_blank"
-            rel="noopener noreferrer"
-          >
+            rel="noopener noreferrer">
+            
             <Button size="lg" className="font-semibold gap-2 px-6 sm:px-8 bg-tertiary text-tertiary-foreground hover:bg-tertiary/90">
               Schedule a Demo with DISRUPT Media <ArrowRight className="h-4 w-4" />
             </Button>
@@ -261,20 +261,20 @@ const SiteLayout = ({ children }: { children: React.ReactNode }) => {
               </div>
             </div>
             <p className="text-xs text-muted-foreground text-center">
-              Real-time funeral profession insights · Data refreshes daily
+              Real-time funeral profession insights. 
             </p>
             <div className="flex items-center gap-4">
-              {allNavItems.map(({ to, label }) => (
-                <Link key={to} to={to} className="text-xs text-muted-foreground hover:text-foreground transition-colors">
+              {allNavItems.map(({ to, label }) =>
+              <Link key={to} to={to} className="text-xs text-muted-foreground hover:text-foreground transition-colors">
                   {label}
                 </Link>
-              ))}
+              )}
             </div>
           </div>
         </div>
       </footer>
-    </div>
-  );
+    </div>);
+
 };
 
 export default SiteLayout;
