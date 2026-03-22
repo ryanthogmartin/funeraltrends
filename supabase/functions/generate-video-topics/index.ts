@@ -43,7 +43,7 @@ Deno.serve(async (req) => {
           },
           {
             role: 'user',
-            content: `For each of these ${topKeywords.length} trending funeral search keywords, suggest exactly 3 short-form video content topics that a funeral director would film and post. Each topic should be a catchy, engaging title under 80 characters suitable for TikTok/Reels/Shorts. Write from the funeral director's voice — think "Day in the life", "Things I wish families knew", "Behind the scenes", etc.
+            content: `For each of these ${topKeywords.length} trending funeral search keywords, suggest exactly 5 short-form video content topics that a funeral director would film and post. Each topic should be a catchy, engaging title under 80 characters suitable for TikTok/Reels/Shorts. Write from the funeral director's voice — think "Day in the life", "Things I wish families knew", "Behind the scenes", etc.
 
 Keywords: ${topKeywords.join(', ')}
 
