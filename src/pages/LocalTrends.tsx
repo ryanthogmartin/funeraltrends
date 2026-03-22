@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { MapPin, Search, Loader2, Plus, X, TrendingUp, TrendingDown, Minus, AlertCircle } from "lucide-react";
+import LocalVideoIdeas from "@/components/LocalVideoIdeas";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -333,42 +334,42 @@ const LocalTrends = () => {
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.05 }}
-                className="flex flex-col sm:grid sm:grid-cols-[1fr_100px_80px_80px_80px] gap-1 sm:gap-4 items-start sm:items-center py-3 px-4 rounded-md hover:bg-secondary/50 transition-colors">
+                className="py-3 px-4 rounded-md hover:bg-secondary/50 transition-colors">
                 
-                  <div className="min-w-0">
-                    <a
-                    href={`https://trends.google.com/trends/explore?q=${encodeURIComponent(result.keyword)}&geo=US`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm font-medium text-foreground hover:text-tertiary transition-colors hover:underline">
-                    
-                      {result.keyword}
-                    </a>
+                  <div className="flex flex-col sm:grid sm:grid-cols-[1fr_100px_80px_80px_80px] gap-1 sm:gap-4 items-start sm:items-center">
+                    <div className="min-w-0">
+                      <a
+                      href={`https://trends.google.com/trends/explore?q=${encodeURIComponent(result.keyword)}&geo=US`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm font-medium text-foreground hover:text-tertiary transition-colors hover:underline">
+                        {result.keyword}
+                      </a>
+                    </div>
+                    <div className="hidden sm:flex justify-center">
+                      <MiniSparkline data={result.sparkline} />
+                    </div>
+                    <div className="sm:text-right">
+                      <span className="text-sm font-mono text-foreground">
+                        {result.volume.toLocaleString()}
+                      </span>
+                      <span className="sm:hidden text-xs text-muted-foreground ml-1">searches/mo</span>
+                    </div>
+                    <div className="flex items-center gap-1 sm:justify-end">
+                      {isUp && <TrendingUp className="h-3.5 w-3.5 text-trend-up" />}
+                      {isDown && <TrendingDown className="h-3.5 w-3.5 text-trend-down" />}
+                      {!isUp && !isDown && <Minus className="h-3.5 w-3.5 text-trend-neutral" />}
+                      <span
+                      className={`text-xs font-mono ${
+                      isUp ? "text-trend-up" : isDown ? "text-trend-down" : "text-trend-neutral"}`}>
+                        {isUp ? "+" : ""}{result.change_percent}%
+                      </span>
+                    </div>
+                    <div className={`text-xs font-medium sm:text-right ${comp.className}`}>
+                      {comp.text}
+                    </div>
                   </div>
-                  <div className="hidden sm:flex justify-center">
-                    <MiniSparkline data={result.sparkline} />
-                  </div>
-                  <div className="sm:text-right">
-                    <span className="text-sm font-mono text-foreground">
-                      {result.volume.toLocaleString()}
-                    </span>
-                    <span className="sm:hidden text-xs text-muted-foreground ml-1">searches/mo</span>
-                  </div>
-                  <div className="flex items-center gap-1 sm:justify-end">
-                    {isUp && <TrendingUp className="h-3.5 w-3.5 text-trend-up" />}
-                    {isDown && <TrendingDown className="h-3.5 w-3.5 text-trend-down" />}
-                    {!isUp && !isDown && <Minus className="h-3.5 w-3.5 text-trend-neutral" />}
-                    <span
-                    className={`text-xs font-mono ${
-                    isUp ? "text-trend-up" : isDown ? "text-trend-down" : "text-trend-neutral"}`
-                    }>
-                    
-                      {isUp ? "+" : ""}{result.change_percent}%
-                    </span>
-                  </div>
-                  <div className={`text-xs font-medium sm:text-right ${comp.className}`}>
-                    {comp.text}
-                  </div>
+                  <LocalVideoIdeas keyword={result.keyword} />
                 </motion.div>);
 
           })}
