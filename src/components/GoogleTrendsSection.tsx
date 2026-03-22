@@ -157,7 +157,7 @@ const GoogleTrendsSection = ({
         </div>
       </div>
       <p className="text-sm text-muted-foreground mb-4">
-        225 funeral-related keywords across 15 categories. Track search volume, add your own keywords, and see what the community is monitoring.
+        225 of the top searched funeral-related keywords across 15 categories. Track search volume, add your own keywords, and see what the community is monitoring.
       </p>
 
       {/* View Mode Toggle */}
