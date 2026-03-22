@@ -85,11 +85,9 @@ const LocalVideoIdeas = ({ keyword }: LocalVideoIdeasProps) => {
             <div className="flex items-center gap-1 shrink-0">
               <CopyButton text={idea} />
               <SaveIdeaButton
-                ideaText={idea}
-                source={`local-trends:${keyword}`}
-                saveIdea={saveIdea}
+                onSave={() => saveIdea({ type: "idea", ideaText: idea, source: `local-trends:${keyword}` })}
                 saving={saving}
-                isSaved={isSaved(idea)}
+                saved={isSaved(idea)}
               />
               <button
                 onClick={() => setScriptIdea(idea)}
