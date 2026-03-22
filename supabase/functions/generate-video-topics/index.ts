@@ -52,7 +52,7 @@ ${JSON.stringify({ topics: [{ keyword: "example", ideas: ["idea1", "idea2", "ide
           }
         ],
         temperature: 0.8,
-        max_tokens: 1000,
+        max_tokens: 2000,
       }),
     });
 
