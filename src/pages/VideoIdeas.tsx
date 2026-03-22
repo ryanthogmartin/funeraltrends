@@ -17,45 +17,45 @@ const VideoIdeas = () => {
   const { data: trends = mockTrends } = useQuery({
     queryKey: ['funeral-trends'],
     queryFn: fetchTrends,
-    staleTime: 1000 * 60 * 5,
+    staleTime: 1000 * 60 * 5
   });
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-6">
         <h1 className="text-2xl font-display font-bold text-foreground">Video Content Ideas</h1>
-        <p className="text-sm text-muted-foreground mt-1">AI-generated short-form video ideas based on trending topics.</p>
+        <p className="text-sm text-muted-foreground mt-1">Use the custom features below to build custom AI-generated short-form video ideas with scripts.    </p>
       </div>
 
       <QuestionSeriesGenerator
         isAuthenticated={isAuthenticated}
-        onRequireAuth={() => navigate("/auth")}
-      />
+        onRequireAuth={() => navigate("/auth")} />
+      
 
       <CustomKeywordTopics
         isAuthenticated={isAuthenticated}
-        onRequireAuth={() => navigate("/auth")}
-      />
+        onRequireAuth={() => navigate("/auth")} />
+      
 
       <VideoTopics
         trends={trends}
         isAuthenticated={isAuthenticated}
-        onRequireAuth={() => navigate("/auth")}
-      />
+        onRequireAuth={() => navigate("/auth")} />
+      
 
       <FacebookInsights
         trends={trends}
         isAuthenticated={isAuthenticated}
-        onRequireAuth={() => navigate("/auth")}
-      />
+        onRequireAuth={() => navigate("/auth")} />
+      
 
       <ReelsInsights
         trends={trends}
         isAuthenticated={isAuthenticated}
-        onRequireAuth={() => navigate("/auth")}
-      />
-    </div>
-  );
+        onRequireAuth={() => navigate("/auth")} />
+      
+    </div>);
+
 };
 
 export default VideoIdeas;
