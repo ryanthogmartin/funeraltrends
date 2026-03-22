@@ -48,7 +48,7 @@ Deno.serve(async (req) => {
 Keywords: ${topKeywords.join(', ')}
 
 Return JSON in this exact format:
-${JSON.stringify({ topics: [{ keyword: "example", ideas: ["idea1", "idea2", "idea3"] }] })}`
+${JSON.stringify({ topics: [{ keyword: "example", ideas: ["idea1", "idea2", "idea3", "idea4", "idea5"] }] })}`
           }
         ],
         temperature: 0.8,

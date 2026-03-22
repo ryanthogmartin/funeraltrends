@@ -70,7 +70,6 @@ const LocalVideoIdeas = ({ keyword }: LocalVideoIdeasProps) => {
             <span className="text-xs text-muted-foreground mt-0.5 shrink-0">{i + 1}.</span>
             <span className="text-xs text-foreground flex-1">{idea}</span>
             <div className="flex items-center gap-1 shrink-0">
-              <CopyButton text={idea} />
               <SaveIdeaButton
                 onSave={() => saveIdea({ type: "idea", ideaText: idea, source: `local-trends:${keyword}` })}
                 saving={saving}
@@ -81,7 +80,7 @@ const LocalVideoIdeas = ({ keyword }: LocalVideoIdeasProps) => {
                 className="shrink-0 p-0.5 rounded hover:bg-accent transition-colors text-muted-foreground hover:text-primary"
                 title="Generate script"
               >
-                <Video className="h-3 w-3" />
+                <FileText className="h-3 w-3" />
               </button>
             </div>
           </div>
