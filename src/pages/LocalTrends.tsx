@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { MapPin, Search, Loader2, Plus, X, TrendingUp, TrendingDown, Minus, AlertCircle } from "lucide-react";
+import LocalVideoIdeas from "@/components/LocalVideoIdeas";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
