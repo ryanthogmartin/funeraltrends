@@ -37,6 +37,12 @@ const VideoIdeas = () => {
         onRequireAuth={() => navigate("/auth")}
       />
 
+      <VideoTopics
+        trends={trends}
+        isAuthenticated={isAuthenticated}
+        onRequireAuth={() => navigate("/auth")}
+      />
+
       <FacebookInsights
         trends={trends}
         isAuthenticated={isAuthenticated}
@@ -44,12 +50,6 @@ const VideoIdeas = () => {
       />
 
       <ReelsInsights
-        trends={trends}
-        isAuthenticated={isAuthenticated}
-        onRequireAuth={() => navigate("/auth")}
-      />
-
-      <VideoTopics
         trends={trends}
         isAuthenticated={isAuthenticated}
         onRequireAuth={() => navigate("/auth")}
