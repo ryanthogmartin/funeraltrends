@@ -20,7 +20,7 @@ interface InstagramHashtag {
 
 const fetchInstagramHashtags = async (keywords: string[]): Promise<InstagramHashtag[]> => {
   const { data, error } = await supabase.functions.invoke('generate-instagram-hashtags', {
-    body: { keywords },
+    body: { keywords }
   });
   if (error) throw new Error(error.message);
   if (!data?.success) throw new Error(data?.error || 'Failed to generate hashtags');
@@ -30,10 +30,10 @@ const fetchInstagramHashtags = async (keywords: string[]): Promise<InstagramHash
 const categoryConfig = {
   trending: { icon: Flame, label: "Trending", className: "bg-destructive/15 text-destructive border-destructive/30" },
   evergreen: { icon: Leaf, label: "Evergreen", className: "bg-primary/15 text-primary border-primary/30" },
-  emerging: { icon: Zap, label: "Emerging", className: "bg-accent/80 text-accent-foreground border-border" },
+  emerging: { icon: Zap, label: "Emerging", className: "bg-accent/80 text-accent-foreground border-border" }
 };
 
-const CopyHashtag = ({ text }: { text: string }) => {
+const CopyHashtag = ({ text }: {text: string;}) => {
   const [copied, setCopied] = useState(false);
   const handleCopy = () => {
     navigator.clipboard.writeText(text);
@@ -43,18 +43,18 @@ const CopyHashtag = ({ text }: { text: string }) => {
   return (
     <button onClick={handleCopy} className="p-1 rounded hover:bg-accent transition-colors text-muted-foreground hover:text-foreground" title="Copy hashtag">
       {copied ? <Check className="h-3 w-3 text-primary" /> : <Copy className="h-3 w-3" />}
-    </button>
-  );
+    </button>);
+
 };
 
 const InstagramHashtagTracker = ({ trends }: InstagramHashtagTrackerProps) => {
-  const topKeywords = trends.slice(0, 8).map(t => t.keyword);
+  const topKeywords = trends.slice(0, 8).map((t) => t.keyword);
 
   const { data: hashtags, isLoading, error } = useQuery({
     queryKey: ['instagram-hashtags', ...topKeywords],
     queryFn: () => fetchInstagramHashtags(topKeywords),
     staleTime: 1000 * 60 * 30,
-    enabled: topKeywords.length > 0,
+    enabled: topKeywords.length > 0
   });
 
   return (
@@ -62,8 +62,8 @@ const InstagramHashtagTracker = ({ trends }: InstagramHashtagTrackerProps) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.7, duration: 0.5 }}
-      className="glass-card p-5 mt-6"
-    >
+      className="glass-card p-5 mt-6">
+      
       <div className="flex items-center gap-2 mb-1">
         <Hash className="h-5 w-5 text-primary" />
         <h2 className="text-lg font-display font-semibold text-foreground">
@@ -71,45 +71,45 @@ const InstagramHashtagTracker = ({ trends }: InstagramHashtagTrackerProps) => {
         </h2>
         <Badge variant="outline" className="ml-auto text-[10px] bg-muted/50 text-muted-foreground border-border">AI-Suggested</Badge>
       </div>
-      <p className="text-sm text-muted-foreground mb-4">AI-suggested Instagram hashtags tailored for funeral professionals. Track growth and discover which tags are gaining traction in the industry.</p>
+      <p className="text-sm text-muted-foreground mb-4">AI-suggested Instagram hashtags tailored for funeral professionals.</p>
 
-      {isLoading && (
-        <div className="flex items-center justify-center py-8 gap-2 text-muted-foreground">
+      {isLoading &&
+      <div className="flex items-center justify-center py-8 gap-2 text-muted-foreground">
           <Loader2 className="h-4 w-4 animate-spin" />
           <span className="text-sm">Analyzing Instagram hashtags...</span>
         </div>
-      )}
+      }
 
-      {error && (
-        <p className="text-sm text-destructive py-4 text-center">
+      {error &&
+      <p className="text-sm text-destructive py-4 text-center">
           Failed to load hashtags. Try refreshing.
         </p>
-      )}
+      }
 
-      {hashtags && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+      {hashtags &&
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {hashtags.map((tag, i) => {
-            const catConfig = categoryConfig[tag.category] || categoryConfig.evergreen;
-            const CatIcon = catConfig.icon;
-            return (
-              <motion.div
-                key={tag.hashtag}
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: i * 0.05, duration: 0.3 }}
-                className="flex items-center gap-3 bg-accent/40 rounded-lg p-3 border border-border/50 hover:border-primary/30 transition-colors"
-              >
+          const catConfig = categoryConfig[tag.category] || categoryConfig.evergreen;
+          const CatIcon = catConfig.icon;
+          return (
+            <motion.div
+              key={tag.hashtag}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: i * 0.05, duration: 0.3 }}
+              className="flex items-center gap-3 bg-accent/40 rounded-lg p-3 border border-border/50 hover:border-primary/30 transition-colors">
+              
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1.5 mb-1">
                     <span className="text-sm font-semibold text-foreground truncate">{tag.hashtag}</span>
                     <CopyHashtag text={tag.hashtag} />
                     <a
-                      href={`https://www.instagram.com/explore/tags/${tag.hashtag.replace('#', '')}/`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-1 rounded hover:bg-accent transition-colors text-muted-foreground hover:text-foreground"
-                      title="Verify on Instagram"
-                    >
+                    href={`https://www.instagram.com/explore/tags/${tag.hashtag.replace('#', '')}/`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-1 rounded hover:bg-accent transition-colors text-muted-foreground hover:text-foreground"
+                    title="Verify on Instagram">
+                    
                       <ExternalLink className="h-3 w-3" />
                     </a>
                   </div>
@@ -121,13 +121,13 @@ const InstagramHashtagTracker = ({ trends }: InstagramHashtagTrackerProps) => {
                   <CatIcon className="h-2.5 w-2.5" />
                   {catConfig.label}
                 </Badge>
-              </motion.div>
-            );
-          })}
+              </motion.div>);
+
+        })}
         </div>
-      )}
-    </motion.section>
-  );
+      }
+    </motion.section>);
+
 };
 
 export default InstagramHashtagTracker;
