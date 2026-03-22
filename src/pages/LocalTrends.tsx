@@ -6,24 +6,24 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const US_STATES = [
-  { code: "AL", name: "Alabama" }, { code: "AK", name: "Alaska" }, { code: "AZ", name: "Arizona" },
-  { code: "AR", name: "Arkansas" }, { code: "CA", name: "California" }, { code: "CO", name: "Colorado" },
-  { code: "CT", name: "Connecticut" }, { code: "DE", name: "Delaware" }, { code: "FL", name: "Florida" },
-  { code: "GA", name: "Georgia" }, { code: "HI", name: "Hawaii" }, { code: "ID", name: "Idaho" },
-  { code: "IL", name: "Illinois" }, { code: "IN", name: "Indiana" }, { code: "IA", name: "Iowa" },
-  { code: "KS", name: "Kansas" }, { code: "KY", name: "Kentucky" }, { code: "LA", name: "Louisiana" },
-  { code: "ME", name: "Maine" }, { code: "MD", name: "Maryland" }, { code: "MA", name: "Massachusetts" },
-  { code: "MI", name: "Michigan" }, { code: "MN", name: "Minnesota" }, { code: "MS", name: "Mississippi" },
-  { code: "MO", name: "Missouri" }, { code: "MT", name: "Montana" }, { code: "NE", name: "Nebraska" },
-  { code: "NV", name: "Nevada" }, { code: "NH", name: "New Hampshire" }, { code: "NJ", name: "New Jersey" },
-  { code: "NM", name: "New Mexico" }, { code: "NY", name: "New York" }, { code: "NC", name: "North Carolina" },
-  { code: "ND", name: "North Dakota" }, { code: "OH", name: "Ohio" }, { code: "OK", name: "Oklahoma" },
-  { code: "OR", name: "Oregon" }, { code: "PA", name: "Pennsylvania" }, { code: "RI", name: "Rhode Island" },
-  { code: "SC", name: "South Carolina" }, { code: "SD", name: "South Dakota" }, { code: "TN", name: "Tennessee" },
-  { code: "TX", name: "Texas" }, { code: "UT", name: "Utah" }, { code: "VT", name: "Vermont" },
-  { code: "VA", name: "Virginia" }, { code: "WA", name: "Washington" }, { code: "WV", name: "West Virginia" },
-  { code: "WI", name: "Wisconsin" }, { code: "WY", name: "Wyoming" }, { code: "DC", name: "District of Columbia" },
-];
+{ code: "AL", name: "Alabama" }, { code: "AK", name: "Alaska" }, { code: "AZ", name: "Arizona" },
+{ code: "AR", name: "Arkansas" }, { code: "CA", name: "California" }, { code: "CO", name: "Colorado" },
+{ code: "CT", name: "Connecticut" }, { code: "DE", name: "Delaware" }, { code: "FL", name: "Florida" },
+{ code: "GA", name: "Georgia" }, { code: "HI", name: "Hawaii" }, { code: "ID", name: "Idaho" },
+{ code: "IL", name: "Illinois" }, { code: "IN", name: "Indiana" }, { code: "IA", name: "Iowa" },
+{ code: "KS", name: "Kansas" }, { code: "KY", name: "Kentucky" }, { code: "LA", name: "Louisiana" },
+{ code: "ME", name: "Maine" }, { code: "MD", name: "Maryland" }, { code: "MA", name: "Massachusetts" },
+{ code: "MI", name: "Michigan" }, { code: "MN", name: "Minnesota" }, { code: "MS", name: "Mississippi" },
+{ code: "MO", name: "Missouri" }, { code: "MT", name: "Montana" }, { code: "NE", name: "Nebraska" },
+{ code: "NV", name: "Nevada" }, { code: "NH", name: "New Hampshire" }, { code: "NJ", name: "New Jersey" },
+{ code: "NM", name: "New Mexico" }, { code: "NY", name: "New York" }, { code: "NC", name: "North Carolina" },
+{ code: "ND", name: "North Dakota" }, { code: "OH", name: "Ohio" }, { code: "OK", name: "Oklahoma" },
+{ code: "OR", name: "Oregon" }, { code: "PA", name: "Pennsylvania" }, { code: "RI", name: "Rhode Island" },
+{ code: "SC", name: "South Carolina" }, { code: "SD", name: "South Dakota" }, { code: "TN", name: "Tennessee" },
+{ code: "TX", name: "Texas" }, { code: "UT", name: "Utah" }, { code: "VT", name: "Vermont" },
+{ code: "VA", name: "Virginia" }, { code: "WA", name: "Washington" }, { code: "WV", name: "West Virginia" },
+{ code: "WI", name: "Wisconsin" }, { code: "WY", name: "Wyoming" }, { code: "DC", name: "District of Columbia" }];
+
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -36,7 +36,7 @@ interface LocalResult {
   competition_index: number;
 }
 
-const MiniSparkline = ({ data }: { data: number[] }) => {
+const MiniSparkline = ({ data }: {data: number[];}) => {
   if (!data || data.length < 2) return null;
   const max = Math.max(...data);
   const min = Math.min(...data);
@@ -44,13 +44,13 @@ const MiniSparkline = ({ data }: { data: number[] }) => {
   const width = 100;
   const height = 28;
 
-  const points = data
-    .map((v, i) => {
-      const x = (i / (data.length - 1)) * width;
-      const y = height - ((v - min) / range) * height;
-      return `${x},${y}`;
-    })
-    .join(" ");
+  const points = data.
+  map((v, i) => {
+    const x = i / (data.length - 1) * width;
+    const y = height - (v - min) / range * height;
+    return `${x},${y}`;
+  }).
+  join(" ");
 
   return (
     <svg width={width} height={height} className="overflow-visible">
@@ -60,31 +60,31 @@ const MiniSparkline = ({ data }: { data: number[] }) => {
         stroke="hsl(var(--primary))"
         strokeWidth="1.5"
         strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
+        strokeLinejoin="round" />
+      
+    </svg>);
+
 };
 
 const competitionLabel = (comp: string) => {
   switch (comp) {
-    case "HIGH": return { text: "High", className: "text-trend-down" };
-    case "MEDIUM": return { text: "Medium", className: "text-yellow-500" };
-    case "LOW": return { text: "Low", className: "text-trend-up" };
-    default: return { text: "—", className: "text-muted-foreground" };
+    case "HIGH":return { text: "High", className: "text-trend-down" };
+    case "MEDIUM":return { text: "Medium", className: "text-yellow-500" };
+    case "LOW":return { text: "Low", className: "text-trend-up" };
+    default:return { text: "—", className: "text-muted-foreground" };
   }
 };
 
 const SUGGESTED_KEYWORDS = [
-  "cremation cost",
-  "funeral home near me",
-  "green burial",
-  "celebration of life",
-  "pre-planning funeral",
-  "direct cremation",
-  "memorial service",
-  "grief counseling",
-];
+"cremation cost",
+"funeral home near me",
+"green burial",
+"celebration of life",
+"pre-planning funeral",
+"direct cremation",
+"memorial service",
+"grief counseling"];
+
 
 const LocalTrends = () => {
   const [stateCode, setStateCode] = useState("");
@@ -129,11 +129,11 @@ const LocalTrends = () => {
     setError(null);
     setResults([]);
 
-    const stateName = US_STATES.find(s => s.code === stateCode)?.name || stateCode;
+    const stateName = US_STATES.find((s) => s.code === stateCode)?.name || stateCode;
 
     try {
       const { data, error: fnError } = await supabase.functions.invoke("local-keyword-research", {
-        body: { stateCode, stateName, keywords, city: city.trim() || undefined },
+        body: { stateCode, stateName, keywords, city: city.trim() || undefined }
       });
 
       if (fnError) throw fnError;
@@ -176,7 +176,7 @@ const LocalTrends = () => {
           Local Keyword Research
         </h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Select a US state and keywords to see real Google Ads search volume data for that region.
+          Select a US state and keywords to see real Google Ads search volume data for that region. You can also generate video ideas and scripts from the keywords.            
         </p>
       </motion.div>
 
@@ -185,8 +185,8 @@ const LocalTrends = () => {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="glass-card p-5 space-y-4"
-      >
+        className="glass-card p-5 space-y-4">
+        
         {/* State & City Selection */}
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="flex-shrink-0 sm:w-56">
@@ -196,9 +196,9 @@ const LocalTrends = () => {
                 <SelectValue placeholder="Select a state" />
               </SelectTrigger>
               <SelectContent className="max-h-60">
-                {US_STATES.map((s) => (
-                  <SelectItem key={s.code} value={s.code}>{s.name}</SelectItem>
-                ))}
+                {US_STATES.map((s) =>
+                <SelectItem key={s.code} value={s.code}>{s.name}</SelectItem>
+                )}
               </SelectContent>
             </Select>
           </div>
@@ -208,8 +208,8 @@ const LocalTrends = () => {
               placeholder="City (optional)"
               value={city}
               onChange={(e) => setCity(e.target.value)}
-              maxLength={100}
-            />
+              maxLength={100} />
+            
           </div>
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -220,8 +220,8 @@ const LocalTrends = () => {
               onChange={(e) => setKeywordInput(e.target.value)}
               onKeyDown={handleKeyDown}
               maxLength={100}
-              className="pl-9"
-            />
+              className="pl-9" />
+            
           </div>
           <Button onClick={() => addKeyword()} variant="outline" size="sm" className="h-10 gap-1 shrink-0">
             <Plus className="h-3.5 w-3.5" /> Add
@@ -229,80 +229,80 @@ const LocalTrends = () => {
         </div>
 
         {/* Keyword Chips */}
-        {keywords.length > 0 && (
-          <div className="flex flex-wrap gap-2">
-            {keywords.map((kw) => (
-              <span
-                key={kw}
-                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium"
-              >
+        {keywords.length > 0 &&
+        <div className="flex flex-wrap gap-2">
+            {keywords.map((kw) =>
+          <span
+            key={kw}
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
+            
                 {kw}
                 <button onClick={() => removeKeyword(kw)} className="hover:text-destructive transition-colors">
                   <X className="h-3 w-3" />
                 </button>
               </span>
-            ))}
+          )}
             <span className="text-xs text-muted-foreground self-center">
               {keywords.length}/10 keywords
             </span>
           </div>
-        )}
+        }
 
         {/* Suggested Keywords */}
-        {keywords.length === 0 && (
-          <div>
+        {keywords.length === 0 &&
+        <div>
             <p className="text-xs text-muted-foreground mb-2">Suggested keywords:</p>
             <div className="flex flex-wrap gap-1.5">
-              {SUGGESTED_KEYWORDS.map((kw) => (
-                <button
-                  key={kw}
-                  onClick={() => addKeyword(kw)}
-                  className="px-2.5 py-1 rounded-full border border-border text-xs text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
-                >
+              {SUGGESTED_KEYWORDS.map((kw) =>
+            <button
+              key={kw}
+              onClick={() => addKeyword(kw)}
+              className="px-2.5 py-1 rounded-full border border-border text-xs text-muted-foreground hover:bg-accent hover:text-foreground transition-colors">
+              
                   + {kw}
                 </button>
-              ))}
+            )}
             </div>
           </div>
-        )}
+        }
 
         {/* Search Button */}
         <Button
           onClick={handleSearch}
           disabled={loading || keywords.length === 0 || !stateCode}
-          className="w-full sm:w-auto gap-2"
-        >
-          {loading ? (
-            <>
+          className="w-full sm:w-auto gap-2">
+          
+          {loading ?
+          <>
               <Loader2 className="h-4 w-4 animate-spin" /> Searching…
-            </>
-          ) : (
-            <>
+            </> :
+
+          <>
               <Search className="h-4 w-4" /> Search Local Trends
             </>
-          )}
+          }
         </Button>
       </motion.div>
 
       {/* Error */}
-      {error && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="flex items-center gap-2 p-4 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-sm"
-        >
+      {error &&
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="flex items-center gap-2 p-4 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-sm">
+        
           <AlertCircle className="h-4 w-4 shrink-0" />
           {error}
         </motion.div>
-      )}
+      }
 
       {/* Results */}
-      {results.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="glass-card p-5"
-        >
+      {results.length > 0 &&
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="glass-card p-5">
+        
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-display font-semibold text-foreground">
               Results for {searchedLocation}
@@ -323,25 +323,25 @@ const LocalTrends = () => {
 
           <div className="space-y-0.5">
             {results.map((result, i) => {
-              const isUp = result.change_percent > 0;
-              const isDown = result.change_percent < 0;
-              const comp = competitionLabel(result.competition);
+            const isUp = result.change_percent > 0;
+            const isDown = result.change_percent < 0;
+            const comp = competitionLabel(result.competition);
 
-              return (
-                <motion.div
-                  key={result.keyword}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.05 }}
-                  className="flex flex-col sm:grid sm:grid-cols-[1fr_100px_80px_80px_80px] gap-1 sm:gap-4 items-start sm:items-center py-3 px-4 rounded-md hover:bg-secondary/50 transition-colors"
-                >
+            return (
+              <motion.div
+                key={result.keyword}
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: i * 0.05 }}
+                className="flex flex-col sm:grid sm:grid-cols-[1fr_100px_80px_80px_80px] gap-1 sm:gap-4 items-start sm:items-center py-3 px-4 rounded-md hover:bg-secondary/50 transition-colors">
+                
                   <div className="min-w-0">
                     <a
-                      href={`https://trends.google.com/trends/explore?q=${encodeURIComponent(result.keyword)}&geo=US`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm font-medium text-foreground hover:text-tertiary transition-colors hover:underline"
-                    >
+                    href={`https://trends.google.com/trends/explore?q=${encodeURIComponent(result.keyword)}&geo=US`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm font-medium text-foreground hover:text-tertiary transition-colors hover:underline">
+                    
                       {result.keyword}
                     </a>
                   </div>
@@ -359,32 +359,32 @@ const LocalTrends = () => {
                     {isDown && <TrendingDown className="h-3.5 w-3.5 text-trend-down" />}
                     {!isUp && !isDown && <Minus className="h-3.5 w-3.5 text-trend-neutral" />}
                     <span
-                      className={`text-xs font-mono ${
-                        isUp ? "text-trend-up" : isDown ? "text-trend-down" : "text-trend-neutral"
-                      }`}
-                    >
+                    className={`text-xs font-mono ${
+                    isUp ? "text-trend-up" : isDown ? "text-trend-down" : "text-trend-neutral"}`
+                    }>
+                    
                       {isUp ? "+" : ""}{result.change_percent}%
                     </span>
                   </div>
                   <div className={`text-xs font-medium sm:text-right ${comp.className}`}>
                     {comp.text}
                   </div>
-                </motion.div>
-              );
-            })}
+                </motion.div>);
+
+          })}
           </div>
         </motion.div>
-      )}
+      }
 
       {/* Empty state after search */}
-      {!loading && results.length === 0 && searchedLocation && !error && (
-        <div className="text-center py-12 text-muted-foreground text-sm">
+      {!loading && results.length === 0 && searchedLocation && !error &&
+      <div className="text-center py-12 text-muted-foreground text-sm">
           No search volume data found for these keywords in {searchedLocation}.
           <br />Try broader keywords or a different location.
         </div>
-      )}
-    </div>
-  );
+      }
+    </div>);
+
 };
 
 export default LocalTrends;
