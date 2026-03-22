@@ -11,19 +11,6 @@ interface LocalVideoIdeasProps {
   keyword: string;
 }
 
-const CopyButton = ({ text }: { text: string }) => {
-  const [copied, setCopied] = useState(false);
-  const handleCopy = () => {
-    navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
-  };
-  return (
-    <button onClick={handleCopy} className="shrink-0 p-0.5 rounded hover:bg-accent transition-colors text-muted-foreground hover:text-foreground">
-      {copied ? <Check className="h-3 w-3 text-primary" /> : <Copy className="h-3 w-3" />}
-    </button>
-  );
-};
 
 const LocalVideoIdeas = ({ keyword }: LocalVideoIdeasProps) => {
   const [ideas, setIdeas] = useState<string[]>([]);
