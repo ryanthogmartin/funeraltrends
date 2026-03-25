@@ -46,6 +46,7 @@ const SavedScriptCard = ({ item, index, deletingId, onDelete, onUpdate }: SavedS
   const [showTones, setShowTones] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
+  const { hasProfile } = useVoiceProfile();
 
   const handleSaveEdit = async () => {
     setSaving(true);
