@@ -42,6 +42,7 @@ const ScriptModal = ({ open, onOpenChange, idea }: ScriptModalProps) => {
   const { toast } = useToast();
   const { saveIdea, saving: savingIdea, isSaved } = useSaveIdea();
   const { user } = useAuth();
+  const { hasProfile } = useVoiceProfile();
 
   const generateScript = async (tone: string) => {
     setSelectedTone(tone);
