@@ -2,12 +2,13 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, Copy, Check, FileText, Download, Bookmark, Pencil } from "lucide-react";
+import { Loader2, Copy, Check, FileText, Download, Bookmark, Pencil, User } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { exportScriptPdf } from "@/lib/exportPdf";
 import { useSaveIdea } from "@/hooks/useSaveIdea";
 import { useAuth } from "@/hooks/useAuth";
+import { useVoiceProfile } from "@/hooks/useVoiceProfile";
 
 interface ScriptModalProps {
   open: boolean;
