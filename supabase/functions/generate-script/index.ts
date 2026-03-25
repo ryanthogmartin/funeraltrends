@@ -164,7 +164,9 @@ Deno.serve(async (req) => {
       'comforting-guide': 'Soft, supportive, and nurturing. Like a trusted friend helping someone through a difficult time. Focus on emotional support while providing practical guidance.',
     };
 
-    const toneGuide = voiceProfilePrompt || `Tone: ${toneDescriptions[tone] || toneDescriptions['compassionate-educator']}`;
+    const toneGuide = (tone === 'my-voice' && voiceProfilePrompt)
+      ? voiceProfilePrompt
+      : `Tone: ${toneDescriptions[tone] || toneDescriptions['compassionate-educator']}`;
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',

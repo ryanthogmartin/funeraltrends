@@ -110,6 +110,23 @@ const ScriptModal = ({ open, onOpenChange, idea }: ScriptModalProps) => {
         {/* Tone Selection */}
         <div className="space-y-2 mb-4">
           <p className="text-sm font-medium text-foreground">Choose a tone:</p>
+          {hasProfile && (
+            <button
+              onClick={() => generateScript("my-voice")}
+              disabled={isLoading}
+              className={`w-full text-left p-3 rounded-lg border transition-all text-xs flex items-center gap-2 ${
+                selectedTone === "my-voice"
+                  ? "border-primary bg-primary/10 text-primary"
+                  : "border-primary/30 hover:border-primary/50 hover:bg-primary/5 bg-primary/5"
+              } disabled:opacity-50`}
+            >
+              <User className="h-4 w-4 shrink-0" />
+              <div>
+                <p className="font-semibold">My Voice Persona</p>
+                <p className="text-muted-foreground mt-0.5">Use your custom voice profile</p>
+              </div>
+            </button>
+          )}
           <div className="grid grid-cols-2 gap-2">
             {tones.map((tone) => (
               <button
