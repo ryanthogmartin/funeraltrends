@@ -83,7 +83,7 @@ const SavedScriptCard = ({ item, index, deletingId, onDelete, onUpdate }: SavedS
       if (error) throw new Error(error.message);
       if (!data?.success) throw new Error(data?.error || "Failed to regenerate");
 
-      const toneLabel = tones.find((t) => t.id === toneId)?.label || toneId;
+      const toneLabel = toneId === "my-voice" ? "My Voice Persona" : (tones.find((t) => t.id === toneId)?.label || toneId);
       const updated = {
         script_hook: data.data.hook,
         script_body: data.data.body,
