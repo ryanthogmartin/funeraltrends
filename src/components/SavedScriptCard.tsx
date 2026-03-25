@@ -221,20 +221,35 @@ const SavedScriptCard = ({ item, index, deletingId, onDelete, onUpdate }: SavedS
 
       {/* Tone picker */}
       {showTones && !editing && (
-        <div className="mt-2 grid grid-cols-2 gap-1.5">
-          {tones.map((tone) => (
+        <div className="mt-2 space-y-1.5">
+          {hasProfile && (
             <button
-              key={tone.id}
-              onClick={() => handleChangeTone(tone.id)}
-              className={`text-left p-2 rounded border text-xs transition-all ${
-                item.script_tone === tone.label
+              onClick={() => handleChangeTone("my-voice")}
+              className={`w-full text-left p-2 rounded border text-xs transition-all flex items-center gap-1.5 ${
+                item.script_tone === "My Voice Persona"
                   ? "border-primary bg-primary/10 text-primary"
-                  : "border-border/50 hover:border-primary/50 hover:bg-accent/50 text-foreground"
+                  : "border-primary/30 hover:border-primary/50 hover:bg-primary/5 bg-primary/5 text-foreground"
               }`}
             >
-              {tone.label}
+              <User className="h-3 w-3" />
+              My Voice Persona
             </button>
-          ))}
+          )}
+          <div className="grid grid-cols-2 gap-1.5">
+            {tones.map((tone) => (
+              <button
+                key={tone.id}
+                onClick={() => handleChangeTone(tone.id)}
+                className={`text-left p-2 rounded border text-xs transition-all ${
+                  item.script_tone === tone.label
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-border/50 hover:border-primary/50 hover:bg-accent/50 text-foreground"
+                }`}
+              >
+                {tone.label}
+              </button>
+            ))}
+          </div>
         </div>
       )}
 
