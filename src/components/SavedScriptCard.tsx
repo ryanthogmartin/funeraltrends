@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { FileText, Trash2, Loader2, Pencil, Download, RefreshCw, Check, X } from "lucide-react";
+import { FileText, Trash2, Loader2, Pencil, Download, RefreshCw, Check, X, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
+import { useVoiceProfile } from "@/hooks/useVoiceProfile";
 import { exportScriptPdf } from "@/lib/exportPdf";
 
 interface SavedIdea {
@@ -45,6 +46,7 @@ const SavedScriptCard = ({ item, index, deletingId, onDelete, onUpdate }: SavedS
   const [showTones, setShowTones] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
+  const { hasProfile } = useVoiceProfile();
 
   const handleSaveEdit = async () => {
     setSaving(true);
@@ -81,7 +83,7 @@ const SavedScriptCard = ({ item, index, deletingId, onDelete, onUpdate }: SavedS
       if (error) throw new Error(error.message);
       if (!data?.success) throw new Error(data?.error || "Failed to regenerate");
 
-      const toneLabel = tones.find((t) => t.id === toneId)?.label || toneId;
+      const toneLabel = toneId === "my-voice" ? "My Voice Persona" : (tones.find((t) => t.id === toneId)?.label || toneId);
       const updated = {
         script_hook: data.data.hook,
         script_body: data.data.body,
@@ -219,20 +221,35 @@ const SavedScriptCard = ({ item, index, deletingId, onDelete, onUpdate }: SavedS
 
       {/* Tone picker */}
       {showTones && !editing && (
-        <div className="mt-2 grid grid-cols-2 gap-1.5">
-          {tones.map((tone) => (
+        <div className="mt-2 space-y-1.5">
+          {hasProfile && (
             <button
-              key={tone.id}
-              onClick={() => handleChangeTone(tone.id)}
-              className={`text-left p-2 rounded border text-xs transition-all ${
-                item.script_tone === tone.label
+              onClick={() => handleChangeTone("my-voice")}
+              className={`w-full text-left p-2 rounded border text-xs transition-all flex items-center gap-1.5 ${
+                item.script_tone === "My Voice Persona"
                   ? "border-primary bg-primary/10 text-primary"
-                  : "border-border/50 hover:border-primary/50 hover:bg-accent/50 text-foreground"
+                  : "border-primary/30 hover:border-primary/50 hover:bg-primary/5 bg-primary/5 text-foreground"
               }`}
             >
-              {tone.label}
+              <User className="h-3 w-3" />
+              My Voice Persona
             </button>
-          ))}
+          )}
+          <div className="grid grid-cols-2 gap-1.5">
+            {tones.map((tone) => (
+              <button
+                key={tone.id}
+                onClick={() => handleChangeTone(tone.id)}
+                className={`text-left p-2 rounded border text-xs transition-all ${
+                  item.script_tone === tone.label
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-border/50 hover:border-primary/50 hover:bg-accent/50 text-foreground"
+                }`}
+              >
+                {tone.label}
+              </button>
+            ))}
+          </div>
         </div>
       )}
 

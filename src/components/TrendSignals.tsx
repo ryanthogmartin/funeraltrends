@@ -102,8 +102,8 @@ function VideoIdeaCard({ idea, signalTitle }: { idea: VideoIdea; signalTitle: st
       const { data, error } = await supabase.functions.invoke('generate-script', {
         body: {
           idea: idea.title,
-          tone: isCustom ? "compassionate-educator" : personaId,
-          userId: isCustom ? user?.id : undefined,
+          tone: isCustom ? "my-voice" : personaId,
+          userId: user?.id,
         },
       });
 
