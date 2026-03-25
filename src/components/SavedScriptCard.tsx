@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { FileText, Trash2, Loader2, Pencil, Download, RefreshCw, Check, X } from "lucide-react";
+import { FileText, Trash2, Loader2, Pencil, Download, RefreshCw, Check, X, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
+import { useVoiceProfile } from "@/hooks/useVoiceProfile";
 import { exportScriptPdf } from "@/lib/exportPdf";
 
 interface SavedIdea {
