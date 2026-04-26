@@ -382,6 +382,12 @@ If it sounds like it was written by a marketing committee — rewrite it.`
 
 
 
+CRITICAL REQUIREMENTS:
+1. The HOOK must be the single most surprising or specific thing about this topic — no scene-setting, no setup, straight to the point.
+2. The BODY must use real, specific details. No vague statements.
+3. The CTA is REQUIRED — end with one specific action for the viewer to take.
+4. CHECK YOUR GRAMMAR before returning. Every sentence must be grammatically correct.
+
 Return ONLY valid JSON, no markdown, no code fences:
 {"hook":"opening hook lines","body":"main content with [PAUSE] markers","cta":"closing call to action","wordCount":95}`
           }
