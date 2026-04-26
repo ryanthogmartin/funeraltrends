@@ -372,7 +372,7 @@ If it sounds like it was written by a marketing committee — rewrite it.`
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash-preview',
+        model: 'google/gemini-3-flash-preview',
         messages: [
           { role: 'system', content: systemPrompt },
           {
