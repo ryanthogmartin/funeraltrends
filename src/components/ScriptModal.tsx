@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -14,6 +14,10 @@ interface ScriptModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   idea: string;
+  bizType?: string;
+  category?: string;
+  platform?: string;
+  defaultTone?: string;
 }
 
 interface ScriptData {
@@ -30,7 +34,7 @@ const tones = [
   { id: "comforting-guide", label: "Comforting Guide", desc: "Soft, supportive, nurturing" },
 ];
 
-const ScriptModal = ({ open, onOpenChange, idea }: ScriptModalProps) => {
+const ScriptModal = ({ open, onOpenChange, idea, bizType, category, platform, defaultTone }: ScriptModalProps) => {
   const [selectedTone, setSelectedTone] = useState<string | null>(null);
   const [script, setScript] = useState<ScriptData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -51,7 +55,7 @@ const ScriptModal = ({ open, onOpenChange, idea }: ScriptModalProps) => {
 
     try {
       const { data, error } = await supabase.functions.invoke('generate-script', {
-        body: { idea, tone, userId: user?.id },
+        body: { idea, tone, bizType, category, platform, userId: user?.id },
       });
 
       if (error) throw new Error(error.message);
@@ -91,6 +95,16 @@ const ScriptModal = ({ open, onOpenChange, idea }: ScriptModalProps) => {
     }
     onOpenChange(open);
   };
+
+  // Auto-generate using the tone passed in from the parent page when modal opens.
+  // This implements the new "click idea → instantly see script" flow.
+  // If no defaultTone is provided, fall back to manual tone selection (legacy behavior).
+  useEffect(() => {
+    if (open && idea && defaultTone && !script && !isLoading) {
+      generateScript(defaultTone);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, idea, defaultTone]);
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
