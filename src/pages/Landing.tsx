@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Skull, TrendingUp, Video, Hash, ArrowRight, BarChart3, Zap, Globe, Sparkles, Lock, Film, Radio, MapPin, Bookmark, Mic } from "lucide-react";
+import { Skull, Video, ArrowRight, Zap, Sparkles, Lock, Bookmark, Mic, ListChecks, Split, Clapperboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -15,67 +15,58 @@ interface FeatureItem {
 
 const features: FeatureItem[] = [
 {
-  icon: TrendingUp,
-  title: "Google Trends Tracking",
-  description: "Monitor real-time funeral-related search trends with volume data, sparkline charts, and US-focused keyword intelligence.",
-  link: "/video-ideas",
-  requiresAuth: false
-},
-{
-  icon: Radio,
-  title: "Real-Time Trend Signals",
-  description: "AI-detected emerging trends from Reddit, TikTok, Facebook, X, and YouTube — with one-click video idea generation.",
+  icon: ListChecks,
+  title: "Curated Topic Library",
+  description: "Hand-picked topics for funeral homes, cemeteries, crematories, and pet cremation — or bring the questions families actually ask you.",
   link: "/video-ideas",
   requiresAuth: false
 },
 {
   icon: Video,
-  title: "AI Video Ideas & Scripts",
-  description: "Generate short-form video ideas with full 45-second scripts (hook, body, CTA) — ready to record for TikTok, Reels, or Shorts.",
+  title: "8 Video Ideas, Instantly",
+  description: "Pick a business type, topic, angle, platform, and tone — get eight scroll-stopping video concepts built for the funeral profession.",
   link: "/video-ideas",
   requiresAuth: true
 },
 {
-  icon: Hash,
-  title: "Hashtag Intelligence",
-  description: "TikTok and Instagram hashtag tracking with growth rates, category analysis, and trending tag discovery.",
-  link: "/video-ideas",
-  requiresAuth: false
-},
-{
-  icon: Globe,
-  title: "Facebook & Reels Insights",
-  description: "AI-generated Facebook post ideas, Instagram Reels concepts, and live trending funeral discussions across social platforms.",
+  icon: Clapperboard,
+  title: "45-Second Scripts",
+  description: "Every idea turns into a full script — hook, body with pause cues, and a clear call to action, with word count and runtime.",
   link: "/video-ideas",
   requiresAuth: true
 },
 {
-  icon: MapPin,
-  title: "Local Trends",
-  description: "Hyper-local keyword research by city and state — discover what families in your area are searching for.",
+  icon: Split,
+  title: "Three Hook Variants",
+  description: "Each script comes with alternate hooks so you can test the opening line that stops the scroll for your community.",
   link: "/video-ideas",
   requiresAuth: true
 },
 {
   icon: Mic,
   title: "Custom Voice Persona",
-  description: "Customize your AI-generated scripts to match your tone, style, and brand — every script sounds like you.",
+  description: "Train the engine on your tone, phrasing, and brand so every script sounds like you said it — not like AI wrote it.",
   link: "/voice-profile",
   requiresAuth: true
 },
 {
   icon: Bookmark,
-  title: "Saved Ideas & Watchlist",
-  description: "Save video ideas, scripts, and keywords to your personal library. Track keyword spikes with your watchlist.",
+  title: "Saved Script Library",
+  description: "Keep your best ideas and finished scripts in one place, ready to copy, export, or record whenever you're in front of the camera.",
   link: "/saved",
   requiresAuth: true
 }];
 
 const stats = [
-{ value: "Real-time", label: "Data freshness" },
-{ value: "50+", label: "Keywords tracked" },
-{ value: "AI", label: "Powered insights" },
+{ value: "8", label: "Ideas per run" },
+{ value: "45s", label: "Script length" },
+{ value: "3", label: "Hook variants" },
 { value: "Free", label: "To get started" }];
+
+const steps = [
+{ n: "01", title: "Pick your business", desc: "Funeral home, cemetery, crematory, or pet cremation — the engine adapts its insider knowledge to you." },
+{ n: "02", title: "Choose a topic & angle", desc: "Curated keyword, a question families ask, or your own topic — then demystify, price, legal, pre-planning, or myth bust." },
+{ n: "03", title: "Generate & record", desc: "Get eight ideas, open any one into a full script with hooks and pause cues, then save it and hit record." }];
 
 
 const Landing = () => {
@@ -124,7 +115,7 @@ const Landing = () => {
             }
             <Link to="/video-ideas">
               <Button size="sm" className="text-xs font-semibold gap-1">
-                Open Dashboard <ArrowRight className="h-3.5 w-3.5" />
+                Video Content Engine <ArrowRight className="h-3.5 w-3.5" />
               </Button>
             </Link>
           </div>
@@ -143,20 +134,20 @@ const Landing = () => {
             
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-tertiary/30 bg-tertiary/5 text-tertiary text-xs font-medium mb-6">
               <Zap className="h-3 w-3" />
-              AI-Powered Funeral Profession Intelligence
+              The Video Content Engine for the Funeral Profession
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-display font-bold text-foreground leading-tight mb-6">
-              Track funeral trends
+              Never wonder what
               <br />
-              <span className="text-gradient-primary">before they peak</span>
+              <span className="text-gradient-primary">to post again</span>
             </h1>
             <p className="text-lg text-muted-foreground mb-8 max-w-xl mx-auto leading-relaxed">
-              Real-time Google search trends. Social listening from Facebook, Instagram, TikTok, Youtube, Reddit, and X. AI-powered video ideas. Customizable scroll-stopping scripts. Hashtag intelligence - all in one dashboard for the funeral profession.
+              Pick your business type, a topic, and a tone. Get eight video ideas and full 45-second scripts — hook, body, and call to action — written in your voice and ready to record.
             </p>
             <div className="flex items-center justify-center gap-3 flex-wrap">
               <Link to="/video-ideas">
                 <Button size="lg" className="font-semibold gap-2 px-6 bg-tertiary text-tertiary-foreground hover:bg-tertiary/90">
-                  Explore Dashboard <ArrowRight className="h-4 w-4" />
+                  Open the Content Engine <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
               <Button
@@ -166,7 +157,7 @@ const Landing = () => {
                 className="font-semibold gap-2 px-6 border-secondary/50 text-secondary hover:bg-secondary/10">
                 
                 <Sparkles className="h-4 w-4" />
-                Generate Video Ideas
+                Generate Video Scripts
                 {!isAuthenticated && <Lock className="h-3 w-3 ml-1 text-muted-foreground" />}
               </Button>
               {!authLoading && !user &&
@@ -196,6 +187,42 @@ const Landing = () => {
         </div>
       </section>
 
+      {/* How it works */}
+      <section className="py-20 border-t border-border/50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            className="text-center mb-12">
+
+            <h2 className="text-3xl font-display font-bold text-foreground mb-3">
+              From blank page to filmed in minutes
+            </h2>
+            <p className="text-muted-foreground max-w-lg mx-auto">
+              Three steps, no guesswork, no trend chasing.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {steps.map((step, i) =>
+            <motion.div
+              key={step.n}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.1, duration: 0.5 }}
+              className="section-panel">
+
+                <p className="text-xs font-mono text-primary mb-3">{step.n}</p>
+                <h3 className="font-display font-semibold text-foreground mb-2">{step.title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{step.desc}</p>
+              </motion.div>
+            )}
+          </div>
+        </div>
+      </section>
+
       {/* Features */}
       <section className="py-20 border-t border-border/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -206,14 +233,14 @@ const Landing = () => {
             className="text-center mb-12">
             
             <h2 className="text-3xl font-display font-bold text-foreground mb-3">
-              Everything you need to stay ahead
+              Built for one job: better videos
             </h2>
             <p className="text-muted-foreground max-w-lg mx-auto">
-              A comprehensive content toolkit for funeral professionals.
+              Everything in the engine exists to get a script in your hands.
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {features.map((feature, i) => {
               const isLocked = feature.requiresAuth && !isAuthenticated;
               return (
@@ -296,10 +323,10 @@ const Landing = () => {
             className="section-panel text-center py-12 px-6 glow-primary">
             
             <h2 className="text-2xl sm:text-3xl font-display font-bold text-foreground mb-3">
-              Ready to track what matters?
+              Ready to write your next video?
             </h2>
             <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-              Start exploring trends, generating content ideas, and tracking hashtags - completely free.
+              Generate ideas, build scripts, and save your library — completely free to start.
             </p>
             <div className="flex items-center justify-center gap-3 flex-wrap">
               <Link to="/video-ideas">
@@ -314,7 +341,7 @@ const Landing = () => {
                 className="font-semibold gap-2 px-6 border-secondary/50 text-secondary hover:bg-secondary/10">
                 
                 <Sparkles className="h-4 w-4" />
-                Generate Video Ideas
+                Generate Video Scripts
               </Button>
             </div>
           </motion.div>
@@ -334,7 +361,7 @@ const Landing = () => {
             </div>
           </div>
           <p className="text-xs text-muted-foreground">
-            © 2026 FuneralTrends. AI-powered funeral profession intelligence. · Powered by DISRUPT Media
+            © 2026 FuneralTrends. AI video scripts for the funeral profession. · Powered by DISRUPT Media
           </p>
         </div>
       </footer>
