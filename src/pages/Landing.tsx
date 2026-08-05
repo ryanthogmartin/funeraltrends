@@ -115,7 +115,7 @@ const Landing = () => {
             }
             <Link to="/video-ideas">
               <Button size="sm" className="text-xs font-semibold gap-1">
-                Open Dashboard <ArrowRight className="h-3.5 w-3.5" />
+                Video Content Engine <ArrowRight className="h-3.5 w-3.5" />
               </Button>
             </Link>
           </div>
