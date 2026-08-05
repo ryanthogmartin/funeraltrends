@@ -22,6 +22,7 @@ interface ScriptModalProps {
 
 interface ScriptData {
   hook: string;
+  hookVariants?: string[];
   body: string;
   cta: string;
   wordCount: number;
@@ -43,6 +44,7 @@ const ScriptModal = ({ open, onOpenChange, idea, bizType, category, platform, de
   const [editHook, setEditHook] = useState("");
   const [editBody, setEditBody] = useState("");
   const [editCta, setEditCta] = useState("");
+  const [hookIndex, setHookIndex] = useState(0);
   const { toast } = useToast();
   const { saveIdea, saving: savingIdea, isSaved } = useSaveIdea();
   const { user } = useAuth();
@@ -61,6 +63,7 @@ const ScriptModal = ({ open, onOpenChange, idea, bizType, category, platform, de
       if (error) throw new Error(error.message);
       if (!data?.success) throw new Error(data?.error || 'Failed to generate script');
       setScript(data.data);
+      setHookIndex(0);
       setEditHook(data.data.hook);
       setEditBody(data.data.body);
       setEditCta(data.data.cta);
@@ -76,7 +79,8 @@ const ScriptModal = ({ open, onOpenChange, idea, bizType, category, platform, de
     }
   };
 
-  const currentHook = editing ? editHook : (script?.hook || "");
+  const hookOptions = script ? [script.hook, ...(script.hookVariants || [])].filter(Boolean) : [];
+  const currentHook = editing ? editHook : (hookOptions[hookIndex] || script?.hook || "");
   const currentBody = editing ? editBody : (script?.body || "");
   const currentCta = editing ? editCta : (script?.cta || "");
   const fullScript = script ? `${currentHook}\n\n${currentBody}\n\n${currentCta}` : "";
@@ -92,6 +96,7 @@ const ScriptModal = ({ open, onOpenChange, idea, bizType, category, platform, de
       setSelectedTone(null);
       setScript(null);
       setEditing(false);
+      setHookIndex(0);
     }
     onOpenChange(open);
   };
@@ -173,6 +178,26 @@ const ScriptModal = ({ open, onOpenChange, idea, bizType, category, platform, de
           <div className="space-y-3">
             <div className="p-3 bg-primary/5 rounded-lg border border-primary/20">
               <p className="text-xs font-semibold text-primary mb-1 uppercase tracking-wide">🎬 Hook (3 sec)</p>
+              {!editing && hookOptions.length > 1 && (
+                <div className="flex flex-wrap gap-1.5 mb-2">
+                  {hookOptions.map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => {
+                        setHookIndex(i);
+                        setEditHook(hookOptions[i]);
+                      }}
+                      className={`px-2 py-1 rounded-md border text-[11px] font-semibold transition-all ${
+                        hookIndex === i
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-border bg-background hover:border-primary/50 text-muted-foreground"
+                      }`}
+                    >
+                      Hook {i + 1}
+                    </button>
+                  ))}
+                </div>
+              )}
               {editing ? (
                 <Textarea value={editHook} onChange={(e) => setEditHook(e.target.value)} className="text-sm min-h-[40px]" />
               ) : (
