@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Skull, BarChart3, Video, Hash, LogIn, LogOut, Bookmark, Mic, ArrowRight, MapPin, ChevronDown, Menu, TrendingUp, Settings } from "lucide-react";
+import { Skull, Video, LogIn, LogOut, Bookmark, Mic, ArrowRight, ChevronDown, Menu, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -20,22 +20,10 @@ import {
 "@/components/ui/sheet";
 import { useState } from "react";
 
-const researchItems = [
-{ to: "/dashboard", label: "Dashboard", icon: BarChart3, desc: "Trends overview & stats" },
-{ to: "/local-trends", label: "Local Trends", icon: MapPin, desc: "City & state keyword research" }];
-
-
-const contentItems = [
+const allNavItems = [
 { to: "/video-ideas", label: "Video Ideas", icon: Video, desc: "AI-generated video topics & scripts" },
-{ to: "/hashtags", label: "Hashtags", icon: Hash, desc: "TikTok & Instagram tracking" }];
-
-
-const libraryItems = [
-{ to: "/saved", label: "Saved Ideas", icon: Bookmark, desc: "Your saved ideas & scripts" },
+{ to: "/saved", label: "Saved Scripts", icon: Bookmark, desc: "Your saved ideas & scripts" },
 { to: "/voice-profile", label: "Custom Voice Persona", icon: Mic, desc: "Custom tone & branding" }];
-
-
-const allNavItems = [...researchItems, ...contentItems, ...libraryItems];
 
 const SiteLayout = ({ children }: {children: React.ReactNode;}) => {
   const location = useLocation();
@@ -44,44 +32,6 @@ const SiteLayout = ({ children }: {children: React.ReactNode;}) => {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const isActive = (path: string) => location.pathname === path;
-
-  const NavDropdown = ({ label, icon: Icon, items }: {label: string;icon: React.ElementType;items: typeof researchItems;}) => {
-    const groupActive = items.some((item) => isActive(item.to));
-    return (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <button
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors outline-none ${
-            groupActive ?
-            "bg-accent text-accent-foreground" :
-            "text-muted-foreground hover:text-foreground hover:bg-accent/50"}`
-            }>
-            
-            <Icon className="h-3.5 w-3.5" />
-            {label}
-            <ChevronDown className="h-3 w-3 opacity-60" />
-          </button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" className="w-56">
-          {items.map(({ to, label: itemLabel, icon: ItemIcon, desc }) =>
-          <DropdownMenuItem
-            key={to}
-            onClick={() => navigate(to)}
-            className={`flex items-start gap-3 p-3 cursor-pointer ${
-            isActive(to) ? "bg-accent text-accent-foreground" : ""}`
-            }>
-            
-              <ItemIcon className="h-4 w-4 mt-0.5 shrink-0 text-primary" />
-              <div className="flex flex-col gap-0.5">
-                <span className="text-sm font-medium">{itemLabel}</span>
-                <span className="text-xs text-muted-foreground">{desc}</span>
-              </div>
-            </DropdownMenuItem>
-          )}
-        </DropdownMenuContent>
-      </DropdownMenu>);
-
-  };
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
