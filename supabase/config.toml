@@ -3,15 +3,7 @@ project_id = "gaaxslezqzzujfrtkdpo"
 [functions]
   [functions.auth-email-hook]
     verify_jwt = false
-  [functions.generate-question-series]
+  [functions.generate-video-topics]
     verify_jwt = false
-  [functions.generate-facebook-ideas]
-    verify_jwt = false
-  [functions.search-facebook-trends]
-    verify_jwt = false
-  [functions.generate-reels-ideas]
-    verify_jwt = false
-  [functions.search-reels-trends]
-    verify_jwt = false
-  [functions.google-ads-keywords]
+  [functions.generate-script]
     verify_jwt = false

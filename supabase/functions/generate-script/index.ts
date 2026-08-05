@@ -387,13 +387,14 @@ CRITICAL REQUIREMENTS:
 2. The BODY must use real, specific details. No vague statements.
 3. The CTA is REQUIRED — end with one specific action for the viewer to take.
 4. CHECK YOUR GRAMMAR before returning. Every sentence must be grammatically correct.
+5. Also write TWO ALTERNATE HOOKS that open the same script a different way — a different angle, not a reworded version of the first. Each alternate must work as the opening line of the same body.
 
 Return ONLY valid JSON, no markdown, no code fences:
-{"hook":"opening hook lines","body":"main content with [PAUSE] markers","cta":"closing call to action","wordCount":95}`
+{"hook":"opening hook lines","hookVariants":["alternate hook 1","alternate hook 2"],"body":"main content with [PAUSE] markers","cta":"closing call to action","wordCount":95}`
           }
         ],
         temperature: 0.82,
-        max_tokens: 600,
+        max_tokens: 800,
       }),
     });
 
@@ -430,7 +431,13 @@ Return ONLY valid JSON, no markdown, no code fences:
 
 
     return new Response(
-      JSON.stringify({ success: true, data: parsed }),
+      JSON.stringify({
+        success: true,
+        data: {
+          ...parsed,
+          hookVariants: Array.isArray(parsed.hookVariants) ? parsed.hookVariants.filter((h: unknown) => typeof h === 'string' && h.trim()) : [],
+        },
+      }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 

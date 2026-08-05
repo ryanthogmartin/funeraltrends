@@ -18,14 +18,14 @@ const features: FeatureItem[] = [
   icon: TrendingUp,
   title: "Google Trends Tracking",
   description: "Monitor real-time funeral-related search trends with volume data, sparkline charts, and US-focused keyword intelligence.",
-  link: "/dashboard",
+  link: "/video-ideas",
   requiresAuth: false
 },
 {
   icon: Radio,
   title: "Real-Time Trend Signals",
   description: "AI-detected emerging trends from Reddit, TikTok, Facebook, X, and YouTube — with one-click video idea generation.",
-  link: "/dashboard",
+  link: "/video-ideas",
   requiresAuth: false
 },
 {
@@ -39,21 +39,21 @@ const features: FeatureItem[] = [
   icon: Hash,
   title: "Hashtag Intelligence",
   description: "TikTok and Instagram hashtag tracking with growth rates, category analysis, and trending tag discovery.",
-  link: "/hashtags",
+  link: "/video-ideas",
   requiresAuth: false
 },
 {
   icon: Globe,
   title: "Facebook & Reels Insights",
   description: "AI-generated Facebook post ideas, Instagram Reels concepts, and live trending funeral discussions across social platforms.",
-  link: "/dashboard",
+  link: "/video-ideas",
   requiresAuth: true
 },
 {
   icon: MapPin,
   title: "Local Trends",
   description: "Hyper-local keyword research by city and state — discover what families in your area are searching for.",
-  link: "/local-trends",
+  link: "/video-ideas",
   requiresAuth: true
 },
 {
@@ -122,7 +122,7 @@ const Landing = () => {
                 </Button>
               </Link>
             }
-            <Link to="/dashboard">
+            <Link to="/video-ideas">
               <Button size="sm" className="text-xs font-semibold gap-1">
                 Open Dashboard <ArrowRight className="h-3.5 w-3.5" />
               </Button>
@@ -154,7 +154,7 @@ const Landing = () => {
               Real-time Google search trends. Social listening from Facebook, Instagram, TikTok, Youtube, Reddit, and X. AI-powered video ideas. Customizable scroll-stopping scripts. Hashtag intelligence - all in one dashboard for the funeral profession.
             </p>
             <div className="flex items-center justify-center gap-3 flex-wrap">
-              <Link to="/dashboard">
+              <Link to="/video-ideas">
                 <Button size="lg" className="font-semibold gap-2 px-6 bg-tertiary text-tertiary-foreground hover:bg-tertiary/90">
                   Explore Dashboard <ArrowRight className="h-4 w-4" />
                 </Button>
@@ -302,7 +302,7 @@ const Landing = () => {
               Start exploring trends, generating content ideas, and tracking hashtags - completely free.
             </p>
             <div className="flex items-center justify-center gap-3 flex-wrap">
-              <Link to="/dashboard">
+              <Link to="/video-ideas">
                 <Button size="lg" className="font-semibold gap-2 px-8 bg-tertiary text-tertiary-foreground hover:bg-tertiary/90">
                   Get Started <ArrowRight className="h-4 w-4" />
                 </Button>
