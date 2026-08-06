@@ -14,102 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
-      funeral_reddit_posts: {
+      function_rate_limits: {
         Row: {
-          fetched_at: string
+          call_count: number
+          function_name: string
           id: string
-          num_comments: number
-          posted_at: string | null
-          reddit_id: string
-          score: number
-          sentiment: string
-          subreddit: string
-          title: string
-          url: string
-        }
-        Insert: {
-          fetched_at?: string
-          id?: string
-          num_comments?: number
-          posted_at?: string | null
-          reddit_id: string
-          score?: number
-          sentiment?: string
-          subreddit: string
-          title: string
-          url: string
-        }
-        Update: {
-          fetched_at?: string
-          id?: string
-          num_comments?: number
-          posted_at?: string | null
-          reddit_id?: string
-          score?: number
-          sentiment?: string
-          subreddit?: string
-          title?: string
-          url?: string
-        }
-        Relationships: []
-      }
-      funeral_trends: {
-        Row: {
-          category: string | null
-          change_percent: number
-          fetched_at: string
-          id: string
-          keyword: string
-          sparkline: Json | null
-          volume: number
-        }
-        Insert: {
-          category?: string | null
-          change_percent?: number
-          fetched_at?: string
-          id?: string
-          keyword: string
-          sparkline?: Json | null
-          volume?: number
-        }
-        Update: {
-          category?: string | null
-          change_percent?: number
-          fetched_at?: string
-          id?: string
-          keyword?: string
-          sparkline?: Json | null
-          volume?: number
-        }
-        Relationships: []
-      }
-      keyword_watchlist: {
-        Row: {
-          created_at: string
-          id: string
-          keyword: string
-          last_change_percent: number | null
-          last_volume: number | null
-          spiked: boolean | null
           user_id: string
+          window_start: string
         }
         Insert: {
-          created_at?: string
+          call_count?: number
+          function_name: string
           id?: string
-          keyword: string
-          last_change_percent?: number | null
-          last_volume?: number | null
-          spiked?: boolean | null
           user_id: string
+          window_start: string
         }
         Update: {
-          created_at?: string
+          call_count?: number
+          function_name?: string
           id?: string
-          keyword?: string
-          last_change_percent?: number | null
-          last_volume?: number | null
-          spiked?: boolean | null
           user_id?: string
+          window_start?: string
         }
         Relationships: []
       }
@@ -152,65 +77,35 @@ export type Database = {
         }
         Relationships: []
       }
-      trend_signals: {
+      script_fingerprints: {
         Row: {
-          fetched_at: string
-          id: string
-          related_keywords: Json | null
-          relevance_score: number
-          signal_type: string
-          source: string
-          source_urls: Json | null
-          summary: string
-          title: string
-        }
-        Insert: {
-          fetched_at?: string
-          id?: string
-          related_keywords?: Json | null
-          relevance_score?: number
-          signal_type?: string
-          source?: string
-          source_urls?: Json | null
-          summary: string
-          title: string
-        }
-        Update: {
-          fetched_at?: string
-          id?: string
-          related_keywords?: Json | null
-          relevance_score?: number
-          signal_type?: string
-          source?: string
-          source_urls?: Json | null
-          summary?: string
-          title?: string
-        }
-        Relationships: []
-      }
-      user_keywords: {
-        Row: {
-          category: string | null
+          biz_type: string | null
+          content_hash: string
           created_at: string
           id: string
-          is_public: boolean | null
-          keyword: string
+          idea_text: string | null
+          normalized_text: string
+          tone: string | null
           user_id: string
         }
         Insert: {
-          category?: string | null
+          biz_type?: string | null
+          content_hash: string
           created_at?: string
           id?: string
-          is_public?: boolean | null
-          keyword: string
+          idea_text?: string | null
+          normalized_text: string
+          tone?: string | null
           user_id: string
         }
         Update: {
-          category?: string | null
+          biz_type?: string | null
+          content_hash?: string
           created_at?: string
           id?: string
-          is_public?: boolean | null
-          keyword?: string
+          idea_text?: string | null
+          normalized_text?: string
+          tone?: string | null
           user_id?: string
         }
         Relationships: []
@@ -298,7 +193,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      increment_function_rate_limit: {
+        Args: {
+          p_function_name: string
+          p_user_id: string
+          p_window_start: string
+        }
+        Returns: number
+      }
     }
     Enums: {
       [_ in never]: never

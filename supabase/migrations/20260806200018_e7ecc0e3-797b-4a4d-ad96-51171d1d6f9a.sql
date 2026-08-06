@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.increment_function_rate_limit(UUID, TEXT, TIMESTAMP WITH TIME ZONE) FROM anon, authenticated;
