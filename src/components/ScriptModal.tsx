@@ -62,6 +62,12 @@ const ScriptModal = ({ open, onOpenChange, idea, bizType, category, platform, de
 
       if (error) throw new Error(error.message);
       if (!data?.success) throw new Error(data?.error || 'Failed to generate script');
+      if (data.similarityWarning) {
+        toast({
+          title: "Heads up — similar to a previous script",
+          description: "This came out close to something you've generated before. Try a different tone or angle for more variety.",
+        });
+      }
       setScript(data.data);
       setHookIndex(0);
       setEditHook(data.data.hook);

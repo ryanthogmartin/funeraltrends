@@ -13,6 +13,49 @@ const corsHeaders = {
 // are rejected with 429 before any AI spend happens.
 const RATE_LIMIT_PER_HOUR = 30;
 
+// ─── ANTI-REPETITION (Task 5) ─────────────────────────────────────────────────
+// Word-trigram Jaccard similarity at/above this vs any of the user's recent
+// generations triggers one regeneration with an explicit "different angle"
+// instruction; if still similar, the response carries similarityWarning: true.
+const SIMILARITY_THRESHOLD = 0.6;
+// How many of the user's most recent fingerprints to compare against.
+const FINGERPRINT_LOOKBACK = 30;
+
+function normalizeForFingerprint(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/\[pause\]/g, ' ')
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 2000);
+}
+
+async function sha256Hex(text: string): Promise<string> {
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(digest)).map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+function trigramSet(normalized: string): Set<string> {
+  const words = normalized.split(' ').filter(Boolean);
+  const grams = new Set<string>();
+  if (words.length < 3) {
+    if (normalized) grams.add(normalized);
+    return grams;
+  }
+  for (let i = 0; i <= words.length - 3; i++) {
+    grams.add(`${words[i]} ${words[i + 1]} ${words[i + 2]}`);
+  }
+  return grams;
+}
+
+function jaccard(a: Set<string>, b: Set<string>): number {
+  if (a.size === 0 || b.size === 0) return 0;
+  let intersection = 0;
+  for (const g of a) if (b.has(g)) intersection++;
+  return intersection / (a.size + b.size - intersection);
+}
+
 
 
 
@@ -208,14 +251,44 @@ Deno.serve(async (req) => {
 
 
 
+    // Voice profile is now fetched for EVERY tone (Task 5, cross-tenant
+    // differentiation): "My Voice" gets the full persona prompt as before,
+    // while every other tone gets a light business-identity block (name,
+    // specialties, signature opening) so two businesses using the same tone
+    // on the same topic don't produce word-for-word-similar scripts.
     let voiceProfilePrompt = '';
-    if (tone === 'my-voice') {
-      try {
-        const { data: vp } = await supabase.from('voice_profiles').select('*').eq('user_id', userId).maybeSingle();
-        if (vp) voiceProfilePrompt = buildVoicePrompt(vp);
-      } catch (e) {
-        console.error('Failed to fetch voice profile:', e);
+    let businessIdentityPrompt = '';
+    try {
+      const { data: vp } = await supabase.from('voice_profiles').select('*').eq('user_id', userId).maybeSingle();
+      if (vp) {
+        if (tone === 'my-voice') {
+          voiceProfilePrompt = buildVoicePrompt(vp);
+        } else {
+          const bits: string[] = [];
+          if (vp.funeral_home_name) bits.push(`- The speaker works at ${vp.funeral_home_name}. Mention the business naturally where it fits (once, not as an ad).`);
+          if (vp.specialties) bits.push(`- Their specialties: ${vp.specialties}. Lean on these where relevant to the topic.`);
+          if (vp.signature_opening?.trim()) bits.push(`- If it fits the hook, they often open with: "${vp.signature_opening}"`);
+          if (bits.length) {
+            businessIdentityPrompt = `BUSINESS IDENTITY — make this script specific to THIS business, not generic to the industry:\n${bits.join('\n')}`;
+          }
+        }
       }
+    } catch (e) {
+      console.error('Failed to fetch voice profile:', e);
+    }
+
+    // Recent fingerprints for this account, used to detect near-duplicates.
+    let recentFingerprints: { normalized_text: string }[] = [];
+    try {
+      const { data: fps } = await supabase
+        .from('script_fingerprints')
+        .select('normalized_text')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(FINGERPRINT_LOOKBACK);
+      recentFingerprints = fps ?? [];
+    } catch (e) {
+      console.error('Failed to fetch fingerprints:', e);
     }
 
 
@@ -246,6 +319,7 @@ Deno.serve(async (req) => {
       CAT_CONTEXT[category] || CAT_CONTEXT["demystify"],
       PLATFORM_CONTEXT[platform] || PLATFORM_CONTEXT["facebook"],
       toneGuide,
+      businessIdentityPrompt,
       FORBIDDEN,
       `SCRIPT FORMAT:
 HOOK (first 1-3 sentences): Most interesting thing first. No setup. No intro. No "hey guys." Must earn the next 40 seconds on its own.
@@ -259,25 +333,28 @@ LENGTH: Under 120 words total (45 seconds spoken aloud).
 NO emojis in the script.
 NO jargon without immediate plain-language explanation.
 If it sounds like it was written by a marketing committee — rewrite it.`
-    ].join('\n\n');
+    ].filter(Boolean).join('\n\n');
 
 
 
 
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'claude-haiku-4-5',
-        system: systemPrompt,
-        messages: [
-          {
-            role: 'user',
-            content: `Write a 45-second script for a ${bizLabel} about: "${idea}"
+    // One model call. `avoidInstruction` is appended on the anti-repetition
+    // retry to force a different angle.
+    const generateOnce = async (avoidInstruction: string): Promise<{ ok: true; parsed: any } | { ok: false; resp: Response }> => {
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'claude-haiku-4-5',
+          system: systemPrompt,
+          messages: [
+            {
+              role: 'user',
+              content: `Write a 45-second script for a ${bizLabel} about: "${idea}"
 
 
 
@@ -287,54 +364,95 @@ CRITICAL REQUIREMENTS:
 2. The BODY must use real, specific details. No vague statements.
 3. The CTA is REQUIRED — end with one specific action for the viewer to take.
 4. CHECK YOUR GRAMMAR before returning. Every sentence must be grammatically correct.
-5. Also write TWO ALTERNATE HOOKS that open the same script a different way — a different angle, not a reworded version of the first. Each alternate must work as the opening line of the same body.
+5. Also write TWO ALTERNATE HOOKS that open the same script a different way — a different angle, not a reworded version of the first. Each alternate must work as the opening line of the same body.${avoidInstruction}
 
 Return ONLY valid JSON, no markdown, no code fences:
 {"hook":"opening hook lines","hookVariants":["alternate hook 1","alternate hook 2"],"body":"main content with [PAUSE] markers","cta":"closing call to action","wordCount":95}`
-          }
-        ],
-        temperature: 0.82,
-        max_tokens: 800,
-      }),
-    });
+            }
+          ],
+          temperature: 0.82,
+          max_tokens: 800,
+        }),
+      });
 
+      if (!response.ok) {
+        const errText = await response.text();
+        console.error('Anthropic API error:', response.status, errText);
+        if (response.status === 429) return { ok: false, resp: new Response(JSON.stringify({ success: false, error: 'Rate limit — try again in a moment.' }), { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }) };
+        if (response.status === 402) return { ok: false, resp: new Response(JSON.stringify({ success: false, error: 'AI credits exhausted.' }), { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }) };
+        return { ok: false, resp: new Response(JSON.stringify({ success: false, error: `AI request failed: ${response.status}` }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }) };
+      }
 
+      const data = await response.json();
+      // Anthropic Messages API shape: content is an array of blocks; the
+      // generated text lives in the first text block.
+      const content = data.content?.[0]?.text || '';
 
+      try {
+        const cleaned = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+        return { ok: true, parsed: JSON.parse(cleaned) };
+      } catch {
+        console.error('Failed to parse AI response:', content);
+        return { ok: false, resp: new Response(JSON.stringify({ success: false, error: 'Failed to parse AI response' }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }) };
+      }
+    };
 
-    if (!response.ok) {
-      const errText = await response.text();
-      console.error('Anthropic API error:', response.status, errText);
-      if (response.status === 429) return new Response(JSON.stringify({ success: false, error: 'Rate limit — try again in a moment.' }), { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-      if (response.status === 402) return new Response(JSON.stringify({ success: false, error: 'AI credits exhausted.' }), { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-      return new Response(JSON.stringify({ success: false, error: `AI request failed: ${response.status}` }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    const fingerprintOf = (p: any) => normalizeForFingerprint(`${p?.hook || ''} ${p?.body || ''}`);
+    const maxSimilarity = (normalized: string) => {
+      const grams = trigramSet(normalized);
+      let max = 0;
+      for (const fp of recentFingerprints) {
+        max = Math.max(max, jaccard(grams, trigramSet(fp.normalized_text)));
+      }
+      return max;
+    };
+
+    const first = await generateOnce('');
+    if (!first.ok) return first.resp;
+    let parsed = first.parsed;
+    let similarity = maxSimilarity(fingerprintOf(parsed));
+
+    // Near-duplicate of something this account already generated: retry once
+    // with an explicit instruction to take a different angle. Keep whichever
+    // attempt is less similar to the account's history.
+    if (similarity >= SIMILARITY_THRESHOLD) {
+      const retry = await generateOnce(`
+6. IMPORTANT — ANTI-REPETITION: This account has already received a very similar script on this topic. Take a genuinely DIFFERENT angle: a different insider fact for the hook, a different structure, different specifics. Do NOT reuse or lightly reword this previous opening: "${String(parsed.hook || '').slice(0, 160)}"`);
+      if (retry.ok) {
+        const retrySimilarity = maxSimilarity(fingerprintOf(retry.parsed));
+        if (retrySimilarity < similarity) {
+          parsed = retry.parsed;
+          similarity = retrySimilarity;
+        }
+      }
     }
+    // Still too similar after the retry: return it, but tell the frontend so
+    // it can surface "this is close to a script you already have" to the user
+    // instead of silently handing over a near-duplicate.
+    const similarityWarning = similarity >= SIMILARITY_THRESHOLD;
 
-
-
-
-    const data = await response.json();
-    // Anthropic Messages API shape: content is an array of blocks; the
-    // generated text lives in the first text block.
-    const content = data.content?.[0]?.text || '';
-
-
-
-
-    let parsed;
+    // Record this generation's fingerprint (fail-open — a fingerprint write
+    // failure should never block returning the script).
     try {
-      const cleaned = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-      parsed = JSON.parse(cleaned);
-    } catch {
-      console.error('Failed to parse AI response:', content);
-      return new Response(JSON.stringify({ success: false, error: 'Failed to parse AI response' }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      const normalized = fingerprintOf(parsed);
+      if (normalized) {
+        await supabase.from('script_fingerprints').insert({
+          user_id: userId,
+          content_hash: await sha256Hex(normalized),
+          normalized_text: normalized,
+          idea_text: String(idea).slice(0, 500),
+          tone,
+          biz_type: bizType,
+        });
+      }
+    } catch (e) {
+      console.error('Failed to store fingerprint:', e);
     }
-
-
-
 
     return new Response(
       JSON.stringify({
         success: true,
+        similarityWarning,
         data: {
           ...parsed,
           hookVariants: Array.isArray(parsed.hookVariants) ? parsed.hookVariants.filter((h: unknown) => typeof h === 'string' && h.trim()) : [],
