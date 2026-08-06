@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
+import { FORBIDDEN, AUDIENCE, BIZ_CONTEXT, CAT_CONTEXT, PLATFORM_CONTEXT } from "../_shared/content-context.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -8,81 +9,6 @@ const corsHeaders = {
 // Requests exceeding this many calls in the current UTC hour, per user,
 // are rejected with 429 before any AI spend happens.
 const RATE_LIMIT_PER_HOUR = 30;
-
-
-
-
-// ─── FORBIDDEN WORDS ──────────────────────────────────────────────────────────
-const FORBIDDEN = `FORBIDDEN — NEVER USE IN ANY IDEA TITLE OR HOOK:
-dignified, compassionate, heartfelt, loved one (say "your dad/mom/husband/wife"), passing (say "when someone dies"), transition, at this difficult time, here for you, loving tribute, final farewell, laid to rest, dedicated staff, honor their memory, quality care, serving families since, gone but not forgotten, rest in peace, grief journey, healing process, closure, beautiful service, peace of mind, meaningful goodbye, affordable options (be specific).
-Use real words: die, death, dead, body, cost, price. If it sounds like a funeral home brochure — rewrite it.`;
-
-
-
-
-// ─── AUDIENCE ─────────────────────────────────────────────────────────────────
-const AUDIENCE = `VIEWER: Not in crisis. Age 45-65, scrolling social media on a weekday evening. Aging parents. Curious, not grieving. Starting to think about arrangements. Has questions they're embarrassed to ask. Stopped because the hook surprised them.`;
-
-
-
-
-// ─── BUSINESS TYPE CONTEXTS ───────────────────────────────────────────────────
-const BIZ_CONTEXT: Record<string, string> = {
-  "funeral-home": `BUSINESS: Funeral Home. Insider knowledge to draw from: POA ends the moment the person dies. Embalming is not legally required in most states. Pre-arrangements can be transferred between funeral homes. Families choose competitors because the competitor is more known — not because they're better. Direct cremation doesn't mean no service. The casket room is psychologically designed — families overspend because they feel guilty choosing lower-cost options. Thumbprint is taken before cremation for ID. Price is the excuse families give — familiarity is the real reason.`,
-
-
-
-
-  "cemetery": `BUSINESS: Cemetery. Insider knowledge: "Perpetual care" doesn't mean what families think it means. Cemetery lots have deeds and can be resold. Buying in advance locks today's price. Veteran burial benefits are massively underutilized — not automatic, must be applied for. Green burial sections exist inside many traditional cemeteries. The difference between plots, mausoleum spaces, niches, and columbarium spaces has real cost and access implications families don't understand.`,
-
-
-
-
-  "crematory": `BUSINESS: Crematory. Insider knowledge: Flame cremation = 2-3 hours at 1,400-1,800°F. Aquamation (water cremation) = 12-18 hours, produces ~20% more remains, finer and whiter. A stainless steel ID tag travels with the body through the entire process — this is how ID is guaranteed. The ashes are pulverized bone fragments, not ash — white/gray and heavier than expected. Individual vs. communal cremation is a critical distinction families often don't understand. Direct cremation doesn't mean no service.`,
-
-
-
-
-  "pet-cremation": `BUSINESS: Pet Cremation. Insider knowledge: Pet grief is neurologically identical to human grief — it is not smaller grief. Individual cremation = one animal only in chamber. Communal = multiple animals, no individual remains. An ID tag travels with the animal. The remains are bone fragments, not ash. The guilt of having made the end-of-life decision compounds the grief — this deserves to be named. Most people don't know their full range of options for memorialization. In-home euthanasia is available but few know to ask.`
-};
-
-
-
-
-// ─── CONTENT CATEGORY CONTEXT ─────────────────────────────────────────────────
-const CAT_CONTEXT: Record<string, string> = {
-  "demystify": `CONTENT ANGLE: Process & Demystification. Videos that pull back the curtain — what actually happens during embalming, cremation, the first call at 2am, what tools are used, how long things take. Answer the question families are afraid to Google. Be specific. Specific reduces fear. Vague increases it.`,
-
-
-
-
-  "value": `CONTENT ANGLE: Value & Price Transparency. Not defensive — confident. "Here's exactly what you're paying for and here's what you give up by going cheaper." Help families evaluate value, not just price. Specific about what's included and excluded.`,
-
-
-
-
-  "legal": `CONTENT ANGLE: Legal & Decision Clarity. Who has decision-making authority. What POA covers and when it ends (immediately at death). Two types of organ donation. Pre-arrangement rights. Why a thumbprint is taken. These questions cause family conflict. Answer them before the moment of need.`,
-
-
-
-
-  "preplanning": `CONTENT ANGLE: Pre-Planning & Pre-Need. Pre-planning as a gift to the family left behind. Cover: planning vs. pre-paying (two different things), transferring arrangements, what to do if a funeral home closes, how to start the conversation with aging parents. One concrete next step per video.`,
-
-
-
-
-  "mythbust": `CONTENT ANGLE: Myth Busting. State the myth-bust in the first sentence — not "did you know?" but the actual fact. "You don't have to be embalmed." "Caskets don't have to be purchased from the funeral home." "Your POA ends the moment they die." First line creates the pattern interrupt.`
-};
-
-
-
-
-// ─── PLATFORM CONTEXT ─────────────────────────────────────────────────────────
-const PLATFORM_CONTEXT: Record<string, string> = {
-  "facebook": `PLATFORM: Facebook. Audience 50-70. Storytelling openings work. Neighbor-to-neighbor tone. Community connection.`,
-  "reels": `PLATFORM: Instagram Reels / TikTok. Audience 38-55. First sentence stops the scroll — no setup. Most surprising thing first. Fast pace.`,
-  "youtube": `PLATFORM: YouTube Shorts. Audience 42-65. Educational framing. "The real answer to..." still start strong.`
-};
 
 
 
@@ -188,12 +114,12 @@ Deno.serve(async (req) => {
 
 
 
-    const bizLabel = {
+    const bizLabel = ({
       "funeral-home": "Funeral Home",
       "cemetery": "Cemetery",
       "crematory": "Crematory",
       "pet-cremation": "Pet Cremation Business"
-    }[bizType] || "Funeral Home";
+    } as Record<string, string>)[bizType] || "Funeral Home";
 
 
 
