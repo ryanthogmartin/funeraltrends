@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS "Service role can read voice profiles" ON public.voice_profiles;
