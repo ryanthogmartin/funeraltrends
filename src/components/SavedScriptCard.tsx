@@ -78,7 +78,7 @@ const SavedScriptCard = ({ item, index, deletingId, onDelete, onUpdate }: SavedS
     setShowTones(false);
     try {
       const { data, error } = await supabase.functions.invoke("generate-script", {
-        body: { idea: item.idea_text, tone: toneId, userId: user?.id },
+        body: { idea: item.idea_text, tone: toneId },
       });
       if (error) throw new Error(error.message);
       if (!data?.success) throw new Error(data?.error || "Failed to regenerate");

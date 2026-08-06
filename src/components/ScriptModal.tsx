@@ -57,7 +57,7 @@ const ScriptModal = ({ open, onOpenChange, idea, bizType, category, platform, de
 
     try {
       const { data, error } = await supabase.functions.invoke('generate-script', {
-        body: { idea, tone, bizType, category, platform, userId: user?.id },
+        body: { idea, tone, bizType, category, platform },
       });
 
       if (error) throw new Error(error.message);

@@ -8,6 +8,10 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Requests exceeding this many calls in the current UTC hour, per user,
+// are rejected with 429 before any AI spend happens.
+const RATE_LIMIT_PER_HOUR = 30;
+
 
 
 
@@ -273,13 +277,44 @@ Deno.serve(async (req) => {
 
 
   try {
+    // ── Identity: derive the caller from their verified JWT, never from the
+    // request body. `verify_jwt = true` in config.toml already rejects
+    // requests with no/invalid token before this code runs, but we still
+    // resolve the user here so we know *who* is calling.
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ success: false, error: 'Missing Authorization header' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+
+    const supabaseAuth = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
+    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser();
+    if (authError || !user) {
+      return new Response(
+        JSON.stringify({ success: false, error: 'Invalid or expired session' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    const userId = user.id;
+
+    // Service-role client for DB access (voice profile lookup, rate limits).
+    // Only ever keyed off `userId` above — never a client-supplied value.
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
     const {
       idea,
       tone = "straight-shooter",
       bizType = "funeral-home",
       category = "demystify",
       platform = "facebook",
-      userId
     } = await req.json();
 
 
@@ -306,12 +341,35 @@ Deno.serve(async (req) => {
 
 
 
+    // ── Rate limit: cap AI spend per user per hour. Fails open (logs and
+    // continues) if the rate-limit table/RPC itself errors, so a DB hiccup
+    // never blocks a legitimate generation.
+    try {
+      const windowStart = new Date();
+      windowStart.setUTCMinutes(0, 0, 0);
+      const { data: callCount, error: rateError } = await supabase.rpc('increment_function_rate_limit', {
+        p_user_id: userId,
+        p_function_name: 'generate-script',
+        p_window_start: windowStart.toISOString(),
+      });
+      if (rateError) {
+        console.error('Rate limit check failed:', rateError);
+      } else if (typeof callCount === 'number' && callCount > RATE_LIMIT_PER_HOUR) {
+        return new Response(
+          JSON.stringify({ success: false, error: 'Hourly generation limit reached. Try again later.' }),
+          { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+    } catch (e) {
+      console.error('Rate limit check threw:', e);
+    }
+
+
+
+
     let voiceProfilePrompt = '';
-    if (userId && tone === 'my-voice') {
+    if (tone === 'my-voice') {
       try {
-        const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-        const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-        const supabase = createClient(supabaseUrl, supabaseKey);
         const { data: vp } = await supabase.from('voice_profiles').select('*').eq('user_id', userId).maybeSingle();
         if (vp) voiceProfilePrompt = buildVoicePrompt(vp);
       } catch (e) {

@@ -4,6 +4,6 @@ project_id = "gaaxslezqzzujfrtkdpo"
   [functions.auth-email-hook]
     verify_jwt = false
   [functions.generate-video-topics]
-    verify_jwt = false
+    verify_jwt = true
   [functions.generate-script]
-    verify_jwt = false
+    verify_jwt = true

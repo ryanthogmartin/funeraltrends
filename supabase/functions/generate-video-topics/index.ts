@@ -1,7 +1,13 @@
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+// Requests exceeding this many calls in the current UTC hour, per user,
+// are rejected with 429 before any AI spend happens.
+const RATE_LIMIT_PER_HOUR = 30;
 
 
 
@@ -89,6 +95,35 @@ Deno.serve(async (req) => {
 
 
   try {
+    // ── Identity: derive the caller from their verified JWT. `verify_jwt =
+    // true` in config.toml already rejects requests with no/invalid token
+    // before this code runs; we resolve the user here so we can rate-limit
+    // per-user rather than globally.
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ success: false, error: 'Missing Authorization header' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+
+    const supabaseAuth = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
+    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser();
+    if (authError || !user) {
+      return new Response(
+        JSON.stringify({ success: false, error: 'Invalid or expired session' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    const userId = user.id;
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
     const {
       topic,
       inputMode = "keyword",
@@ -123,6 +158,31 @@ Deno.serve(async (req) => {
         JSON.stringify({ success: false, error: 'LOVABLE_API_KEY not configured' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
+    }
+
+
+
+
+    // ── Rate limit: cap AI spend per user per hour. Fails open (logs and
+    // continues) if the rate-limit table/RPC itself errors.
+    try {
+      const windowStart = new Date();
+      windowStart.setUTCMinutes(0, 0, 0);
+      const { data: callCount, error: rateError } = await supabase.rpc('increment_function_rate_limit', {
+        p_user_id: userId,
+        p_function_name: 'generate-video-topics',
+        p_window_start: windowStart.toISOString(),
+      });
+      if (rateError) {
+        console.error('Rate limit check failed:', rateError);
+      } else if (typeof callCount === 'number' && callCount > RATE_LIMIT_PER_HOUR) {
+        return new Response(
+          JSON.stringify({ success: false, error: 'Hourly generation limit reached. Try again later.' }),
+          { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+    } catch (e) {
+      console.error('Rate limit check threw:', e);
     }
 
 
