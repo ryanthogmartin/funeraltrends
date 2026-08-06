@@ -152,10 +152,10 @@ Deno.serve(async (req) => {
 
 
 
-    const apiKey = Deno.env.get('LOVABLE_API_KEY');
+    const apiKey = Deno.env.get('ANTHROPIC_API_KEY');
     if (!apiKey) {
       return new Response(
-        JSON.stringify({ success: false, error: 'LOVABLE_API_KEY not configured' }),
+        JSON.stringify({ success: false, error: 'ANTHROPIC_API_KEY not configured' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -243,16 +243,17 @@ Deno.serve(async (req) => {
 
 
 
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${apiKey}`,
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-3-flash-preview',
+        model: 'claude-haiku-4-5',
+        system: systemPrompt,
         messages: [
-          { role: 'system', content: systemPrompt },
           { role: 'user', content: userMessage }
         ],
         temperature: 0.88,
@@ -265,7 +266,7 @@ Deno.serve(async (req) => {
 
     if (!response.ok) {
       const errText = await response.text();
-      console.error('AI gateway error:', response.status, errText);
+      console.error('Anthropic API error:', response.status, errText);
       if (response.status === 429) return new Response(JSON.stringify({ success: false, error: 'Rate limit — try again in a moment.' }), { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
       if (response.status === 402) return new Response(JSON.stringify({ success: false, error: 'AI credits exhausted.' }), { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
       return new Response(JSON.stringify({ success: false, error: `AI request failed: ${response.status}` }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
@@ -275,7 +276,9 @@ Deno.serve(async (req) => {
 
 
     const data = await response.json();
-    const content = data.choices?.[0]?.message?.content || '';
+    // Anthropic Messages API shape: content is an array of blocks; the
+    // generated text lives in the first text block.
+    const content = data.content?.[0]?.text || '';
 
 
 
