@@ -373,7 +373,6 @@ Return ONLY valid JSON, no markdown, no code fences:
 {"hook":"opening hook lines","hookVariants":["alternate hook 1","alternate hook 2"],"body":"main content with [PAUSE] markers","cta":"closing call to action","wordCount":95}`
             }
           ],
-          temperature: 0.7,
           max_tokens: 1000,
         }),
       });
