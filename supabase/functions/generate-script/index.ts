@@ -1,5 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
-import { FORBIDDEN, AUDIENCE, BIZ_CONTEXT, CAT_CONTEXT, PLATFORM_CONTEXT } from "../_shared/content-context.ts";
+import { FORBIDDEN, AUDIENCE, BIZ_CONTEXT, CAT_CONTEXT, PLATFORM_CONTEXT, STANCE, INTEGRITY, EXEMPLARS } from "../_shared/content-context.ts";
 
 
 
@@ -61,13 +61,13 @@ function jaccard(a: Set<string>, b: Set<string>): number {
 
 // ─── TONE CONTEXT ─────────────────────────────────────────────────────────────
 const TONE_CONTEXT: Record<string, string> = {
-  "straight-shooter": "TONE: Direct. Confident. No fluff. Says the real thing plainly. Doesn't soften it.",
-  "myth-buster": "TONE: Provocative. Challenges what they think they know. Bold opener. Creates a pattern interrupt.",
-  "insider": "TONE: Expert letting them in on something. Shares what most funeral directors won't say publicly.",
+  "straight-shooter": "TONE: Direct, confident, plain-spoken. Says the real thing clearly and kindly. Direct is not cold.",
+  "myth-buster": "TONE: Clears up a common misconception with a clear, confident opener — corrects gently, never confronts.",
+  "insider": "TONE: A generous expert sharing what families wish they'd known sooner — knowledgeable and open, never 'exposing' the industry.",
   "neighbor": "TONE: Warm but real. Talks like a knowledgeable person having a genuine conversation — not a professional delivering a presentation.",
   "compassionate-educator": "TONE: Warm, educational, and caring. Speak like a funeral director who genuinely wants families to understand their options. Informative but human.",
-  "industry-insider": "TONE: Confident and authoritative. Share insider knowledge with a 'let me tell you what most people don't know' energy. Direct.",
-  "myth-buster-legacy": "TONE: Bold, slightly provocative. Challenge misconceptions. 'Did you know?' energy — surprising and engaging.",
+  "industry-insider": "TONE: Confident and knowledgeable. Shares real expertise plainly, the way a seasoned professional educates — direct, never conspiratorial.",
+  "myth-buster-legacy": "TONE: Clears up a common misconception with a clear, confident opener — corrects gently, never confronts.",
   "comforting-guide": "TONE: Soft, supportive. Like a trusted friend helping someone through something difficult while giving them real information."
 };
 
@@ -306,7 +306,7 @@ Deno.serve(async (req) => {
 
     const toneGuide = (tone === 'my-voice' && voiceProfilePrompt)
       ? voiceProfilePrompt
-      : TONE_CONTEXT[tone] || TONE_CONTEXT["straight-shooter"];
+      : TONE_CONTEXT[tone] || TONE_CONTEXT["compassionate-educator"];
 
 
 
@@ -315,7 +315,9 @@ Deno.serve(async (req) => {
       `You write 45-second teleprompter-ready video scripts for ${bizLabel}s to post on social media.`,
       `The script is written FROM the funeral professional's perspective — they are speaking on camera as the expert.`,
       AUDIENCE,
+      STANCE,
       BIZ_CONTEXT[bizType] || BIZ_CONTEXT["funeral-home"],
+      INTEGRITY,
       CAT_CONTEXT[category] || CAT_CONTEXT["demystify"],
       PLATFORM_CONTEXT[platform] || PLATFORM_CONTEXT["facebook"],
       toneGuide,
@@ -323,7 +325,7 @@ Deno.serve(async (req) => {
       FORBIDDEN,
       `SCRIPT FORMAT:
 HOOK (first 1-3 sentences): Most interesting thing first. No setup. No intro. No "hey guys." Must earn the next 40 seconds on its own.
-BODY: Natural spoken language — not prose, not a brochure. Short sentences. [PAUSE] markers where the speaker breathes or lets a point land. Specific details, real numbers, real timeframes. Vague claims are invisible. Specifics get shared.
+BODY: Natural spoken language — not prose, not a brochure. Short sentences. [PAUSE] markers where the speaker breathes or lets a point land. Concrete, specific language — real steps, real experience, sensory detail. Where a real number, price, or timeframe belongs, insert a [placeholder] for the director to fill rather than inventing one. Specifics that are TRUE get shared; invented specifics get the director in trouble.
 CTA: One real, specific ask. NOT "like and subscribe." Something that creates genuine connection: "Drop your question below," "DM me the word PLAN," "Save this — your family needs to see it."
 
 
@@ -332,7 +334,8 @@ CTA: One real, specific ask. NOT "like and subscribe." Something that creates ge
 LENGTH: Under 120 words total (45 seconds spoken aloud).
 NO emojis in the script.
 NO jargon without immediate plain-language explanation.
-If it sounds like it was written by a marketing committee — rewrite it.`
+If it sounds like it was written by a marketing committee — rewrite it.`,
+      EXEMPLARS
     ].filter(Boolean).join('\n\n');
 
 
@@ -349,7 +352,7 @@ If it sounds like it was written by a marketing committee — rewrite it.`
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'claude-haiku-4-5',
+          model: 'claude-sonnet-5',
           system: systemPrompt,
           messages: [
             {
@@ -360,8 +363,8 @@ If it sounds like it was written by a marketing committee — rewrite it.`
 
 
 CRITICAL REQUIREMENTS:
-1. The HOOK must be the single most surprising or specific thing about this topic — no scene-setting, no setup, straight to the point.
-2. The BODY must use real, specific details. No vague statements.
+1. The HOOK must be the most RESONANT thing about this topic — the real question families are afraid to ask, or the reassurance they most need. Straight in, no scene-setting. Surprising is fine; a gotcha or "they don't want you to know" angle is not.
+2. The BODY must be concrete and specific in LANGUAGE, but must NOT state any price, number, temperature, or timeline that isn't provided — use a [placeholder] instead. Concrete does not mean invented.
 3. The CTA is REQUIRED — end with one specific action for the viewer to take.
 4. CHECK YOUR GRAMMAR before returning. Every sentence must be grammatically correct.
 5. Also write TWO ALTERNATE HOOKS that open the same script a different way — a different angle, not a reworded version of the first. Each alternate must work as the opening line of the same body.${avoidInstruction}
@@ -370,8 +373,8 @@ Return ONLY valid JSON, no markdown, no code fences:
 {"hook":"opening hook lines","hookVariants":["alternate hook 1","alternate hook 2"],"body":"main content with [PAUSE] markers","cta":"closing call to action","wordCount":95}`
             }
           ],
-          temperature: 0.82,
-          max_tokens: 800,
+          temperature: 0.7,
+          max_tokens: 1000,
         }),
       });
 
