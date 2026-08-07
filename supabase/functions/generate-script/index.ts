@@ -373,7 +373,7 @@ Return ONLY valid JSON, no markdown, no code fences:
 {"hook":"opening hook lines","hookVariants":["alternate hook 1","alternate hook 2"],"body":"main content with [PAUSE] markers","cta":"closing call to action","wordCount":95}`
             }
           ],
-          max_tokens: 1000,
+          max_tokens: 3000,
         }),
       });
 
@@ -386,9 +386,10 @@ Return ONLY valid JSON, no markdown, no code fences:
       }
 
       const data = await response.json();
-      // Anthropic Messages API shape: content is an array of blocks; the
-      // generated text lives in the first text block.
-      const content = data.content?.[0]?.text || '';
+      // Anthropic Messages API shape: content is an array of blocks. On
+      // claude-sonnet-5, adaptive thinking is on by default, so a thinking
+      // block precedes the text block — find the text block, don't index [0].
+      const content = data.content?.find((b: any) => b.type === 'text')?.text || '';
 
       try {
         const cleaned = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();

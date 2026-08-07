@@ -182,7 +182,7 @@ Deno.serve(async (req) => {
         messages: [
           { role: 'user', content: userMessage }
         ],
-        max_tokens: 1000,
+        max_tokens: 3000,
       }),
     });
 
@@ -203,7 +203,8 @@ Deno.serve(async (req) => {
     const data = await response.json();
     // Anthropic Messages API shape: content is an array of blocks; the
     // generated text lives in the first text block.
-    const content = data.content?.[0]?.text || '';
+    // On claude-sonnet-5 a thinking block precedes the text block.
+    const content = data.content?.find((b: any) => b.type === 'text')?.text || '';
 
 
 
