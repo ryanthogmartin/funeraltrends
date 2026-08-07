@@ -178,11 +178,12 @@ Deno.serve(async (req) => {
       },
       body: JSON.stringify({
         model: 'claude-sonnet-5',
+        thinking: { type: 'disabled' },
         system: systemPrompt,
         messages: [
           { role: 'user', content: userMessage }
         ],
-        max_tokens: 3000,
+        max_tokens: 1000,
       }),
     });
 

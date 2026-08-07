@@ -353,6 +353,7 @@ If it sounds like it was written by a marketing committee — rewrite it.`,
         },
         body: JSON.stringify({
           model: 'claude-sonnet-5',
+          thinking: { type: 'disabled' },
           system: systemPrompt,
           messages: [
             {
@@ -373,7 +374,7 @@ Return ONLY valid JSON, no markdown, no code fences:
 {"hook":"opening hook lines","hookVariants":["alternate hook 1","alternate hook 2"],"body":"main content with [PAUSE] markers","cta":"closing call to action","wordCount":95}`
             }
           ],
-          max_tokens: 3000,
+          max_tokens: 1000,
         }),
       });
 
