@@ -1,5 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 import { FORBIDDEN, AUDIENCE, BIZ_CONTEXT, CAT_CONTEXT, PLATFORM_CONTEXT } from "../_shared/content-context.ts";
+import { buildIdeaVoicePrompt } from "../_shared/idea-voice.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -131,6 +132,7 @@ Deno.serve(async (req) => {
     // included here. In a script it seeds one hook; in a menu it would tend to
     // prefix all eight titles with the same phrase.
     let businessIdentityPrompt = '';
+    let ideaVoicePrompt = '';
     try {
       const { data: vp } = await supabase.from('voice_profiles').select('*').eq('user_id', userId).maybeSingle();
       if (vp) {
@@ -139,6 +141,12 @@ Deno.serve(async (req) => {
         if (vp.specialties) bits.push(`- Their specialties: ${vp.specialties}. Prefer angles that draw on these where the topic allows.`);
         if (bits.length) {
           businessIdentityPrompt = `BUSINESS IDENTITY — make these ideas specific to THIS business, not generic to the industry:\n${bits.join('\n')}`;
+        }
+        // "My Voice" additionally gets the narrowed persona block: vocabulary,
+        // audience address, and world — not catchphrases, signature opening,
+        // or dialect. Those remain script-only (see _shared/idea-voice.ts).
+        if (tone === 'my-voice') {
+          ideaVoicePrompt = buildIdeaVoicePrompt(vp);
         }
       }
     } catch (e) {
@@ -186,6 +194,7 @@ Deno.serve(async (req) => {
       PLATFORM_CONTEXT[platform] || PLATFORM_CONTEXT["facebook"],
       `TONE: ${toneLabels[tone] || toneLabels["compassionate-educator"]}`,
       businessIdentityPrompt,
+      ideaVoicePrompt,
       FORBIDDEN,
       `RULES FOR IDEAS:
 - Statements or reveals — NOT questions
