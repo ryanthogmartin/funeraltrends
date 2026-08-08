@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useVoiceProfile } from "@/hooks/useVoiceProfile";
 import { useNavigate } from "react-router-dom";
@@ -97,6 +97,10 @@ const VideoIdeas = () => {
   const [generating, setGenerating] = useState(false);
   const [activeTopic, setActiveTopic] = useState<string>("");
 
+  // Every idea title already shown for the current topic, across regenerations,
+  // so the backend can steer new runs away from repeating them.
+  const seenIdeasRef = useRef<{ topic: string; titles: string[] }>({ topic: "", titles: [] });
+
   const [scriptOpen, setScriptOpen] = useState(false);
   const [scriptIdea, setScriptIdea] = useState<string>("");
 
@@ -122,14 +126,20 @@ const VideoIdeas = () => {
     if (!topic.trim()) return;
     setGenerating(true);
     setIdeas([]);
+    const trimmedTopic = topic.trim();
+    const previousIdeas = seenIdeasRef.current.topic === trimmedTopic ? seenIdeasRef.current.titles : [];
     try {
       const { data, error } = await supabase.functions.invoke("generate-video-topics", {
-        body: { topic: topic.trim(), inputMode, bizType, category, platform, tone },
+        body: { topic: trimmedTopic, inputMode, bizType, category, platform, tone, previousIdeas },
       });
       if (error) throw new Error(error.message);
       if (!data?.success) throw new Error(data?.error || "Failed to generate ideas");
       setIdeas(data.ideas || []);
-      setActiveTopic(topic.trim());
+      setActiveTopic(trimmedTopic);
+      seenIdeasRef.current = {
+        topic: trimmedTopic,
+        titles: [...previousIdeas, ...(data.ideas || [])].slice(-24),
+      };
     } catch (err: any) {
       toast({ title: "Generation failed", description: err.message || "Try again later", variant: "destructive" });
     } finally {
