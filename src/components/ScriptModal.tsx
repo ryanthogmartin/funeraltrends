@@ -28,11 +28,13 @@ interface ScriptData {
   wordCount: number;
 }
 
+// Canonical tone lineup — kept identical (names, order, copy, keys) with
+// VideoIdeas and SavedScriptCard. "My Voice" is rendered separately below,
+// gated on the user having a saved voice profile.
 const tones = [
   { id: "compassionate-educator", label: "Compassionate Educator", desc: "Warm, empathetic, educational" },
-  { id: "industry-insider", label: "Industry Insider", desc: "Confident, authoritative insider knowledge" },
-  { id: "myth-buster", label: "Myth Buster", desc: "Bold, provocative, challenge misconceptions" },
-  { id: "comforting-guide", label: "Comforting Guide", desc: "Soft, supportive, nurturing" },
+  { id: "neighbor", label: "Community Neighbor", desc: "Warm, real, human" },
+  { id: "comforting-guide", label: "Comforting Guide", desc: "Soft, supportive, reassuring" },
 ];
 
 const ScriptModal = ({ open, onOpenChange, idea, bizType, category, platform, defaultTone }: ScriptModalProps) => {

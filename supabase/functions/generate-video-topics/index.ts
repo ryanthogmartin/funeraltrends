@@ -131,11 +131,20 @@ Deno.serve(async (req) => {
 
 
 
+    // Must cover every key the UI can send, plus the retired keys kept as
+    // aliases (an old saved selection can still arrive here). An unknown key
+    // falls back to the default warm voice — never to a provocative one.
     const toneLabels: Record<string, string> = {
-      "straight-shooter": "Direct. Confident. Says the real thing plainly.",
-      "myth-buster": "Provocative. Challenges what they think they know. Bold opener.",
-      "insider": "Shares what most funeral directors won't say publicly.",
-      "neighbor": "Warm but real. Knowledgeable person talking, not a professional presenting."
+      "compassionate-educator": "Warm, educational, and caring. Speaks like a funeral director who genuinely wants families to understand their options.",
+      "neighbor": "Warm but real. Knowledgeable person talking, not a professional presenting.",
+      "comforting-guide": "Soft, supportive. Like a trusted friend giving real information through something difficult.",
+      "my-voice": "Warm, personal, and specific to this business — the way this director actually talks to families.",
+      // Retired from the UI; retained so previously-stored selections resolve.
+      "straight-shooter": "Direct, confident, plain-spoken. Says the real thing clearly and kindly.",
+      "myth-buster": "Clears up a common misconception with a clear, confident opener — corrects gently, never confronts.",
+      "myth-buster-legacy": "Clears up a common misconception with a clear, confident opener — corrects gently, never confronts.",
+      "insider": "A generous expert sharing what families wish they'd known sooner — knowledgeable and open.",
+      "industry-insider": "Confident and knowledgeable. Shares real expertise plainly, the way a seasoned professional educates."
     };
 
 
@@ -148,7 +157,7 @@ Deno.serve(async (req) => {
       BIZ_CONTEXT[bizType] || BIZ_CONTEXT["funeral-home"],
       CAT_CONTEXT[category] || CAT_CONTEXT["demystify"],
       PLATFORM_CONTEXT[platform] || PLATFORM_CONTEXT["facebook"],
-      `TONE: ${toneLabels[tone] || toneLabels["straight-shooter"]}`,
+      `TONE: ${toneLabels[tone] || toneLabels["compassionate-educator"]}`,
       FORBIDDEN,
       `RULES FOR IDEAS:
 - Statements or reveals — NOT questions
