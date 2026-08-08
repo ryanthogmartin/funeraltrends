@@ -121,6 +121,33 @@ Deno.serve(async (req) => {
 
 
 
+    // Business identity (mirrors generate-script): so a menu of ideas is
+    // specific to THIS business rather than generic to the profession, and two
+    // businesses on the same topic don't get the same eight titles. Applied to
+    // EVERY tone, including my-voice — full persona voice on idea titles is a
+    // separate, still-undecided change.
+    //
+    // Deliberate deviation from generate-script: `signature_opening` is NOT
+    // included here. In a script it seeds one hook; in a menu it would tend to
+    // prefix all eight titles with the same phrase.
+    let businessIdentityPrompt = '';
+    try {
+      const { data: vp } = await supabase.from('voice_profiles').select('*').eq('user_id', userId).maybeSingle();
+      if (vp) {
+        const bits: string[] = [];
+        if (vp.funeral_home_name) bits.push(`- The speaker works at ${vp.funeral_home_name}. Where an idea naturally calls for it, ground it in that business — not as an ad, and not in every title.`);
+        if (vp.specialties) bits.push(`- Their specialties: ${vp.specialties}. Prefer angles that draw on these where the topic allows.`);
+        if (bits.length) {
+          businessIdentityPrompt = `BUSINESS IDENTITY — make these ideas specific to THIS business, not generic to the industry:\n${bits.join('\n')}`;
+        }
+      }
+    } catch (e) {
+      console.error('Failed to fetch voice profile:', e);
+    }
+
+
+
+
     const bizLabel = ({
       "funeral-home": "Funeral Home",
       "cemetery": "Cemetery",
@@ -158,6 +185,7 @@ Deno.serve(async (req) => {
       CAT_CONTEXT[category] || CAT_CONTEXT["demystify"],
       PLATFORM_CONTEXT[platform] || PLATFORM_CONTEXT["facebook"],
       `TONE: ${toneLabels[tone] || toneLabels["compassionate-educator"]}`,
+      businessIdentityPrompt,
       FORBIDDEN,
       `RULES FOR IDEAS:
 - Statements or reveals — NOT questions
@@ -167,7 +195,7 @@ Deno.serve(async (req) => {
 - If it sounds like generic AI content — make it more specific to the ${bizLabel} industry`,
       `The 8 ideas MUST be genuinely distinct — not 8 rewordings of one angle. Deliberately vary the ENTRY POINT across the set, drawing from different ones: a myth to gently correct, a real question a family asked, a behind-the-scenes/process moment, a legal or decision point, a pre-planning nudge, a cost/value explanation, a short personal story, an emotional reassurance. Vary the FORMAT too (direct answer, story, comparison, "what to expect," step-by-step). No more than two of the eight may lean on the same underlying fact. On a narrow topic, find fresh angles ON the topic rather than repeating the single most obvious one.`,
       `Return ONLY valid JSON, no markdown: {"ideas":["idea 1","idea 2","idea 3","idea 4","idea 5","idea 6","idea 7","idea 8"]}`
-    ].join('\n\n');
+    ].filter(Boolean).join('\n\n');
 
 
 
