@@ -22,9 +22,10 @@ interface SavedIdea {
 }
 
 const tones = [
+  // Canonical tone lineup — kept identical (names, order, keys) with
+  // VideoIdeas and ScriptModal. "My Voice" is rendered separately below.
   { id: "compassionate-educator", label: "Compassionate Educator" },
-  { id: "industry-insider", label: "Industry Insider" },
-  { id: "myth-buster", label: "Myth Buster" },
+  { id: "neighbor", label: "Community Neighbor" },
   { id: "comforting-guide", label: "Comforting Guide" },
 ];
 

@@ -13,7 +13,7 @@ type BizType = "funeral-home" | "cemetery" | "crematory" | "pet-cremation";
 type InputMode = "keyword" | "question" | "free";
 type Category = "demystify" | "value" | "legal" | "preplanning" | "mythbust";
 type Platform = "facebook" | "reels" | "youtube";
-type Tone = "straight-shooter" | "myth-buster" | "insider" | "neighbor" | "my-voice";
+type Tone = "compassionate-educator" | "neighbor" | "comforting-guide" | "my-voice";
 
 const BIZ_OPTIONS: { value: BizType; emoji: string; label: string }[] = [
   { value: "funeral-home", emoji: "🏛️", label: "Funeral Home" },
@@ -72,11 +72,13 @@ const PLATFORM_OPTIONS: { value: Platform; label: string }[] = [
   { value: "youtube", label: "YouTube Shorts" },
 ];
 
+// Canonical tone lineup — kept identical (names, order, copy, keys) with
+// ScriptModal and SavedScriptCard. "My Voice" is rendered separately below,
+// gated on the user having a saved voice profile.
 const TONE_OPTIONS: { value: Tone; label: string; desc: string }[] = [
-  { value: "straight-shooter", label: "Straight Shooter", desc: "Direct, confident, says it plainly" },
-  { value: "myth-buster", label: "Myth Buster", desc: "Provocative, pattern interrupt" },
-  { value: "insider", label: "Industry Insider", desc: "Shares what others won't say" },
+  { value: "compassionate-educator", label: "Compassionate Educator", desc: "Warm, empathetic, educational" },
   { value: "neighbor", label: "Community Neighbor", desc: "Warm, real, human" },
+  { value: "comforting-guide", label: "Comforting Guide", desc: "Soft, supportive, reassuring" },
 ];
 
 const VideoIdeas = () => {
@@ -91,7 +93,7 @@ const VideoIdeas = () => {
   const [topic, setTopic] = useState<string>("");
   const [category, setCategory] = useState<Category>("demystify");
   const [platform, setPlatform] = useState<Platform>("facebook");
-  const [tone, setTone] = useState<Tone>("straight-shooter");
+  const [tone, setTone] = useState<Tone>("compassionate-educator");
 
   const [ideas, setIdeas] = useState<string[]>([]);
   const [generating, setGenerating] = useState(false);

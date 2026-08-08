@@ -60,6 +60,13 @@ function jaccard(a: Set<string>, b: Set<string>): number {
 
 
 // ─── TONE CONTEXT ─────────────────────────────────────────────────────────────
+// The UI offers only the warm lineup (compassionate-educator, neighbor,
+// comforting-guide, plus the My Voice persona path). The remaining keys are
+// retained as ALIASES, not dead code: `saved_ideas.script_tone` persists a
+// tone per saved script, so a previously-generated script can still send
+// `straight-shooter` / `insider` / `industry-insider` / `myth-buster` /
+// `myth-buster-legacy` on regenerate. Removing them would fall back to the
+// default voice silently. Keep unless that persistence goes away.
 const TONE_CONTEXT: Record<string, string> = {
   "straight-shooter": "TONE: Direct, confident, plain-spoken. Says the real thing clearly and kindly. Direct is not cold.",
   "myth-buster": "TONE: Clears up a common misconception with a clear, confident opener — corrects gently, never confronts.",
