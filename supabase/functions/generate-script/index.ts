@@ -460,12 +460,23 @@ Return ONLY valid JSON, no markdown, no code fences:
       console.error('Failed to store fingerprint:', e);
     }
 
+    // The model's self-reported wordCount is unreliable (observed: reported 118
+    // for a 129-word body), and the UI displays it as fact. Recompute from the
+    // text we actually return and overwrite — the server value wins.
+    //
+    // Counts the BODY only, matching what the saved-script PDF counts. [PAUSE]
+    // markers are stage directions, not spoken words, so they're excluded —
+    // this number is meant to answer "how long is this to read aloud".
+    const spokenBody = String(parsed.body || '').replace(/\[PAUSE\]/gi, ' ');
+    const trueWordCount = spokenBody.trim().split(/\s+/).filter(Boolean).length;
+
     return new Response(
       JSON.stringify({
         success: true,
         similarityWarning,
         data: {
           ...parsed,
+          wordCount: trueWordCount,
           hookVariants: Array.isArray(parsed.hookVariants) ? parsed.hookVariants.filter((h: unknown) => typeof h === 'string' && h.trim()) : [],
         },
       }),
