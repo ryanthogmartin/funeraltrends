@@ -42,6 +42,12 @@ export const TONE_CONTEXT: Record<string, string> = {
 // The FULL persona block, used only when tone === 'my-voice'. Idea titles get
 // the narrowed version in _shared/idea-voice.ts instead — see that file for
 // what is deliberately held back from a menu of eight headlines and why.
+//
+// NOTE: taboo_topics used to be appended here. Living here meant it was
+// honored only on my-voice and never on idea titles, while the UI promised
+// "the AI will never include these in your scripts". It is a constraint, not a
+// voice flourish, and now lives in buildTabooBlock() applied on every tone and
+// both paths. Do not move it back into this function.
 export function buildVoicePrompt(vp: any): string {
   let prompt = `VOICE PROFILE — Write the script AS this specific funeral professional:\n\n`;
 
@@ -90,7 +96,6 @@ export function buildVoicePrompt(vp: any): string {
   if (vp.signature_opening?.trim()) prompt += `\n\nSIGNATURE OPENING — Start with or inspired by: "${vp.signature_opening}"`;
   if (vp.content_pillars?.trim()) prompt += `\n\nCONTENT PILLARS: ${vp.content_pillars}`;
   if (vp.catchphrases?.trim()) prompt += `\n\nSIGNATURE PHRASES (weave in naturally): ${vp.catchphrases}`;
-  if (vp.taboo_topics?.trim()) prompt += `\n\n⚠️ NEVER MENTION: ${vp.taboo_topics}`;
   if (vp.sample_script?.trim()) prompt += `\n\nSAMPLE OF HOW THIS PERSON SPEAKS — match this voice closely:\n"${vp.sample_script.slice(0, 1200)}"`;
 
   return prompt;
@@ -105,6 +110,8 @@ export interface ScriptPromptOptions {
   voiceProfilePrompt?: string;
   /** Business-identity block (name/specialties/opening); '' when no profile. */
   businessIdentityPrompt?: string;
+  /** Per-business off-limits list; '' when the director set none. Every tone. */
+  tabooPrompt?: string;
 }
 
 export function buildScriptSystemPrompt(opts: ScriptPromptOptions): string {
@@ -132,6 +139,11 @@ export function buildScriptSystemPrompt(opts: ScriptPromptOptions): string {
     toneGuide,
     opts.businessIdentityPrompt || "",
     FORBIDDEN,
+    // Immediately after FORBIDDEN — the other never-say block — so the
+    // director's own free text never lands inside the STANCE/INTEGRITY layer,
+    // while still sitting upstream of the format rules. Same slot in
+    // buildIdeaSystemPrompt, so the two paths stay diffable.
+    opts.tabooPrompt || "",
     `SCRIPT FORMAT:
 HOOK (first 1-3 sentences): Most interesting thing first. No setup. No intro. No "hey guys." Must earn the next 40 seconds on its own.
 BODY: Natural spoken language — not prose, not a brochure. Short sentences. [PAUSE] markers where the speaker breathes or lets a point land. Concrete, specific language — real steps, real experience, sensory detail. Where a real number, price, or timeframe belongs, insert a [placeholder] for the director to fill rather than inventing one. Specifics that are TRUE get shared; invented specifics get the director in trouble.

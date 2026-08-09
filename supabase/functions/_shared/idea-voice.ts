@@ -11,6 +11,12 @@
 //
 // Deliberately EXCLUDED (script-only): signature_opening, catchphrases,
 // sample_script, pacing_style, cta_style.
+//
+// taboo_topics is NOT in that list and must not be added to it. Every field
+// above is a performance flourish that reads badly repeated across eight
+// headlines; taboo_topics is a prohibition, which has no such downside. It is
+// applied to BOTH paths and every tone via buildTabooBlock() in
+// content-context.ts — not here, because it is a constraint, not a voice.
 
 export function buildIdeaVoicePrompt(vp: Record<string, unknown>): string {
   const bits: string[] = [];

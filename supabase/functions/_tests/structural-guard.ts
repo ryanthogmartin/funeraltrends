@@ -25,6 +25,9 @@
 import { buildScriptSystemPrompt, type ScriptPromptOptions } from "../_shared/script-prompt.ts";
 import { buildIdeaSystemPrompt, type IdeaPromptOptions } from "../_shared/idea-prompt.ts";
 
+/** Heading of the per-business off-limits block, when the director set one. */
+export const TABOO_MARKER = "OFF-LIMITS FOR THIS BUSINESS — HARD CONSTRAINT:";
+
 /** A block that must be present, identified by a distinctive substring of its real text. */
 interface RequiredBlock {
   name: string;
@@ -93,6 +96,8 @@ export const ORDERING: [string, string][] = [
   ["WHO IS WATCHING:", "STANCE — READ BEFORE ANYTHING ELSE:"],
   ["STANCE — READ BEFORE ANYTHING ELSE:", "FACTUAL INTEGRITY — HARD RULE"],
   ["FACTUAL INTEGRITY — HARD RULE", "FORBIDDEN — NEVER USE"],
+  // The director's free text must land AFTER the safety layer, never inside it.
+  ["FORBIDDEN — NEVER USE", TABOO_MARKER],
 ];
 
 export interface GuardResult {

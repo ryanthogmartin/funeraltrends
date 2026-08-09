@@ -5,7 +5,7 @@ import {
   buildAvoidInstruction,
   buildVoicePrompt,
 } from "../_shared/script-prompt.ts";
-import { bizLabelFor } from "../_shared/content-context.ts";
+import { bizLabelFor, buildTabooBlock } from "../_shared/content-context.ts";
 
 
 
@@ -175,9 +175,15 @@ Deno.serve(async (req) => {
     // on the same topic don't produce word-for-word-similar scripts.
     let voiceProfilePrompt = '';
     let businessIdentityPrompt = '';
+    let tabooPrompt = '';
     try {
       const { data: vp } = await supabase.from('voice_profiles').select('*').eq('user_id', userId).maybeSingle();
       if (vp) {
+        // Applies on EVERY tone, my-voice included — it is a constraint, not a
+        // voice flourish. It used to live inside buildVoicePrompt, which runs
+        // only for my-voice, so the UI's "the AI will never include these"
+        // promise was silently broken on the default tone. Keep it out here.
+        tabooPrompt = buildTabooBlock(vp.taboo_topics);
         if (tone === 'my-voice') {
           voiceProfilePrompt = buildVoicePrompt(vp);
         } else {
@@ -186,7 +192,7 @@ Deno.serve(async (req) => {
           if (vp.specialties) bits.push(`- Their specialties: ${vp.specialties}. Lean on these where relevant to the topic.`);
           if (vp.signature_opening?.trim()) bits.push(`- If it fits the hook, they often open with: "${vp.signature_opening}"`);
           if (bits.length) {
-            businessIdentityPrompt = `BUSINESS IDENTITY — make this script specific to THIS business, not generic to the industry:\n${bits.join('\n')}`;
+            businessIdentityPrompt = `BUSINESS IDENTITY — make this script specific to THIS business, not generic to the profession:\n${bits.join('\n')}`;
           }
         }
       }
@@ -224,6 +230,7 @@ Deno.serve(async (req) => {
       bizType, category, platform, tone,
       voiceProfilePrompt,
       businessIdentityPrompt,
+      tabooPrompt,
     });
 
 

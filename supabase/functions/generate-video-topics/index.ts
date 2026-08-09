@@ -1,6 +1,7 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 import { buildIdeaVoicePrompt } from "../_shared/idea-voice.ts";
 import { buildIdeaSystemPrompt, buildIdeaUserMessage } from "../_shared/idea-prompt.ts";
+import { buildTabooBlock } from "../_shared/content-context.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -133,14 +134,20 @@ Deno.serve(async (req) => {
     // prefix all eight titles with the same phrase.
     let businessIdentityPrompt = '';
     let ideaVoicePrompt = '';
+    let tabooPrompt = '';
     try {
       const { data: vp } = await supabase.from('voice_profiles').select('*').eq('user_id', userId).maybeSingle();
       if (vp) {
+        // Applies on EVERY tone. Unlike signature_opening (held back below
+        // because it would prefix all eight titles), a prohibition has no
+        // downside on a menu — it was simply missed, and idea titles honored
+        // no taboo list at all until now.
+        tabooPrompt = buildTabooBlock(vp.taboo_topics);
         const bits: string[] = [];
         if (vp.funeral_home_name) bits.push(`- The speaker works at ${vp.funeral_home_name}. Where an idea naturally calls for it, ground it in that business — not as an ad, and not in every title.`);
         if (vp.specialties) bits.push(`- Their specialties: ${vp.specialties}. Prefer angles that draw on these where the topic allows.`);
         if (bits.length) {
-          businessIdentityPrompt = `BUSINESS IDENTITY — make these ideas specific to THIS business, not generic to the industry:\n${bits.join('\n')}`;
+          businessIdentityPrompt = `BUSINESS IDENTITY — make these ideas specific to THIS business, not generic to the profession:\n${bits.join('\n')}`;
         }
         // "My Voice" additionally gets the narrowed persona block: vocabulary,
         // audience address, and world — not catchphrases, signature opening,
@@ -164,6 +171,7 @@ Deno.serve(async (req) => {
       bizType, category, platform, tone,
       businessIdentityPrompt,
       ideaVoicePrompt,
+      tabooPrompt,
     });
 
     const userMessage = buildIdeaUserMessage({
