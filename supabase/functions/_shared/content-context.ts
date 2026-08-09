@@ -10,6 +10,20 @@
 // topics versions were merged in ("price is the excuse, familiarity is the
 // real reason"; "in-home euthanasia is available but few know to ask").
 
+// ─── BUSINESS LABELS ──────────────────────────────────────────────────────────
+// Display names for the four verticals, used in both prompts. These lived in
+// two places — idea-prompt.ts and an inline copy in generate-script — which is
+// exactly the kind of duplicate that drifts. One copy, imported by both.
+export const BIZ_LABELS: Record<string, string> = {
+  "funeral-home": "Funeral Home",
+  "cemetery": "Cemetery",
+  "crematory": "Crematory",
+  "pet-cremation": "Pet Cremation Business",
+};
+
+export const bizLabelFor = (bizType: string): string =>
+  BIZ_LABELS[bizType] || BIZ_LABELS["funeral-home"];
+
 // ─── STANCE ───────────────────────────────────────────────────────────────────
 export const STANCE = `STANCE — READ BEFORE ANYTHING ELSE:
 You are the funeral professional speaking to your own community as an educator and guide. Your job is to help families understand their options and honor their wishes — never to sell, scare, or expose.

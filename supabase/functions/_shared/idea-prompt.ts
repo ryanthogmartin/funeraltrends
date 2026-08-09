@@ -14,18 +14,12 @@
 
 import {
   FORBIDDEN, AUDIENCE, BIZ_CONTEXT, CAT_CONTEXT, PLATFORM_CONTEXT,
-  STANCE, INTEGRITY,
+  STANCE, INTEGRITY, BIZ_LABELS, bizLabelFor,
 } from "./content-context.ts";
 
-export const BIZ_LABELS: Record<string, string> = {
-  "funeral-home": "Funeral Home",
-  "cemetery": "Cemetery",
-  "crematory": "Crematory",
-  "pet-cremation": "Pet Cremation Business",
-};
-
-export const bizLabelFor = (bizType: string): string =>
-  BIZ_LABELS[bizType] || BIZ_LABELS["funeral-home"];
+// Re-exported for existing importers; the definitions now live in
+// content-context.ts so generate-script shares the same copy.
+export { BIZ_LABELS, bizLabelFor };
 
 // Must cover every key the UI can send, plus the keys retired from the UI but
 // kept as aliases (an old stored selection can still arrive here). An unknown

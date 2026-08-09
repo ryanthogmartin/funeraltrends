@@ -1,5 +1,11 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
-import { FORBIDDEN, AUDIENCE, BIZ_CONTEXT, CAT_CONTEXT, PLATFORM_CONTEXT, STANCE, INTEGRITY, EXEMPLARS } from "../_shared/content-context.ts";
+import {
+  buildScriptSystemPrompt,
+  buildScriptUserMessage,
+  buildAvoidInstruction,
+  buildVoicePrompt,
+} from "../_shared/script-prompt.ts";
+import { bizLabelFor } from "../_shared/content-context.ts";
 
 
 
@@ -59,103 +65,7 @@ function jaccard(a: Set<string>, b: Set<string>): number {
 
 
 
-// ─── TONE CONTEXT ─────────────────────────────────────────────────────────────
-// The UI offers only the warm lineup (compassionate-educator, neighbor,
-// comforting-guide, plus the My Voice persona path). The remaining keys are
-// retained as ALIASES, not dead code: `saved_ideas.script_tone` persists a
-// tone per saved script, so a previously-generated script can still send
-// `straight-shooter` / `insider` / `industry-insider` / `myth-buster` /
-// `myth-buster-legacy` on regenerate. Removing them would fall back to the
-// default voice silently. Keep unless that persistence goes away.
-const TONE_CONTEXT: Record<string, string> = {
-  "straight-shooter": "TONE: Direct, confident, plain-spoken. Says the real thing clearly and kindly. Direct is not cold.",
-  "myth-buster": "TONE: Clears up a common misconception with a clear, confident opener — corrects gently, never confronts.",
-  "insider": "TONE: A generous expert sharing what families wish they'd known sooner — knowledgeable and open, never 'exposing' the industry.",
-  "neighbor": "TONE: Warm but real. Talks like a knowledgeable person having a genuine conversation — not a professional delivering a presentation.",
-  "compassionate-educator": "TONE: Warm, educational, and caring. Speak like a funeral director who genuinely wants families to understand their options. Informative but human.",
-  "industry-insider": "TONE: Confident and knowledgeable. Shares real expertise plainly, the way a seasoned professional educates — direct, never conspiratorial.",
-  "myth-buster-legacy": "TONE: Clears up a common misconception with a clear, confident opener — corrects gently, never confronts.",
-  "comforting-guide": "TONE: Soft, supportive. Like a trusted friend helping someone through something difficult while giving them real information."
-};
-
-
-
-
-// ─── VOICE PROFILE BUILDER (preserved from original) ──────────────────────────
-function buildVoicePrompt(vp: any): string {
-  let prompt = `VOICE PROFILE — Write the script AS this specific funeral professional:\n\n`;
-
-
-
-
-  if (vp.funeral_home_name) prompt += `They work at ${vp.funeral_home_name}. `;
-  if (vp.years_experience) prompt += `${vp.years_experience} years of experience. `;
-  if (vp.specialties) prompt += `Specialties: ${vp.specialties}. `;
-
-
-
-
-  const toneMap: Record<string, string> = {
-    'warm-empathetic': 'Warm, empathetic, caring. Like a trusted friend who also happens to be a funeral professional.',
-    'professional-authoritative': 'Confident and authoritative. An expert families trust completely.',
-    'down-to-earth': 'Casual, approachable, real. Talks about tough topics in a relatable way.',
-    'reverent-formal': 'Dignified, respectful, traditional.',
-  };
-  if (vp.tone_descriptor) prompt += `\nTONE: ${toneMap[vp.tone_descriptor] || vp.tone_descriptor}`;
-
-
-
-
-  if (vp.target_audience_age) {
-    const ageMap: Record<string, string> = {
-      'millennials': 'Target: Millennials 25-40. Casual, relatable.',
-      'gen-x': 'Target: Gen X 40-55. Practical, direct.',
-      'boomers': 'Target: Boomers 55+. Traditional, respectful.',
-      'all-ages': 'Target: All ages. Universal language.',
-    };
-    prompt += `\nAUDIENCE: ${ageMap[vp.target_audience_age] || vp.target_audience_age}`;
-  }
-
-
-
-
-  if (vp.pacing_style) {
-    const pacingMap: Record<string, string> = {
-      'short-punchy': 'Short punchy sentences. Rapid delivery.',
-      'mixed': 'Natural mix of short and longer sentences.',
-      'flowing': 'Flowing sentences with storytelling cadence.',
-    };
-    prompt += `\nPACING: ${pacingMap[vp.pacing_style] || vp.pacing_style}`;
-  }
-
-
-
-
-  if (vp.cta_style) {
-    const ctaMap: Record<string, string> = {
-      'soft-ask': 'Soft close — "If this helped, consider sharing it."',
-      'direct-cta': 'Direct CTA — "Follow for more and drop a comment."',
-      'question': 'End with a question to spark comments.',
-      'emotional-close': 'Emotional close — "You don\'t have to go through this alone."',
-    };
-    prompt += `\nCTA STYLE: ${ctaMap[vp.cta_style] || vp.cta_style}`;
-  }
-
-
-
-
-  if (vp.audience_address) prompt += `\nAddress the audience as "${vp.audience_address}".`;
-  if (vp.signature_opening?.trim()) prompt += `\n\nSIGNATURE OPENING — Start with or inspired by: "${vp.signature_opening}"`;
-  if (vp.content_pillars?.trim()) prompt += `\n\nCONTENT PILLARS: ${vp.content_pillars}`;
-  if (vp.catchphrases?.trim()) prompt += `\n\nSIGNATURE PHRASES (weave in naturally): ${vp.catchphrases}`;
-  if (vp.taboo_topics?.trim()) prompt += `\n\n⚠️ NEVER MENTION: ${vp.taboo_topics}`;
-  if (vp.sample_script?.trim()) prompt += `\n\nSAMPLE OF HOW THIS PERSON SPEAKS — match this voice closely:\n"${vp.sample_script.slice(0, 1200)}"`;
-
-
-
-
-  return prompt;
-}
+// TONE_CONTEXT and buildVoicePrompt now live in _shared/script-prompt.ts.
 
 
 
@@ -301,49 +211,20 @@ Deno.serve(async (req) => {
 
 
 
-    const bizLabel = ({
-      "funeral-home": "Funeral Home",
-      "cemetery": "Cemetery",
-      "crematory": "Crematory",
-      "pet-cremation": "Pet Cremation Business"
-    } as Record<string, string>)[bizType] || "Funeral Home";
+    const bizLabel = bizLabelFor(bizType);
 
 
 
 
-    const toneGuide = (tone === 'my-voice' && voiceProfilePrompt)
-      ? voiceProfilePrompt
-      : TONE_CONTEXT[tone] || TONE_CONTEXT["compassionate-educator"];
-
-
-
-
-    const systemPrompt = [
-      `You write 45-second teleprompter-ready video scripts for ${bizLabel}s to post on social media.`,
-      `The script is written FROM the funeral professional's perspective — they are speaking on camera as the expert.`,
-      AUDIENCE,
-      STANCE,
-      BIZ_CONTEXT[bizType] || BIZ_CONTEXT["funeral-home"],
-      INTEGRITY,
-      CAT_CONTEXT[category] || CAT_CONTEXT["demystify"],
-      PLATFORM_CONTEXT[platform] || PLATFORM_CONTEXT["facebook"],
-      toneGuide,
+    // Prompt assembly lives in _shared/script-prompt.ts so tests import the
+    // exact builder production uses. Do NOT reconstruct a prompt inline here —
+    // a hand-mirrored copy in a harness is what let STANCE/INTEGRITY go missing
+    // from generate-video-topics undetected for four rounds.
+    const systemPrompt = buildScriptSystemPrompt({
+      bizType, category, platform, tone,
+      voiceProfilePrompt,
       businessIdentityPrompt,
-      FORBIDDEN,
-      `SCRIPT FORMAT:
-HOOK (first 1-3 sentences): Most interesting thing first. No setup. No intro. No "hey guys." Must earn the next 40 seconds on its own.
-BODY: Natural spoken language — not prose, not a brochure. Short sentences. [PAUSE] markers where the speaker breathes or lets a point land. Concrete, specific language — real steps, real experience, sensory detail. Where a real number, price, or timeframe belongs, insert a [placeholder] for the director to fill rather than inventing one. Specifics that are TRUE get shared; invented specifics get the director in trouble.
-CTA: One real, specific ask. NOT "like and subscribe." Something that creates genuine connection: "Drop your question below," "DM me the word PLAN," "Save this — your family needs to see it."
-
-
-
-
-LENGTH: Under 120 words total (45 seconds spoken aloud).
-NO emojis in the script.
-NO jargon without immediate plain-language explanation.
-If it sounds like it was written by a marketing committee — rewrite it.`,
-      EXEMPLARS
-    ].filter(Boolean).join('\n\n');
+    });
 
 
 
@@ -365,20 +246,7 @@ If it sounds like it was written by a marketing committee — rewrite it.`,
           messages: [
             {
               role: 'user',
-              content: `Write a 45-second script for a ${bizLabel} about: "${idea}"
-
-
-
-
-CRITICAL REQUIREMENTS:
-1. The HOOK must be the most RESONANT thing about this topic — the real question families are afraid to ask, or the reassurance they most need. Straight in, no scene-setting. Surprising is fine; a gotcha or "they don't want you to know" angle is not.
-2. The BODY must be concrete and specific in LANGUAGE, but must NOT state any price, number, temperature, or timeline that isn't provided — use a [placeholder] instead. Concrete does not mean invented.
-3. The CTA is REQUIRED — end with one specific action for the viewer to take.
-4. CHECK YOUR GRAMMAR before returning. Every sentence must be grammatically correct.
-5. Also write TWO ALTERNATE HOOKS that open the same script a different way — a different angle, not a reworded version of the first. Each alternate must work as the opening line of the same body.${avoidInstruction}
-
-Return ONLY valid JSON, no markdown, no code fences:
-{"hook":"opening hook lines","hookVariants":["alternate hook 1","alternate hook 2"],"body":"main content with [PAUSE] markers","cta":"closing call to action","wordCount":95}`
+              content: buildScriptUserMessage({ bizType, idea, avoidInstruction }),
             }
           ],
           max_tokens: 1000,
@@ -427,8 +295,7 @@ Return ONLY valid JSON, no markdown, no code fences:
     // with an explicit instruction to take a different angle. Keep whichever
     // attempt is less similar to the account's history.
     if (similarity >= SIMILARITY_THRESHOLD) {
-      const retry = await generateOnce(`
-6. IMPORTANT — ANTI-REPETITION: This account has already received a very similar script on this topic. Take a genuinely DIFFERENT angle: a different insider fact for the hook, a different structure, different specifics. Do NOT reuse or lightly reword this previous opening: "${String(parsed.hook || '').slice(0, 160)}"`);
+      const retry = await generateOnce(buildAvoidInstruction(parsed.hook));
       if (retry.ok) {
         const retrySimilarity = maxSimilarity(fingerprintOf(retry.parsed));
         if (retrySimilarity < similarity) {
