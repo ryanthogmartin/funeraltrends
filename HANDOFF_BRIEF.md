@@ -28,8 +28,10 @@ Consequences that bite:
 
 ## 2. Current state
 
-`main` = **`255194a`**. Working tree clean. **Merged but NOT deployed** — Lovable must
-redeploy **both** functions (`_shared/` changed).
+`main` = **`6827ec2`**. Working tree clean. **Deployed and live-verified.** Both functions
+were redeployed together and confirmed on the same `_shared/` version — a partial redeploy
+would have left them on different safety layers, which is the divergence this whole audit
+exists to kill. Check that explicitly on any future `_shared/` change.
 
 Latest work closed open thread 6.1 (the ideas-vs-script audit). See
 `AUDIT_ideas_vs_script.md` for the full parity matrix and `SPEC_taboo_safety_layer.md` for
@@ -144,10 +146,15 @@ voice reaching idea titles; the legal-question path no longer 500ing.
 > commit gets reverted — regardless of how clean the harness was.** The harness has lied
 > before (see §3). Live is the only check that counts. This time they agreed.
 
-**Verified against the live model for `255194a` (43 calls + a 7-call re-run), NOT against the
-deployed functions** — there was no deployed version of the change to test, so this is a
-weaker claim than the deployed-function checks above and should not be read as the same
-thing. `taboo_topics` reach 1/8 → 8/8 path+tone combinations; injection payload in the taboo
+**Verified live against the DEPLOYED functions:** a default-tone (Compassionate Educator)
+script with `taboo_topics = cremation` on the profile and the topic "what to expect at a
+funeral service" covered a celebration-of-life service warmly and never touched cremation —
+no visible seam. Both functions confirmed redeployed on the same shared layer;
+`script_fingerprints` and the pg_cron jobs intact. **Live and harness agree.**
+
+**Verified against the live model before merge (43 calls + a 7-call re-run)** — a weaker
+claim than the deployed-function check above, kept here because it is what the pre-merge
+decisions rested on. `taboo_topics` reach 1/8 → 8/8 path+tone combinations; injection payload in the taboo
 field contained (0 outputs asserted it, 0 named any state in 44KB of transcript); the rules
 rewrite did not flatten titles (20.4 vs 19.6 avg words, 15 vs 16 concrete nouns, 0 exposé
 posture in both arms); the `script-prompt.ts` refactor byte-equivalent to the old inline
@@ -182,10 +189,32 @@ not fixed** — don't rediscover them as new:
 2. **Zero-ideas silent success** — an empty ideas array returns `success: true` and the
    frontend renders a blank list with no error.
 
-Also still open from the audit: Finding F (the 30/hr cap is really up to 90 upstream calls —
-per-function counters plus an uncounted anti-repetition retry; **held deliberately**, it is
-billing-relevant and collides with 6.2) and Finding D (no precedence line protecting
-STANCE/INTEGRITY from `sample_script` in the my-voice persona block).
+Also still open from the audit: Finding D (no precedence line protecting STANCE/INTEGRITY
+from `sample_script` in the my-voice persona block).
+
+### 6.0a NEXT THREAD — quantify what the anti-repetition retry costs (Finding F)
+
+Ryan's next priority, and it is **billing work, not content work** — he is setting tier
+prices and needs a real number first. Keep it separate from thread 6.2.
+
+The ask is "help me understand what the retry actually costs and whether it should exist,"
+not "patch it." Two distinct things, don't conflate them:
+
+- **Per script:** the retry makes at most ONE extra call, so worst case is **2x, not 3x**.
+  True multiplier is `1 + (trigger rate)`, where the retry fires only when trigram-Jaccard
+  similarity ≥ 0.6 against that account's last 30 fingerprints. Fresh account ≈ 1.0, rising
+  as a user regenerates on similar topics. Measure the trigger rate; don't assume worst case.
+- **Per hour:** separate problem. Counters are per-function and the retry is uncounted, so
+  30 script + 30 ideas generations can cost up to ~90 upstream calls against a nominal "30".
+  That is a rate-limit and abuse-surface issue, NOT a per-script cost multiplier.
+
+Inputs needed before any pricing math: observed trigger rate; the input/output token split
+(cost is input-dominated — `EXEMPLARS` alone is ~1,400 tokens and a retry re-sends the whole
+system prompt, so **prompt caching may be a cheaper lever than removing the retry**); and
+whether the retry earns its keep at all — current logic keeps the retry only if it scores
+less similar, so it may be paying full price for a marginal gain.
+
+Starting data: `select count(*), max(created_at) from script_fingerprints;` via Lovable.
 
 ### 6.1 ~~Audit `generate-video-topics` against `generate-script`~~ — DONE, see 6.0
 
