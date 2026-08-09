@@ -14,18 +14,12 @@
 
 import {
   FORBIDDEN, AUDIENCE, BIZ_CONTEXT, CAT_CONTEXT, PLATFORM_CONTEXT,
-  STANCE, INTEGRITY,
+  STANCE, INTEGRITY, BIZ_LABELS, bizLabelFor,
 } from "./content-context.ts";
 
-export const BIZ_LABELS: Record<string, string> = {
-  "funeral-home": "Funeral Home",
-  "cemetery": "Cemetery",
-  "crematory": "Crematory",
-  "pet-cremation": "Pet Cremation Business",
-};
-
-export const bizLabelFor = (bizType: string): string =>
-  BIZ_LABELS[bizType] || BIZ_LABELS["funeral-home"];
+// Re-exported for existing importers; the definitions now live in
+// content-context.ts so generate-script shares the same copy.
+export { BIZ_LABELS, bizLabelFor };
 
 // Must cover every key the UI can send, plus the keys retired from the UI but
 // kept as aliases (an old stored selection can still arrive here). An unknown
@@ -52,6 +46,8 @@ export interface IdeaPromptOptions {
   businessIdentityPrompt?: string;
   /** Narrowed persona-voice block; '' unless tone is my-voice. */
   ideaVoicePrompt?: string;
+  /** Per-business off-limits list; '' when the director set none. Every tone. */
+  tabooPrompt?: string;
 }
 
 export function buildIdeaSystemPrompt(opts: IdeaPromptOptions): string {
@@ -73,12 +69,17 @@ export function buildIdeaSystemPrompt(opts: IdeaPromptOptions): string {
     opts.businessIdentityPrompt || "",
     opts.ideaVoicePrompt || "",
     FORBIDDEN,
+    // Immediately after FORBIDDEN — the other never-say block — so the
+    // director's own free text never lands inside the STANCE/INTEGRITY layer,
+    // while still sitting upstream of the format rules. Same slot in
+    // buildScriptSystemPrompt, so the two paths stay diffable.
+    opts.tabooPrompt || "",
     `RULES FOR IDEAS:
 - Statements or reveals — NOT questions
 - Use real words (die, death, cost, body) — not euphemisms
 - Specific beats vague every time: "The 4 documents you need within 48 hours of a death" beats "What to do when someone dies"
-- Each idea should be something the viewer couldn't have Googled to find at the top of results — insider knowledge, unexpected angles, things the industry usually avoids saying publicly
-- If it sounds like generic AI content — make it more specific to the ${bizLabel} industry
+- Each idea should be something the viewer couldn't have Googled to find at the top of results — insider knowledge and unexpected angles, the things families are relieved to learn from someone who does this work
+- If it sounds like generic AI content — make it more specific: the details only someone who does this work day to day would know
 - PRECEDENCE: the STANCE and FACTUAL INTEGRITY rules above outrank every rule in this list. "Statements not questions" and "specific beats vague" are style guidance, not permission to assert law or to sell an exception. Where the punchier title would break one of those rules, write the less punchy title.`,
     `The 8 ideas MUST be genuinely distinct — not 8 rewordings of one angle. Deliberately vary the ENTRY POINT across the set, drawing from different ones: a myth to gently correct, a real question a family asked, a behind-the-scenes/process moment, a legal or decision point, a pre-planning nudge, a cost/value explanation, a short personal story, an emotional reassurance. Vary the FORMAT too (direct answer, story, comparison, "what to expect," step-by-step). No more than two of the eight may lean on the same underlying fact. On a narrow topic, find fresh angles ON the topic rather than repeating the single most obvious one.`,
     `Return ONLY valid JSON, no markdown: {"ideas":["idea 1","idea 2","idea 3","idea 4","idea 5","idea 6","idea 7","idea 8"]}`,

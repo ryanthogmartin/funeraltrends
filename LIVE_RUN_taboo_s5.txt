@@ -1,0 +1,71 @@
+==============================================================================
+STRUCTURAL GUARD — runs before any token is spent
+==============================================================================
+selfTest (can the guard fail?): all assertions have teeth
+
+==============================================================================
+SCENARIO 5 — TABOO/TOPIC COLLISION (the impossible case)
+  taboo="cremation" while the requested topic IS cremation.
+  PASS = graceful adjacent angle. FAIL = a visible seam ('I can't cover that'),
+  an empty result, or plowing through the off-limits subject anyway.
+==============================================================================
+RUN 1 (ideas)
+      [01]  A family thought power of attorney let them make the final call — here's why that authority actually ends the moment someone dies
+      [02]  The thumbprint we take before a body leaves our care, and why families tell us it means more than they expected
+      [03]  Why refrigeration and preservation are not the same thing, and what that means for how soon a family needs to decide anything
+      [04]  A family called last week worried their prepaid plan from another state was wasted money — here's why it usually wasn't
+      [05]  The one document families are surprised they still need, even when there's no burial and no casket to choose
+      [06]  Why I tell families a service can still happen weeks after we've already cared for the body
+      [07]  A husband told me he had to buy the cheapest option to prove he loved his wife enough — here's what I told him
+      [08]  A family on Medicaid didn't know they could set money aside for final arrangements before the spend-down — here's how that works
+
+RUN 2 (ideas)
+      [01]  A family asked me why we still take a thumbprint before certain procedures — here's the answer that made them tear up
+      [02]  The document your power of attorney can't help you with anymore the moment someone dies
+      [03]  I had a family come in last week thinking their pre-planned service from another state was useless here — it wasn't
+      [04]  Why the cemetery plot is the one thing most funeral plans don't already include
+      [05]  A widow told me she felt guilty choosing a simple casket — here's what I told her
+      [06]  Refrigeration and embalming get mixed up constantly — they're not solving the same problem at all
+      [07]  The Medicaid rule about funeral funds that most families find out too late
+      [08]  What actually happens in the first two hours after we get the 2am phone call
+
+RUN 3 (ideas)
+      [01]  The moment your power of attorney stops working — and what takes over after that
+      [02]  A family asked me why we take a thumbprint before we begin our process — here's the answer that changed how they saw it
+      [03]  Refrigeration and embalming get mixed up constantly — here's what each one actually does for a family
+      [04]  Why a prepaid funeral plan might survive a Medicaid spend-down when almost nothing else does
+      [05]  You can move a pre-arranged plan to a different funeral home — a widow taught me families need to hear this more
+      [06]  The plot and the plan are two separate purchases — the surprise I see on families' faces every week
+      [07]  A bigger casket doesn't mean a bigger love — what I tell families who feel guilty about choosing simple
+      [08]  What actually happens in the first two hours after we get the call at 2am
+
+RUN 4 (ideas)
+      [01]  The power of attorney a family brought me last week stopped working the moment their mother died, and no one had told them
+      [02]  Why I take a thumbprint before I do anything else, and what it means to the families I explain it to
+      [03]  A family asked me if refrigeration and embalming were the same thing, here's the honest answer I gave them
+      [04]  The pre-arrangement plan your father made at another funeral home ten years ago, and what happens to it now
+      [05]  I had a mother in my office last week who thought she had to choose one option, so we went through all three paths together
+      [06]  The document a family thinks they need within an hour of a death, and the one they actually need first
+      [07]  Why the plot at the cemetery is almost never part of the plan you already paid for, and when families find that out
+      [08]  A husband told me he needed the expensive casket to show he loved her, here's what I said back
+
+   RUN 1 (script)
+      HOOK: A power of attorney ends the moment someone dies. That surprises almost every family I sit down with.
+      BODY: While someone is living, their power of attorney can make decisions for them. [PAUSE] The moment they die, that authority ends completely. It shifts to next of kin, and there's an order to who that is. I've seen families get caught off guard by this in the middle of an already hard week, when someone assumed they still had the final say. [PAUSE] Knowing this ahead of time changes everything. It means the right people are prepared, there's less confusion, and fewer hard conversations happen while everyone's grieving. It's one small piece of information that brings real peace of mind.
+      CTA : Has your family talked about who makes these decisions? Drop a comment or send me a message if you want to walk through it.
+
+   RUN 2 (script)
+      HOOK: A family asked me last week what the thumbprint on their dad's paperwork was for. It surprised them how much thought goes into that one step.
+      BODY: Before anything happens, we take a thumbprint. It stays with the family forever, and it's part of how we make sure every step of identification is exact. [PAUSE] Families are often surprised there are really three paths to choose from. A simple option with no services. A visitation or memorial first, with the ashes returned after. Or a full service, much like a traditional funeral, before that final step. [PAUSE] None of these is more right than the other. It's about what fits your dad, your mom, your family. And no matter which path you choose, a memorial or service can still happen — it just happens on your timeline, not before you're ready.
+      CTA : If your family hasn't talked about which path feels right, drop a comment or send me a message — I'm glad to walk through it with you.
+
+   RUN 3 (script)
+      HOOK: A power of attorney doesn't work anymore the moment someone dies. I had a family in last week who didn't know that, and it caught them off guard.
+      BODY: While someone is living, power of attorney lets a person make decisions on their behalf. [PAUSE] But that authority ends the moment they die. After that, decision-making shifts to the next of kin, following a specific order. [PAUSE] This matters because families sometimes assume whoever was handling things before is still handling things after. And that's not always the same person. [PAUSE] Knowing this ahead of time takes so much confusion off the table during a week that's already hard enough.
+      CTA : Has your family talked about who steps in after death? Drop a comment or send me a message — I'm glad to walk through it with you.
+
+------------------------------------------------------------------------------
+
+Total Anthropic calls: 7
+
+Deleted /Users/ryanthogmartin/.anthropic_test_key. REVOKE THE KEY IN THE CONSOLE — that is the real cleanup.
