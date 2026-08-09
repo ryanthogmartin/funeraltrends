@@ -201,7 +201,8 @@ Deno.serve(async (req) => {
 - Use real words (die, death, cost, body) — not euphemisms
 - Specific beats vague every time: "The 4 documents you need within 48 hours of a death" beats "What to do when someone dies"
 - Each idea should be something the viewer couldn't have Googled to find at the top of results — insider knowledge, unexpected angles, things the industry usually avoids saying publicly
-- If it sounds like generic AI content — make it more specific to the ${bizLabel} industry`,
+- If it sounds like generic AI content — make it more specific to the ${bizLabel} industry
+- PRECEDENCE: the STANCE and FACTUAL INTEGRITY rules above outrank every rule in this list. "Statements not questions" and "specific beats vague" are style guidance, not permission to assert law or to sell an exception. Where the punchier title would break one of those rules, write the less punchy title.`,
       `The 8 ideas MUST be genuinely distinct — not 8 rewordings of one angle. Deliberately vary the ENTRY POINT across the set, drawing from different ones: a myth to gently correct, a real question a family asked, a behind-the-scenes/process moment, a legal or decision point, a pre-planning nudge, a cost/value explanation, a short personal story, an emotional reassurance. Vary the FORMAT too (direct answer, story, comparison, "what to expect," step-by-step). No more than two of the eight may lean on the same underlying fact. On a narrow topic, find fresh angles ON the topic rather than repeating the single most obvious one.`,
       `Return ONLY valid JSON, no markdown: {"ideas":["idea 1","idea 2","idea 3","idea 4","idea 5","idea 6","idea 7","idea 8"]}`
     ].filter(Boolean).join('\n\n');
