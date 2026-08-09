@@ -28,9 +28,30 @@ Consequences that bite:
 
 ## 2. Current state
 
-`main` = **`7d0cd32`**. Working tree clean. Branches kept, all merged:
-`prompt-voice-safety-layer`, `prompt-edits-round2/3/4`, `frontend-tone-unification`,
-`ideas-business-identity`, `ideas-persona-voice`, `fix-ideas-missing-safety-blocks`.
+`main` = **`255194a`**. Working tree clean. **Merged but NOT deployed** — Lovable must
+redeploy **both** functions (`_shared/` changed).
+
+Latest work closed open thread 6.1 (the ideas-vs-script audit). See
+`AUDIT_ideas_vs_script.md` for the full parity matrix and `SPEC_taboo_safety_layer.md` for
+the spec that came out of it. What landed:
+
+- **`taboo_topics` now reaches both paths on every tone** (was 1 of 8 path+tone
+  combinations — my-voice scripts only — while the UI promised "the AI will never include
+  these in your scripts"). Lives in `buildTabooBlock()` in `_shared/content-context.ts`,
+  applied immediately after `FORBIDDEN`. It is a constraint, not a voice flourish —
+  **do not move it back into a voice builder.**
+- **`generate-script` now assembles through `_shared/script-prompt.ts`.** Neither function
+  builds a prompt inline any more.
+- **`supabase/functions/_tests/`** — 17 tests, and a structural guard that provably fails
+  against the historical bug (run against `02554e1^` it reports 5 of 8 blocks missing).
+  `deno` is installed but **not on PATH**: `~/.deno/bin/deno test --allow-read supabase/functions/_tests/`
+- Ideas rules no longer instruct the exposé posture STANCE forbids, and no longer render
+  "Pet Cremation Business industry".
+
+Branches kept, all merged: `audit-ideas-vs-script`, `mechanical-hardening`,
+`script-prompt-builder`, plus the older `prompt-voice-safety-layer`,
+`prompt-edits-round2/3/4`, `frontend-tone-unification`, `ideas-business-identity`,
+`ideas-persona-voice`, `fix-ideas-missing-safety-blocks`.
 
 Live at https://funeraltrends.ai. Model is **`claude-sonnet-5`** on both functions with
 **`thinking: {type:'disabled'}`** — deliberate: adaptive thinking is Sonnet 5's default and
@@ -123,6 +144,15 @@ voice reaching idea titles; the legal-question path no longer 500ing.
 > commit gets reverted — regardless of how clean the harness was.** The harness has lied
 > before (see §3). Live is the only check that counts. This time they agreed.
 
+**Verified against the live model for `255194a` (43 calls + a 7-call re-run), NOT against the
+deployed functions** — there was no deployed version of the change to test, so this is a
+weaker claim than the deployed-function checks above and should not be read as the same
+thing. `taboo_topics` reach 1/8 → 8/8 path+tone combinations; injection payload in the taboo
+field contained (0 outputs asserted it, 0 named any state in 44KB of transcript); the rules
+rewrite did not flatten titles (20.4 vs 19.6 avg words, 15 vs 16 concrete nouns, 0 exposé
+posture in both arms); the `script-prompt.ts` refactor byte-equivalent to the old inline
+assembly across 3,661 input combinations.
+
 **Not verified:** PDF export, save-idea flow, signup/login. `script_fingerprints` row growth
 can't be checked from the client (RLS denies) — ask Lovable to run
 `select count(*), max(created_at) from script_fingerprints;`.
@@ -134,7 +164,30 @@ is the real cleanup, not the file delete. Never ask for a key to be pasted into 
 
 ## 6. Open threads
 
-### 6.1 Audit `generate-video-topics` against `generate-script` (highest value)
+### 6.0 CLOSED — 6.1 audit, and what it left behind
+
+The audit is done (`AUDIT_ideas_vs_script.md`). Two residuals were **deliberately ticketed,
+not fixed** — don't rediscover them as new:
+
+1. **Topic-equals-taboo collision.** When the director's avoid-list names the same subject
+   as the requested topic, scripts still deliver it ~1/3 of the time; ideas are clean 32/32
+   (eight titles give room to pivot, one script does not). **This is not a prompt-strength
+   problem — do not try to fix it by strengthening the prompt.** A tightening pass was
+   written, live-tested and reverted (`33472d4`): it moved the leak from 1/3 word-level to
+   0/3 word-level but left 1/3 **subject**-level, delivering cremation as "the ashes
+   returned after" and "before that final step", and pushed vague circumlocution in idea
+   titles from 2/32 to 4/32 against FORBIDDEN's no-euphemisms rule. Camouflaged leaks are
+   worse than visible ones. The fix is pre-call collision detection plus telling the user.
+   Evidence: `LIVE_RUN_taboo.txt`, `LIVE_RUN_taboo_s5.txt`.
+2. **Zero-ideas silent success** — an empty ideas array returns `success: true` and the
+   frontend renders a blank list with no error.
+
+Also still open from the audit: Finding F (the 30/hr cap is really up to 90 upstream calls —
+per-function counters plus an uncounted anti-repetition retry; **held deliberately**, it is
+billing-relevant and collides with 6.2) and Finding D (no precedence line protecting
+STANCE/INTEGRITY from `sample_script` in the my-voice persona block).
+
+### 6.1 ~~Audit `generate-video-topics` against `generate-script`~~ — DONE, see 6.0
 
 The missing STANCE/INTEGRITY was found by accident, from a live/harness split. **Nobody has
 systematically diffed what one function has and the other doesn't.** Known deltas still
