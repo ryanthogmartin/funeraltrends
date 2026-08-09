@@ -202,7 +202,12 @@ Deno.serve(async (req) => {
 
     const {
       idea,
-      tone = "straight-shooter",
+      // Matches the tone the UI preselects. The previous default was
+      // "straight-shooter", which is retired from the UI and only survives as
+      // an alias for stored selections (see TONE_CONTEXT above) — a caller
+      // that omitted `tone` got a voice no picker offers. Only reachable via
+      // direct API calls; the frontend always sends one.
+      tone = "compassionate-educator",
       bizType = "funeral-home",
       category = "demystify",
       platform = "facebook",
@@ -398,6 +403,13 @@ Return ONLY valid JSON, no markdown, no code fences:
       // claude-sonnet-5, adaptive thinking is on by default, so a thinking
       // block precedes the text block — find the text block, don't index [0].
       const content = data.content?.find((b: any) => b.type === 'text')?.text || '';
+
+      // A max_tokens stop truncates mid-JSON, so the parse below fails and the
+      // caller sees a generic "Failed to parse AI response" with no hint that
+      // the cause was truncation. Log the real reason before we get there.
+      if (data.stop_reason === 'max_tokens') {
+        console.error('Anthropic response truncated at max_tokens — JSON parse will likely fail.');
+      }
 
       try {
         const cleaned = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();

@@ -57,7 +57,12 @@ Deno.serve(async (req) => {
       bizType = "funeral-home",
       category = "demystify",
       platform = "facebook",
-      tone = "straight-shooter",
+      // Matches the tone the UI preselects. The previous default was
+      // "straight-shooter", which is retired from the UI and only survives as
+      // an alias for stored selections — a caller that omitted `tone` got a
+      // voice no picker offers. Only reachable via direct API calls; the
+      // frontend always sends one.
+      tone = "compassionate-educator",
       keywords,
       previousIdeas
     } = await req.json();
@@ -211,6 +216,13 @@ Deno.serve(async (req) => {
     // On claude-sonnet-5 a thinking block precedes the text block.
     const content = data.content?.find((b: any) => b.type === 'text')?.text || '';
 
+    // A max_tokens stop truncates mid-JSON, so the parse below fails and the
+    // caller sees a generic "Failed to parse AI response" with no hint that
+    // the cause was truncation. Log the real reason before we get there.
+    if (data.stop_reason === 'max_tokens') {
+      console.error('Anthropic response truncated at max_tokens — JSON parse will likely fail.');
+    }
+
 
 
 
@@ -226,11 +238,19 @@ Deno.serve(async (req) => {
 
 
 
+    // Harden the model's array before it reaches the client, mirroring what
+    // generate-script does for hookVariants. VideoIdeas.tsx does `setIdeas(
+    // data.ideas || [])` and then maps over it, so a non-array (or a null
+    // entry) from the model would render-crash the page rather than degrade.
+    const ideas: string[] = Array.isArray(parsed.ideas)
+      ? parsed.ideas.filter((i: unknown): i is string => typeof i === 'string' && i.trim().length > 0)
+      : [];
+
     return new Response(
       JSON.stringify({
         success: true,
-        ideas: parsed.ideas || [],
-        data: [{ keyword: activeTopic, ideas: parsed.ideas || [] }]
+        ideas,
+        data: [{ keyword: activeTopic, ideas }]
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
