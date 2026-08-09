@@ -179,6 +179,23 @@ Both use `max_tokens: 1000` and neither inspects `stop_reason`. A truncated resp
 invalid JSON and a generic 500 — "Failed to parse AI response" — with the real cause
 (truncation) invisible in the logs. Shared gap, cheap to log.
 
+## J. Aside — "industry" vs "profession" in shipped copy
+
+Not a parity issue, but it surfaced during the diff and you use "profession". Live
+occurrences, prompt-side and user-facing:
+
+- `_shared/idea-prompt.ts:80,81` — `things the industry usually avoids`, `specific to the ${bizLabel} industry`
+- `generate-script/index.ts:279` and `generate-video-topics/index.ts:143` — `not generic to the industry`
+- `_shared/content-context.ts:125` — `something the industry hides`
+- `_shared/idea-voice.ts:19` — `No industry jargon`
+- `src/pages/VideoIdeas.tsx:175` — **user-visible**: `this knows your industry, your language`
+- `src/pages/VideoIdeas.tsx:26` — **user-visible**: `funeral-industry keywords`
+
+`generate-script/index.ts:73` (`never 'exposing' the industry`) reads correctly as-is —
+it is naming the posture being forbidden.
+
+The two `VideoIdeas.tsx` strings are the ones a customer actually reads.
+
 ---
 
 ## Closed questions
