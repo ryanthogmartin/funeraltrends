@@ -108,15 +108,20 @@ tone lineup identical across all three pickers with Compassionate Educator prese
 `previousIdeas` accumulating through the real UI (0 then 8); business identity and persona
 voice reaching idea titles; the legal-question path no longer 500ing.
 
-**Verified only through the shared-builder harness — LIVE RUN PENDING AND BLOCKING:** the
-STANCE/INTEGRITY fix in `7d0cd32`. Harness result: structural guard all-true; 6 legal prompts
-naming TX/CA/FL/NY/OH/AZ → **0/48 titles pairing a state with the requirement, 0 naming a
-state at all**; 4 unembalmed-viewing prompts → 5 flags, all reviewed by Ryan as the
-question-then-honest-answer pattern; 0 format breaks.
+**The STANCE/INTEGRITY fix in `7d0cd32` is verified BOTH ways — harness and live agree.**
 
-> **Standing rule agreed with Ryan: if the live run disagrees with the harness, it blocks and
-> `7d0cd32` gets reverted — regardless of how clean the harness was.** The harness has lied
-> before. Live is the only check that counts.
+- Harness (through the shared builder): structural guard all-true; 6 legal prompts naming
+  TX/CA/FL/NY/OH/AZ → **0/48 titles pairing a state with the requirement, 0 naming a state at
+  all**; 4 unembalmed-viewing prompts → 5 flags, all reviewed by Ryan as the
+  question-then-honest-answer pattern; 0 format breaks.
+- **Live, against the deployed function, identical six states: 0 violations, 0 states named,
+  48/48 clean.** The Florida prompt that broke Round 4 is clean. Titles now route the state
+  into the body correctly — e.g. *"Whether embalming is required depends on your state and
+  your plans, not just the calendar."*
+
+> **Standing rule agreed with Ryan: if a live run disagrees with a harness, it blocks and the
+> commit gets reverted — regardless of how clean the harness was.** The harness has lied
+> before (see §3). Live is the only check that counts. This time they agreed.
 
 **Not verified:** PDF export, save-idea flow, signup/login. `script_fingerprints` row growth
 can't be checked from the client (RLS denies) — ask Lovable to run
