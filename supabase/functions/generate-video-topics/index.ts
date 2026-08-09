@@ -1,6 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
-import { FORBIDDEN, AUDIENCE, BIZ_CONTEXT, CAT_CONTEXT, PLATFORM_CONTEXT } from "../_shared/content-context.ts";
 import { buildIdeaVoicePrompt } from "../_shared/idea-voice.ts";
+import { buildIdeaSystemPrompt, buildIdeaUserMessage } from "../_shared/idea-prompt.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -156,74 +156,19 @@ Deno.serve(async (req) => {
 
 
 
-    const bizLabel = ({
-      "funeral-home": "Funeral Home",
-      "cemetery": "Cemetery",
-      "crematory": "Crematory",
-      "pet-cremation": "Pet Cremation Business"
-    } as Record<string, string>)[bizType] || "Funeral Home";
-
-
-
-
-    // Must cover every key the UI can send, plus the retired keys kept as
-    // aliases (an old saved selection can still arrive here). An unknown key
-    // falls back to the default warm voice — never to a provocative one.
-    const toneLabels: Record<string, string> = {
-      "compassionate-educator": "Warm, educational, and caring. Speaks like a funeral director who genuinely wants families to understand their options.",
-      "neighbor": "Warm but real. Knowledgeable person talking, not a professional presenting.",
-      "comforting-guide": "Soft, supportive. Like a trusted friend giving real information through something difficult.",
-      "my-voice": "Warm, personal, and specific to this business — the way this director actually talks to families.",
-      // Retired from the UI; retained so previously-stored selections resolve.
-      "straight-shooter": "Direct, confident, plain-spoken. Says the real thing clearly and kindly.",
-      "myth-buster": "Clears up a common misconception with a clear, confident opener — corrects gently, never confronts.",
-      "myth-buster-legacy": "Clears up a common misconception with a clear, confident opener — corrects gently, never confronts.",
-      "insider": "A generous expert sharing what families wish they'd known sooner — knowledgeable and open.",
-      "industry-insider": "Confident and knowledgeable. Shares real expertise plainly, the way a seasoned professional educates."
-    };
-
-
-
-
-    const systemPrompt = [
-      `You generate short-form video ideas for ${bizLabel}s to post on social media.`,
-      `Each idea is a video TITLE that doubles as the opening hook — it must be compelling enough to stop someone scrolling on its own.`,
-      AUDIENCE,
-      BIZ_CONTEXT[bizType] || BIZ_CONTEXT["funeral-home"],
-      CAT_CONTEXT[category] || CAT_CONTEXT["demystify"],
-      PLATFORM_CONTEXT[platform] || PLATFORM_CONTEXT["facebook"],
-      `TONE: ${toneLabels[tone] || toneLabels["compassionate-educator"]}`,
+    // Prompt assembly lives in _shared/idea-prompt.ts so tests import the exact
+    // builder production uses. Do NOT reconstruct a prompt inline here — a
+    // hand-mirrored copy in a harness is what let STANCE/INTEGRITY go missing
+    // from this function undetected for four rounds.
+    const systemPrompt = buildIdeaSystemPrompt({
+      bizType, category, platform, tone,
       businessIdentityPrompt,
       ideaVoicePrompt,
-      FORBIDDEN,
-      `RULES FOR IDEAS:
-- Statements or reveals — NOT questions
-- Use real words (die, death, cost, body) — not euphemisms
-- Specific beats vague every time: "The 4 documents you need within 48 hours of a death" beats "What to do when someone dies"
-- Each idea should be something the viewer couldn't have Googled to find at the top of results — insider knowledge, unexpected angles, things the industry usually avoids saying publicly
-- If it sounds like generic AI content — make it more specific to the ${bizLabel} industry
-- PRECEDENCE: the STANCE and FACTUAL INTEGRITY rules above outrank every rule in this list. "Statements not questions" and "specific beats vague" are style guidance, not permission to assert law or to sell an exception. Where the punchier title would break one of those rules, write the less punchy title.`,
-      `The 8 ideas MUST be genuinely distinct — not 8 rewordings of one angle. Deliberately vary the ENTRY POINT across the set, drawing from different ones: a myth to gently correct, a real question a family asked, a behind-the-scenes/process moment, a legal or decision point, a pre-planning nudge, a cost/value explanation, a short personal story, an emotional reassurance. Vary the FORMAT too (direct answer, story, comparison, "what to expect," step-by-step). No more than two of the eight may lean on the same underlying fact. On a narrow topic, find fresh angles ON the topic rather than repeating the single most obvious one.`,
-      `Return ONLY valid JSON, no markdown: {"ideas":["idea 1","idea 2","idea 3","idea 4","idea 5","idea 6","idea 7","idea 8"]}`
-    ].filter(Boolean).join('\n\n');
+    });
 
-
-
-
-    const userMessages: Record<string, string> = {
-      "keyword": `Generate 8 video ideas for a ${bizLabel} about the topic: "${activeTopic}"`,
-      "question": `A family keeps asking this question: "${activeTopic}" — Generate 8 different video angles a ${bizLabel} could make to answer this, each with a different hook or approach.`,
-      "free": `Generate 8 video ideas for a ${bizLabel} about: "${activeTopic}"`
-    };
-
-
-
-
-    let userMessage = userMessages[inputMode] || userMessages["keyword"];
-
-    if (priorTitles.length) {
-      userMessage += `\n\nThese angles were already generated for this topic — produce 8 that are genuinely DIFFERENT from these, using different entry points and formats:\n${priorTitles.map((t) => `- ${t}`).join('\n')}`;
-    }
+    const userMessage = buildIdeaUserMessage({
+      inputMode, activeTopic, bizType, priorTitles,
+    });
 
 
 
