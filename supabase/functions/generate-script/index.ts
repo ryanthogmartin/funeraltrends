@@ -243,6 +243,12 @@ Deno.serve(async (req) => {
 
     // One model call. `avoidInstruction` is appended on the anti-repetition
     // retry to force a different angle.
+    // Accumulates `usage` across however many model calls this generation makes,
+    // so the log line below reports the TRUE cost of the generation rather than
+    // just the attempt that happened to win. A retried generation reports both
+    // calls' tokens summed.
+    const spend = { calls: 0, input: 0, output: 0, cacheRead: 0, cacheWrite: 0 };
+
     const generateOnce = async (avoidInstruction: string): Promise<{ ok: true; parsed: any } | { ok: false; resp: Response }> => {
       const response = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
@@ -274,6 +280,15 @@ Deno.serve(async (req) => {
       }
 
       const data = await response.json();
+
+      // Record what this call actually cost. `usage` is authoritative — never
+      // infer tokens from string length.
+      spend.calls++;
+      spend.input += data.usage?.input_tokens ?? 0;
+      spend.output += data.usage?.output_tokens ?? 0;
+      spend.cacheRead += data.usage?.cache_read_input_tokens ?? 0;
+      spend.cacheWrite += data.usage?.cache_creation_input_tokens ?? 0;
+
       // Anthropic Messages API shape: content is an array of blocks. On
       // claude-sonnet-5, adaptive thinking is on by default, so a thinking
       // block precedes the text block — find the text block, don't index [0].
@@ -310,6 +325,12 @@ Deno.serve(async (req) => {
     let parsed = first.parsed;
     let similarity = maxSimilarity(fingerprintOf(parsed));
 
+    // Captured before the retry block mutates `similarity`. Instrumentation
+    // only — the retry's behavior below is unchanged.
+    const initialSimilarity = similarity;
+    const retryFired = similarity >= SIMILARITY_THRESHOLD;
+    let retryImproved = false;
+
     // Near-duplicate of something this account already generated: retry once
     // with an explicit instruction to take a different angle. Keep whichever
     // attempt is less similar to the account's history.
@@ -320,6 +341,7 @@ Deno.serve(async (req) => {
         if (retrySimilarity < similarity) {
           parsed = retry.parsed;
           similarity = retrySimilarity;
+          retryImproved = true;
         }
       }
     }
@@ -327,6 +349,33 @@ Deno.serve(async (req) => {
     // it can surface "this is close to a script you already have" to the user
     // instead of silently handing over a near-duplicate.
     const similarityWarning = similarity >= SIMILARITY_THRESHOLD;
+
+    // ─── RETRY COST TELEMETRY ─────────────────────────────────────────────────
+    // One structured line per generation, so trigger rate is computable as
+    // count(retry_fired=true) / count(all). EVERY generation logs, not just the
+    // retried ones — a numerator with no denominator is a count, not a rate.
+    //
+    // `history` matters for interpreting that rate: an account with fewer than
+    // ~1 prior fingerprint can never trigger a retry, so early low rates say
+    // "no history yet", not "the retry is unnecessary".
+    //
+    // Query in the Supabase edge-function logs by the `evt` key.
+    console.log(JSON.stringify({
+      evt: 'script_generation',
+      retry_fired: retryFired,
+      retry_improved: retryImproved,
+      similarity_initial: Number(initialSimilarity.toFixed(3)),
+      similarity_final: Number(similarity.toFixed(3)),
+      similarity_warning: similarityWarning,
+      history: recentFingerprints.length,
+      calls: spend.calls,
+      input_tokens: spend.input,
+      output_tokens: spend.output,
+      cache_read_tokens: spend.cacheRead,
+      cache_write_tokens: spend.cacheWrite,
+      tone,
+      biz_type: bizType,
+    }));
 
     // Record this generation's fingerprint (fail-open — a fingerprint write
     // failure should never block returning the script).
