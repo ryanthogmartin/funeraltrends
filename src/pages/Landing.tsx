@@ -65,7 +65,7 @@ const stats = [
 
 const steps = [
 { n: "01", title: "Pick your business", desc: "Funeral home, cemetery, crematory, or pet cremation — the engine adapts its insider knowledge to you." },
-{ n: "02", title: "Choose a topic & angle", desc: "Curated keyword, a question families ask, or your own topic — then demystify, price, legal, pre-planning, or myth bust." },
+{ n: "02", title: "Choose a topic & angle", desc: "Enter a topic or a question families ask, then choose the angle you want to explore." },
 { n: "03", title: "Generate & record", desc: "Get eight ideas, open any one into a full script with hooks and pause cues, then save it and hit record." }];
 
 
@@ -142,7 +142,7 @@ const Landing = () => {
               <span className="text-gradient-primary">to post again</span>
             </h1>
             <p className="text-lg text-muted-foreground mb-8 max-w-xl mx-auto leading-relaxed">
-              Pick your business type, a topic, and a tone. Get eight video ideas and full 45-second scripts — hook, body, and call to action — written in your voice and ready to record.
+              Pick your business type and enter a topic. Get eight video ideas and full 45-second scripts — hook, body, and call to action — written in your voice and ready to record.
             </p>
             <div className="flex items-center justify-center gap-3 flex-wrap">
               <Link to="/video-ideas">

@@ -10,10 +10,7 @@ import { Loader2, FileText, ArrowRight } from "lucide-react";
 import ScriptModal from "@/components/ScriptModal";
 
 type BizType = "funeral-home" | "cemetery" | "crematory" | "pet-cremation";
-type InputMode = "keyword" | "question" | "free";
 type Category = "demystify" | "value" | "legal" | "preplanning" | "mythbust";
-type Platform = "facebook" | "reels" | "youtube";
-type Tone = "compassionate-educator" | "neighbor" | "comforting-guide" | "my-voice";
 
 const BIZ_OPTIONS: { value: BizType; emoji: string; label: string }[] = [
   { value: "funeral-home", emoji: "🏛️", label: "Funeral Home" },
@@ -22,63 +19,12 @@ const BIZ_OPTIONS: { value: BizType; emoji: string; label: string }[] = [
   { value: "pet-cremation", emoji: "🐾", label: "Pet Cremation" },
 ];
 
-const INPUT_MODE_OPTIONS: { value: InputMode; emoji: string; label: string; desc: string }[] = [
-  { value: "keyword", emoji: "📋", label: "Keyword Database", desc: "Pick from funeral-industry keywords organized by search volume and topic" },
-  { value: "question", emoji: "❓", label: "Families Ask Me…", desc: "Type a question families ask you at the arrangement conference or viewing" },
-  { value: "free", emoji: "✏️", label: "Free Topic", desc: "Type any topic you want to make a video about" },
-];
-
-const KEYWORDS: Record<BizType, string[]> = {
-  "funeral-home": [
-    "do you have to be embalmed", "who makes decisions after death", "what happens to power of attorney after death",
-    "how does embalming work", "how long does embalming last", "why do funeral homes take a thumbprint",
-    "the two types of organ donation", "difference between a memorial service and a funeral", "can you personalize a casket",
-    "can you make changes to a prearrangement", "direct cremation vs full service cremation", "why did the funeral cost that much",
-    "how to transfer a prearrangement", "what happens during the first call", "how do you position the body during embalming",
-    "what tools are used in embalming", "difference between a celebration of life and a traditional funeral",
-    "can you personalize an urn", "pre-planning vs pre-paying",
-  ],
-  "cemetery": [
-    "what does perpetual care actually cover", "difference between a burial plot and a mausoleum",
-    "how to find someone buried in a cemetery", "veteran burial benefits explained", "can you resell a cemetery lot",
-    "green burial at a traditional cemetery", "what happens if a cemetery closes", "columbarium niche vs burial plot",
-    "how to buy a cemetery plot in advance", "what is a cemetery deed",
-  ],
-  "crematory": [
-    "what actually happens during cremation", "flame cremation vs water cremation", "how long does cremation take",
-    "what is aquamation", "how does the cremation ID process work", "what does direct cremation include",
-    "individual vs communal cremation", "what are cremated remains actually made of",
-    "can you have a service after cremation", "what to do with ashes after cremation",
-  ],
-  "pet-cremation": [
-    "individual vs communal pet cremation", "how do I know the ashes are really my pet",
-    "how the pet cremation ID process works", "how to memorialize a pet", "pet loss grief is valid",
-    "in-home pet euthanasia what to expect", "what happens to my pet before cremation",
-    "how long does pet cremation take", "options for pet ashes", "is it normal to grieve this hard for a pet",
-  ],
-};
-
 const CATEGORY_OPTIONS: { value: Category; label: string; desc: string }[] = [
-  { value: "demystify", label: "Demystify", desc: "Pull back the curtain. Answer what families are afraid to Google. Specific steps, real tools, actual timeframes." },
-  { value: "value", label: "Value/Price", desc: "Price transparency from confidence. What they're paying for and what they give up by going cheaper." },
+  { value: "demystify", label: "Demystify", desc: "Explain what families most need to understand, plainly and clearly." },
+  { value: "value", label: "Value/Price", desc: "Help families understand what shapes cost and how to weigh their options." },
   { value: "legal", label: "Legal", desc: "Who has decision-making authority. What POA covers. Organ donation types. Pre-arrangement rights." },
   { value: "preplanning", label: "Pre-Planning", desc: "Pre-planning as a gift to the family left behind. Make it feel manageable with one concrete next step." },
-  { value: "mythbust", label: "Myth Bust", desc: "State the myth-bust in the first sentence. Pattern interrupt = scroll stop." },
-];
-
-const PLATFORM_OPTIONS: { value: Platform; label: string }[] = [
-  { value: "facebook", label: "Facebook" },
-  { value: "reels", label: "Instagram Reels / TikTok" },
-  { value: "youtube", label: "YouTube Shorts" },
-];
-
-// Canonical tone lineup — kept identical (names, order, copy, keys) with
-// ScriptModal and SavedScriptCard. "My Voice" is rendered separately below,
-// gated on the user having a saved voice profile.
-const TONE_OPTIONS: { value: Tone; label: string; desc: string }[] = [
-  { value: "compassionate-educator", label: "Compassionate Educator", desc: "Warm, empathetic, educational" },
-  { value: "neighbor", label: "Community Neighbor", desc: "Warm, real, human" },
-  { value: "comforting-guide", label: "Comforting Guide", desc: "Soft, supportive, reassuring" },
+  { value: "mythbust", label: "Myth Bust", desc: "Clear up a common misconception gently and honestly." },
 ];
 
 const VideoIdeas = () => {
@@ -86,14 +32,16 @@ const VideoIdeas = () => {
   const { hasProfile } = useVoiceProfile();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const isAuthenticated = loading || !!user;
+  const isAuthenticated = !loading && !!user;
 
   const [bizType, setBizType] = useState<BizType>("funeral-home");
-  const [inputMode, setInputMode] = useState<InputMode>("keyword");
   const [topic, setTopic] = useState<string>("");
   const [category, setCategory] = useState<Category>("demystify");
-  const [platform, setPlatform] = useState<Platform>("facebook");
-  const [tone, setTone] = useState<Tone>("compassionate-educator");
+  const platform = "facebook";
+  const inputMode = "free";
+  const [useSavedVoice, setUseSavedVoice] = useState(false);
+  const tone = useSavedVoice && hasProfile ? "my-voice" : "compassionate-educator";
+  const [resultContext, setResultContext] = useState({ bizType, category, platform, tone });
 
   const [ideas, setIdeas] = useState<string[]>([]);
   const [generating, setGenerating] = useState(false);
@@ -113,19 +61,12 @@ const VideoIdeas = () => {
     setActiveTopic("");
   };
 
-  const handleInputModeChange = (val: InputMode) => {
-    setInputMode(val);
-    setTopic("");
-    setIdeas([]);
-    setActiveTopic("");
-  };
-
   const generateIdeas = async () => {
     if (!user) {
       navigate("/auth");
       return;
     }
-    if (!topic.trim()) return;
+    if (!topic.trim() || generating) return;
     setGenerating(true);
     setIdeas([]);
     const trimmedTopic = topic.trim();
@@ -136,7 +77,11 @@ const VideoIdeas = () => {
       });
       if (error) throw new Error(error.message);
       if (!data?.success) throw new Error(data?.error || "Failed to generate ideas");
-      setIdeas(data.ideas || []);
+      if (!Array.isArray(data.ideas) || !data.ideas.length || data.ideas.some((value: unknown) => typeof value !== "string" || !value.trim())) {
+        throw new Error("We couldn't generate ideas for this topic. Please try again.");
+      }
+      setIdeas(data.ideas);
+      setResultContext({ bizType, category, platform, tone });
       setActiveTopic(trimmedTopic);
       seenIdeasRef.current = {
         topic: trimmedTopic,
@@ -172,7 +117,7 @@ const VideoIdeas = () => {
         <h1 className="text-3xl sm:text-4xl font-display font-bold text-foreground">Video Content Engine</h1>
         <p className="text-sm sm:text-base text-muted-foreground max-w-2xl">
           Built for funeral homes, cemeteries, crematories, and pet cremation businesses.
-          Not generic AI — this knows your industry, your language, and your audience.
+          Not generic AI — this knows your profession, your language, and your audience.
         </p>
       </header>
 
@@ -184,6 +129,7 @@ const VideoIdeas = () => {
             <button
               key={opt.value}
               onClick={() => handleBizChange(opt.value)}
+              disabled={generating}
               className={`px-3 py-3 rounded-lg border text-sm font-medium transition-all ${
                 bizType === opt.value
                   ? "border-primary bg-primary/10 text-primary"
@@ -197,66 +143,22 @@ const VideoIdeas = () => {
         </div>
       </section>
 
-      {/* SECTION 3 — INPUT MODE */}
       <section className="rounded-xl border border-border bg-card p-5 space-y-3 shadow-sm">
-        <p className="text-sm font-semibold text-foreground">How are you finding your topic?</p>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          {INPUT_MODE_OPTIONS.map((opt) => (
-            <button
-              key={opt.value}
-              onClick={() => handleInputModeChange(opt.value)}
-              className={`text-left p-4 rounded-lg border transition-all ${
-                inputMode === opt.value
-                  ? "border-primary bg-primary/10"
-                  : "border-border hover:border-primary/50 hover:bg-accent"
-              }`}
-            >
-              <p className="font-semibold text-sm text-foreground mb-1">
-                {opt.emoji} {opt.label}
-              </p>
-              <p className="text-xs text-muted-foreground">{opt.desc}</p>
-            </button>
-          ))}
-        </div>
-      </section>
-
-      {/* SECTION 4 — TOPIC INPUT */}
-      <section className="rounded-xl border border-border bg-card p-5 space-y-3 shadow-sm">
-        <p className="text-sm font-semibold text-foreground">Choose your topic</p>
-        {inputMode === "keyword" && (
-          <div className="max-h-72 overflow-y-auto pr-1">
-            <div className="flex flex-wrap gap-2">
-              {KEYWORDS[bizType].map((kw) => (
-                <button
-                  key={kw}
-                  onClick={() => setTopic(kw)}
-                  className={`px-3 py-2 rounded-md border text-xs font-medium transition-all ${
-                    topic === kw
-                      ? "border-primary bg-primary text-primary-foreground"
-                      : "border-border bg-background hover:border-primary/50 hover:bg-accent text-foreground"
-                  }`}
-                >
-                  {kw}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-        {inputMode === "question" && (
-          <Textarea
-            value={topic}
-            onChange={(e) => setTopic(e.target.value)}
-            placeholder="Type the question families ask you... e.g. 'Do I have to be embalmed?' or 'Who gets to make the decisions after my husband dies?'"
-            className="min-h-[100px]"
-          />
-        )}
-        {inputMode === "free" && (
-          <Textarea
-            value={topic}
-            onChange={(e) => setTopic(e.target.value)}
-            placeholder="Type any topic... e.g. 'What actually happens during embalming' or 'Why we cost more than the funeral home down the street'"
-            className="min-h-[100px]"
-          />
+        <label htmlFor="video-topic" className="text-sm font-semibold text-foreground">What would you like to talk about?</label>
+        <Textarea
+          id="video-topic"
+          value={topic}
+          onChange={(e) => setTopic(e.target.value)}
+          placeholder="Enter a topic or a question families ask you, such as what to expect at a funeral service."
+          className="min-h-[120px]"
+          disabled={generating}
+        />
+        <p className="text-xs text-muted-foreground">Start with one question or idea. We'll suggest eight ways to approach it.</p>
+        {hasProfile && (
+          <label className="flex items-center gap-2 text-sm">
+            <input type="checkbox" checked={useSavedVoice} onChange={(e) => setUseSavedVoice(e.target.checked)} disabled={generating} />
+            Use my saved voice profile
+          </label>
         )}
       </section>
 
@@ -268,6 +170,7 @@ const VideoIdeas = () => {
             <button
               key={opt.value}
               onClick={() => setCategory(opt.value)}
+              disabled={generating}
               className={`px-3 py-2 rounded-md border text-xs font-medium transition-all ${
                 category === opt.value
                   ? "border-primary bg-primary text-primary-foreground"
@@ -279,83 +182,6 @@ const VideoIdeas = () => {
           ))}
         </div>
         <p className="text-xs text-muted-foreground italic">{selectedCategoryDesc}</p>
-      </section>
-
-      {/* SECTION 6 — PLATFORM + TONE */}
-      <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="rounded-xl border border-border bg-card p-5 space-y-3 shadow-sm">
-          <p className="text-sm font-semibold text-foreground">Platform</p>
-          <div className="space-y-2">
-            {PLATFORM_OPTIONS.map((opt) => (
-              <label
-                key={opt.value}
-                className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all ${
-                  platform === opt.value
-                    ? "border-primary bg-primary/10"
-                    : "border-border hover:border-primary/50 hover:bg-accent"
-                }`}
-              >
-                <input
-                  type="radio"
-                  name="platform"
-                  checked={platform === opt.value}
-                  onChange={() => setPlatform(opt.value)}
-                  className="accent-primary"
-                />
-                <span className="text-sm font-medium text-foreground">{opt.label}</span>
-              </label>
-            ))}
-          </div>
-        </div>
-
-        <div className="rounded-xl border border-border bg-card p-5 space-y-3 shadow-sm">
-          <p className="text-sm font-semibold text-foreground">Tone</p>
-          <div className="space-y-2">
-            {TONE_OPTIONS.map((opt) => (
-              <label
-                key={opt.value}
-                className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all ${
-                  tone === opt.value
-                    ? "border-primary bg-primary/10"
-                    : "border-border hover:border-primary/50 hover:bg-accent"
-                }`}
-              >
-                <input
-                  type="radio"
-                  name="tone"
-                  checked={tone === opt.value}
-                  onChange={() => setTone(opt.value)}
-                  className="accent-primary mt-1"
-                />
-                <div>
-                  <p className="text-sm font-medium text-foreground">{opt.label}</p>
-                  <p className="text-xs text-muted-foreground">{opt.desc}</p>
-                </div>
-              </label>
-            ))}
-            {hasProfile && (
-              <label
-                className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all ${
-                  tone === "my-voice"
-                    ? "border-primary bg-primary/10"
-                    : "border-primary/40 bg-primary/5 hover:border-primary/60"
-                }`}
-              >
-                <input
-                  type="radio"
-                  name="tone"
-                  checked={tone === "my-voice"}
-                  onChange={() => setTone("my-voice")}
-                  className="accent-primary mt-1"
-                />
-                <div>
-                  <p className="text-sm font-semibold text-primary">My Voice</p>
-                  <p className="text-xs text-muted-foreground">Use your saved voice profile</p>
-                </div>
-              </label>
-            )}
-          </div>
-        </div>
       </section>
 
       {/* SECTION 7 — GENERATE BUTTON */}
@@ -371,7 +197,7 @@ const VideoIdeas = () => {
             Generating Ideas...
           </>
         ) : !topicSelected ? (
-          "Select a topic above to continue"
+          "Enter a topic above to continue"
         ) : (
           <>
             Generate 8 Video Ideas
@@ -385,7 +211,7 @@ const VideoIdeas = () => {
         <section className="space-y-4">
           <div>
             <h2 className="text-lg font-display font-bold text-foreground uppercase tracking-wide">
-              8 Ideas — {activeTopic.toUpperCase()}
+              {ideas.length} Ideas — {activeTopic.toUpperCase()}
             </h2>
             <p className="text-xs text-muted-foreground mt-1">
               Click any idea to get a 45-second script
@@ -421,10 +247,10 @@ const VideoIdeas = () => {
         open={scriptOpen}
         onOpenChange={setScriptOpen}
         idea={scriptIdea}
-        bizType={bizType}
-        category={category}
-        platform={platform}
-        defaultTone={tone}
+        bizType={resultContext.bizType}
+        category={resultContext.category}
+        platform={resultContext.platform}
+        defaultTone={resultContext.tone}
       />
     </div>
   );

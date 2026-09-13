@@ -2,13 +2,12 @@ import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, Copy, Check, FileText, Download, Bookmark, Pencil, User } from "lucide-react";
+import { Loader2, Copy, Check, FileText, Download, Bookmark, Pencil } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { exportScriptPdf } from "@/lib/exportPdf";
 import { useSaveIdea } from "@/hooks/useSaveIdea";
 import { useAuth } from "@/hooks/useAuth";
-import { useVoiceProfile } from "@/hooks/useVoiceProfile";
 
 interface ScriptModalProps {
   open: boolean;
@@ -28,16 +27,7 @@ interface ScriptData {
   wordCount: number;
 }
 
-// Canonical tone lineup — kept identical (names, order, copy, keys) with
-// VideoIdeas and SavedScriptCard. "My Voice" is rendered separately below,
-// gated on the user having a saved voice profile.
-const tones = [
-  { id: "compassionate-educator", label: "Compassionate Educator", desc: "Warm, empathetic, educational" },
-  { id: "neighbor", label: "Community Neighbor", desc: "Warm, real, human" },
-  { id: "comforting-guide", label: "Comforting Guide", desc: "Soft, supportive, reassuring" },
-];
-
-const ScriptModal = ({ open, onOpenChange, idea, bizType, category, platform, defaultTone }: ScriptModalProps) => {
+const ScriptModal = ({ open, onOpenChange, idea, bizType, category, platform, defaultTone = "compassionate-educator" }: ScriptModalProps) => {
   const [selectedTone, setSelectedTone] = useState<string | null>(null);
   const [script, setScript] = useState<ScriptData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -50,7 +40,6 @@ const ScriptModal = ({ open, onOpenChange, idea, bizType, category, platform, de
   const { toast } = useToast();
   const { saveIdea, saving: savingIdea, isSaved } = useSaveIdea();
   const { user } = useAuth();
-  const { hasProfile } = useVoiceProfile();
 
   const generateScript = async (tone: string) => {
     setSelectedTone(tone);
@@ -67,7 +56,7 @@ const ScriptModal = ({ open, onOpenChange, idea, bizType, category, platform, de
       if (data.similarityWarning) {
         toast({
           title: "Heads up — similar to a previous script",
-          description: "This came out close to something you've generated before. Try a different tone or angle for more variety.",
+          description: "This came out close to something you've generated before. Try a different angle for more variety.",
         });
       }
       setScript(data.data);
@@ -111,7 +100,7 @@ const ScriptModal = ({ open, onOpenChange, idea, bizType, category, platform, de
 
   // Auto-generate using the tone passed in from the parent page when modal opens.
   // This implements the new "click idea → instantly see script" flow.
-  // If no defaultTone is provided, fall back to manual tone selection (legacy behavior).
+  // Without a saved voice selection, use the warm default.
   useEffect(() => {
     if (open && idea && defaultTone && !script && !isLoading) {
       generateScript(defaultTone);
@@ -134,44 +123,9 @@ const ScriptModal = ({ open, onOpenChange, idea, bizType, category, platform, de
           <p className="text-sm font-medium text-foreground">{idea}</p>
         </div>
 
-        {/* Tone Selection */}
-        <div className="space-y-2 mb-4">
-          <p className="text-sm font-medium text-foreground">Choose a tone:</p>
-          {hasProfile && (
-            <button
-              onClick={() => generateScript("my-voice")}
-              disabled={isLoading}
-              className={`w-full text-left p-3 rounded-lg border transition-all text-xs flex items-center gap-2 ${
-                selectedTone === "my-voice"
-                  ? "border-primary bg-primary/10 text-primary"
-                  : "border-primary/30 hover:border-primary/50 hover:bg-primary/5 bg-primary/5"
-              } disabled:opacity-50`}
-            >
-              <User className="h-4 w-4 shrink-0" />
-              <div>
-                <p className="font-semibold">My Voice Persona</p>
-                <p className="text-muted-foreground mt-0.5">Use your custom voice profile</p>
-              </div>
-            </button>
-          )}
-          <div className="grid grid-cols-2 gap-2">
-            {tones.map((tone) => (
-              <button
-                key={tone.id}
-                onClick={() => generateScript(tone.id)}
-                disabled={isLoading}
-                className={`text-left p-3 rounded-lg border transition-all text-xs ${
-                  selectedTone === tone.id
-                    ? "border-primary bg-primary/10 text-primary"
-                    : "border-border/50 hover:border-primary/50 hover:bg-accent/50"
-                } disabled:opacity-50`}
-              >
-                <p className="font-semibold">{tone.label}</p>
-                <p className="text-muted-foreground mt-0.5">{tone.desc}</p>
-              </button>
-            ))}
-          </div>
-        </div>
+        <Button variant="outline" onClick={() => generateScript(defaultTone)} disabled={isLoading} className="mb-4">
+          {script ? "Generate another script" : "Try again"}
+        </Button>
 
         {/* Loading */}
         {isLoading && (
@@ -252,7 +206,7 @@ const ScriptModal = ({ open, onOpenChange, idea, bizType, category, platform, de
                     scriptHook: currentHook,
                     scriptBody: currentBody,
                     scriptCta: currentCta,
-                    scriptTone: tones.find(t => t.id === selectedTone)?.label || selectedTone || "",
+                    scriptTone: selectedTone === "my-voice" ? "My Voice" : "Compassionate Educator",
                   })}
                   disabled={savingIdea || isSaved(idea, "script", selectedTone || "")}
                   className="gap-1.5 text-xs"
@@ -263,7 +217,7 @@ const ScriptModal = ({ open, onOpenChange, idea, bizType, category, platform, de
                 <Button
                   size="sm"
                   variant="outline"
-                  onClick={() => exportScriptPdf(idea, { hook: currentHook, body: currentBody, cta: currentCta, wordCount: script.wordCount }, tones.find(t => t.id === selectedTone)?.label || selectedTone || "")}
+                  onClick={() => exportScriptPdf(idea, { hook: currentHook, body: currentBody, cta: currentCta, wordCount: script.wordCount }, selectedTone === "my-voice" ? "My Voice" : "Compassionate Educator")}
                   className="gap-1.5 text-xs"
                 >
                   <Download className="h-3 w-3" />
